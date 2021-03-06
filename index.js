@@ -486,12 +486,6 @@ client.on('message', async m => {
 
         await db.set(m.author.id, {verbose:false, reset:true})
         await setCacheDB(user.player.stats.TNTGames, user.player.uuid, m.author.id)
-            // TNT Overall Vars
-            // const TNTGames = user.player.stats.TNTGames
-            // setDB(TNTGames,args,m.author.id)
-            // cache.set(m.author.id, [cache.get(m.author.id), {coins: TNTcoins, date: Date.now(), run: {record: TNTRunRecord, wins: TNTRunWins, losses: TNTRunLosses, wl: TNTRunWL, doubles: TNTRunDoubles, slowness: TNTRunSlowness, speed: TNTRunSpeed}, pvp: {record: PVPRunRecord, wins: PVPRunWins, losses: PVPRunLosses, kills: PVPRunKills, wl: PVPRunWL, kd: PVPRunKD, doubles: PVPRunDoubles, slowness: TNTRunSlowness, speed: TNTRunSpeed, regen: PVPRunRegen, notoriety: PVPRunNotoriety, fortitude: PVPRunFortitude}, bow: {wins: BowWins, losses: BowLosses, shots: BowShots, wl: BowWL, doubles: BowDoubles, triples: BowTriples, rain: BowRain, repulsor: BowRepulsor, explosivedash: BowExplosiveDash}, tag: {wins: TNTTagWins, kills: TNTTagKills, prot: TNTTagBlastProt, speedy: TNTTagSpeedy, speed: TNTTagSpeed, slow: TNTTagSlow}, wizards: {wins: WizWins, kills: WizKills, deaths: WizDeaths, assists: WizAssists, kd: WizKD, kad: WizKAD, firekills: FireKills, icekills: IceKills, witherkills: WitherKills, kinetickills: KineticKills, toxickills: ToxicKills, bloodkills: BloodKills, stormkills: StormKills, ancientkills: AncientKills, hydrokills: HydroKills, presFire: firePres, presWither: witherPres, presIce: icePres, presKinetic: kineticPres, presToxic: toxicPres, presBlood: bloodPres, presStorm: stormPres, presAncient: ancientPres, presHydro: hydroPres}}])
-            // cooldowns.hypixel.set.set(m.author.id, Date.now() + cooldownT);
-            // setTimeout(() => cooldowns.hypixel.set.delete(m.author.id), cooldownT);
         return m.channel.send("Successfully set your ign to " + args[0])
     }
 
