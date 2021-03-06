@@ -257,7 +257,7 @@ async function setWizDB(TNTGames, uuid, authorID) {
         d:replaceError(TNTGames.deaths_capture, 0),
         p:replaceError(TNTGames.points_capture, 0),
         kd:ratio(TNTGames.kills_capture, TNTGames.deaths_capture),
-        kad:ratio(replaceError(TNTGames.kills_capture)+replaceError(TNTGames.assists_capture), TNTGames.deaths_capture),
+        kad:ratio(replaceError(TNTGames.kills_capture, 0)+replaceError(TNTGames.assists_capture, 0), TNTGames.deaths_capture),
         air:replaceError(TNTGames.air_time_capture, 0),
         kw:ratio(TNTGames.kills_capture, TNTGames.wins_capture)
     }
@@ -316,10 +316,12 @@ async function setCacheDB(TNTGames, uuid, authorID) {
     await setWizKillsDB(TNTGames, uuid, authorID);
 
     await db.set(`cache.${authorID}.${uuid}.coins`, replaceError(TNTGames.coins, 0))
+    await db.set(`cache.${authorID}.${uuid}.w`, replaceError(TNTGames.wins, 0))
+    await db.set(`cache.${authorID}.${uuid}.streak`, replaceError(TNTGames.streak, 0))
     return
 }
 
-client.on('ready', () => {
+client.on('ready', async () => {
     console.log('Bot: TNT Stats Bot is online!');
     client.user.setActivity("TNT Games  | Use /TNThelp");
 });
@@ -468,15 +470,22 @@ client.on('message', async m => {
 
         if(!user.success || user.success == false || user.player == null || user.player == undefined || !user.player || user.player.stats == undefined) return sendErrorEmbed(m.channel, `Unknown Player`, `Player has no data in Hypixel's Database`);
         if(user.player.stats.TNTGames == undefined) return sendErrorEmbed(m.channel,`Unknown Player`,`Player has no Data in Hypixel's TNT Games Database`)
+        
+        let received = ""
+        try {received = await fs.readFileSync('IDS.json')} catch{ console.log("Failure! File Invalid"); console.log("Terminating Program - Code 005"); process.exit(); }
+        idData = JSON.parse(received)
+
+        if (idData[m.author.id] == user.player.uuid) {
+            return m.channel.send("This ign has already been set to this account!")
+        }
+
+        
         if (!user.player.socialMedia) return m.channel.send(`You must first link your discord to hypixel. <https://www.youtube.com/watch?v=Cfa-EcRD6SI> for a tutorial (ignore the part at the end with using a command in guild discord)\nThen, come back here to do /set ${args[0]} again.\n\nAlternatively, DM Mysterium#5229 or ping me and I will verify you.`)
         if (!user.player.socialMedia.links) return m.channel.send(`You must first link your discord to hypixel. <https://www.youtube.com/watch?v=Cfa-EcRD6SI> for a tutorial (ignore the part at the end with using a command in guild discord)\nThen, come back here to do /set ${args[0]} again.\n\nAlternatively, DM Mysterium#5229 or ping me and I will verify you.`)
         if (!user.player.socialMedia.links.DISCORD) return m.channel.send(`You must first link your discord to hypixel. <https://www.youtube.com/watch?v=Cfa-EcRD6SI> for a tutorial (ignore the part at the end with using a command in guild discord)\nThen, come back here to do /set ${args[0]} again.\n\nAlternatively, DM Mysterium#5229 or ping me and I will verify you.`)
         console.log(m.author.tag == user.player.socialMedia.links.DISCORD)
         if (user.player.socialMedia.links.DISCORD != m.author.tag) {return m.channel.send(`ljsadfafjskdIncorrectly set Discord!\nYou must first link your discord to hypixel. <https://www.youtube.com/watch?v=Cfa-EcRD6SI> for a tutorial (ignore the part at the end with using a command in guild discord)\nThen, come back here to do /set ${args[0]} again.\n\nAlternatively, DM Mysterium#5229 or ping me and I will verify you.`)}
 
-        let received = ""
-        try {received = await fs.readFileSync('IDS.json')} catch{ console.log("Failure! File Invalid"); console.log("Terminating Program - Code 005"); process.exit(); }
-        idData = JSON.parse(received)
 
         idData[user.player.uuid] = args[0].replace('<', '').replace('>', '').replace('@', '').replace('!', '')
 
@@ -558,27 +567,18 @@ client.on('message', async m => {
         data = await db.get(`cache.${m.author.id}.${user.player.uuid}`)
         if (data == undefined) {
             await setCacheDB(TNTGames, user.player.uuid, m.author.id)
+            data = await db.get(`cache.${m.author.id}.${user.player.uuid}`)
         }
-        if (data.run == undefined || data.tag == undefined || data.pvp == undefined || data.bow == undefined || data.wizards == undefined || data.wizardKills == undefined || data.coins == undefined) {
-            await setCacheDB(TNTGames, user.player.uuid, m.author.id);
-        }
-
-        if (data.wins == undefined || data.streak == undefined) {
-            await db.set(`cache.${m.author.id}.${user.player.uuid}.streak`, replaceError(TNTGames.winstreak, 0))
-            await db.set(`cache.${m.author.id}.${user.player.uuid}.w`, replaceError(TNTGames.wins, 0))
-            await db.get(`cache.${m.author.id}.${user.player.uuid}`)
-        }
-        data = await db.get(`cache.${m.author.id}.${user.player.uuid}`)
 
         rankData = findRank(user)
 
         if (game == "run") {
             if (TNTGames.record_tntrun == undefined) {var runRecordDifference = 0} else {var runRecordDifference = TNTGames.record_tntrun - data.run.record}
             if (runRecordDifference > 0) {
-                var runRecordDisplay = min_sec(TNTGames.record_tntrun) + " (+" + min_sec(runRecordDifference) + ")"
+                var runRecordDisplay = min_sec(replaceError(TNTGames.record_tntrun, 0)) + " (+" + min_sec(runRecordDifference) + ")"
             }
             else {
-                var runRecordDisplay = min_sec(TNTGames.record_tntrun)
+                var runRecordDisplay = min_sec(replaceError(TNTGames.record_tntrun, 0))
             }
 
             const embed = new Discord.MessageEmbed()
@@ -605,9 +605,9 @@ client.on('message', async m => {
         else if (game == "pvp") {
             if (TNTGames.record_pvprun == undefined) {var pvpRecordDifference = 0} else {var pvpRecordDifference = TNTGames.record_pvprun - data.pvp.record}
             if (pvpRecordDifference > 0) {
-                var pvpRecordDisplay = min_sec(TNTGames.record_pvprun) + " (+" + min_sec(pvpRecordDifference) + ")"
+                var pvpRecordDisplay = min_sec(replaceError(TNTGames.record_pvprun, 0)) + " (+" + min_sec(pvpRecordDifference) + ")"
             } else {
-                var pvpRecordDisplay = min_sec(TNTGames.record_pvprun)
+                var pvpRecordDisplay = min_sec(replaceError(TNTGames.record_pvprun, 0))
             }
 
             const embed = new Discord.MessageEmbed()
@@ -689,14 +689,14 @@ client.on('message', async m => {
             if (settings.verbose) {
                 if (TNTGames.air_time_capture == undefined) {var airTimeDifference = 0} else {var airTimeDifference = TNTGames.air_time_capture - data.air}
                 if (airTimeDifference > 0) {
-                    var airTimeDisplay = min_sec(Math.floor(TNTGames.air_time_capture/1200)) + " (+" + min_sec(Math.floor(airTimeDifference/1200)) + ")"
+                    var airTimeDisplay = min_sec(Math.floor(replaceError(TNTGames.air_time_capture, 0)/1200)) + " (+" + min_sec(Math.floor(airTimeDifference/1200)) + ")"
                 }
                 else {
-                    var airTimeDisplay = min_sec(Math.floor(TNTGames.air_time_capture/1200))
+                    var airTimeDisplay = min_sec(Math.floor(replaceError(TNTGames.air_time_capture, 0)/1200))
                 }
 
                 embed.addField(`**Airtime**`, airTimeDisplay, true)
-                .addField(`**KADR**`, displayOldNewNumbers(Math.round(data.wizards.kad*1000)/1000, Math.round(ratio(replaceError(TNTGames.kills_capture)+replaceError(TNTGames.assists_capture), TNTGames.deaths_capture)*1000)/1000), true)
+                .addField(`**KADR**`, displayOldNewNumbers(Math.round(data.wizards.kad*1000)/1000, Math.round(ratio(replaceError(TNTGames.kills_capture, 0)+replaceError(TNTGames.assists_capture, 0), TNTGames.deaths_capture)*1000)/1000), true)
                 .addField(`**K/W**`, displayOldNewNumbers(Math.round(data.wizards.kw*1000)/1000, Math.round(ratio(TNTGames.kills_capture, TNTGames.wins_capture)*1000)/1000), true)
                 .addField(`**Fire**`, displayOldNewNumbers(data.wizardKills.f_k, replaceError(TNTGames.new_firewizard_kills, 0)), true)
                 .addField(`**Ice**`, displayOldNewNumbers(data.wizardKills.i_k, replaceError(TNTGames.new_icewizard_kills, 0)), true)
