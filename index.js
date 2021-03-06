@@ -16,9 +16,11 @@ const config = yamlConfig[0]
 
 const package = JSON.parse(fs.readFileSync('package.json'))
 
+
+
 // HELPER OBJECTS
 const embedFooter = {
-        text: 'TNT Stats Bot by Mysterium_',
+        text: ['TNT Stats Bot by Mysterium_', 'TNT Stats Bot by Mysterium_', 'TNT Stats Bot by Mysterium_', 'TNT Stats Bot by Mysterium_', 'Created by Mysterium_', 'Created by Mysterium_', 'Created by Mysterium_', 'Made by Mysterium_', 'Wizard Leaderboard Bot! (/discord)', 'TNT Stats Bot by Mysterium_', 'Suggest fixes! (/discord)', 'Join the discord! (/discord)', 'All bow to sensei Kidzyy', 'Check out my code! (/source)', `Version: ${package.version}`, 'Report any bugs! (/discord)'],
         image: {
             'green': 'https://cdn.discordapp.com/emojis/722990201307398204.png?v=1',
             'red':   'https://cdn.discordapp.com/emojis/722990201302941756.png?v=1'
@@ -88,6 +90,9 @@ const booleanPhrases = {"false":false,
     "1":true,
     "0":false}
 
+function randInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + min)
+}
 
 // USEFUL COMMON FUNCTIONS
 function findRank (user) {
@@ -134,7 +139,7 @@ function sendErrorEmbed(channel, error, description) {
         .setTitle(`Oops!`)
         .addField(`${error}`, `${description}`)
         .setTimestamp()
-        .setFooter(embedFooter.text, embedFooter.image.red)
+        .setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.red)
     return channel.send(errorEmbed);
 }
 
@@ -354,7 +359,7 @@ client.on('message', async m => {
         .setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`)
         .setTitle(`Success! Channel Configured`)
         .setTimestamp()
-        .setFooter(embedFooter.text, embedFooter.image.green)
+        .setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green)
         .addField(`__Default Game:__`, configurationTool[args[0]], true)
         .addField(`__Bot Prefix:__`, args[1], true)
         return m.channel.send(embed)
@@ -588,7 +593,7 @@ client.on('message', async m => {
                 .setThumbnail(`https://visage.surgeplay.com/head/128/{user.player.uuid}`)
                 .setURL(`https://plancke.io/hypixel/player/stats/${user.player.displayname}`)
                 .setTimestamp()
-                .setFooter(embedFooter.text, embedFooter.image.green)
+                .setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green)
                 .addField(`**Record**`, runRecordDisplay, true)
                 .addField(`**Wins**`, displayOldNewNumbers(data.run.w, replaceError(TNTGames.wins_tntrun, 0)), true)
                 .addField(`**Deaths**`, displayOldNewNumbers(data.run.l, replaceError(TNTGames.deaths_tntrun, 0)), true)
@@ -617,7 +622,7 @@ client.on('message', async m => {
                 .setThumbnail(`https://visage.surgeplay.com/head/128/{user.player.uuid}`)
                 .setURL(`https://plancke.io/hypixel/player/stats/${user.player.displayname}`)
                 .setTimestamp()
-                .setFooter(embedFooter.text, embedFooter.image.green)
+                .setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green)
                 .addField(`**Record**`, pvpRecordDisplay, true)
                 .addField(`**Wins**`, displayOldNewNumbers(data.pvp.w, replaceError(TNTGames.wins_pvprun, 0)), true)
                 .addField(`**Deaths**`, displayOldNewNumbers(data.pvp.l, replaceError(TNTGames.deaths_pvprun, 0)), true)
@@ -638,7 +643,7 @@ client.on('message', async m => {
                 .setThumbnail(`https://visage.surgeplay.com/head/128/{user.player.uuid}`)
                 .setURL(`https://plancke.io/hypixel/player/stats/${user.player.displayname}`)
                 .setTimestamp()
-                .setFooter(embedFooter.text, embedFooter.image.green)
+                .setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green)
                 .addField(`**Wins**`, displayOldNewNumbers(data.bow.w, replaceError(TNTGames.wins_bowspleef, 0)), true)
                 .addField(`**Deaths**`, displayOldNewNumbers(data.bow.l, replaceError(TNTGames.deaths_bowspleef, 0)), true)
                 .addField(`**Kills**`, displayOldNewNumbers(data.bow.k, replaceError(TNTGames.kills_bowspleef, 0)), true)
@@ -658,7 +663,7 @@ client.on('message', async m => {
                 .setThumbnail(`https://visage.surgeplay.com/head/128/{user.player.uuid}`)
                 .setURL(`https://plancke.io/hypixel/player/stats/${user.player.displayname}`)
                 .setTimestamp()
-                .setFooter(embedFooter.text, embedFooter.image.green)
+                .setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green)
                 .addField(`**Wins**`, displayOldNewNumbers(data.tag.w, replaceError(TNTGames.wins_tntag, 0)), true)
                 .addField(`**Kills**`, displayOldNewNumbers(data.tag.k, replaceError(TNTGames.kills_tntag, 0)), true)
                 .addField(`**W/K**`, displayOldNewNumbers(Math.round(data.tag.kw*1000)/1000, Math.round(ratio(TNTGames.kills_tntag, TNTGames.wins_tntag)*1000)/1000, true))
@@ -677,7 +682,7 @@ client.on('message', async m => {
                 .setURL(`https://plancke.io/hypixel/player/stats/${user.player.displayname}`)
                 .setThumbnail(`https://visage.surgeplay.com/head/128/{user.player.uuid}`)
                 .setTimestamp()
-                .setFooter(embedFooter.text, embedFooter.image.green)
+                .setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green)
                 .addField(`**Wins**`, displayOldNewNumbers(data.wizards.w, replaceError(TNTGames.wins_capture, 0)), true)
                 .addField(`**Kills**`, displayOldNewNumbers(data.wizards.k, replaceError(TNTGames.kills_capture, 0)), true)
                 .addField(`**Assists**`, displayOldNewNumbers(data.wizards.a, replaceError(TNTGames.assists_capture, 0)), true)
@@ -739,7 +744,7 @@ client.on('message', async m => {
                 .setThumbnail(`https://visage.surgeplay.com/head/128/{user.player.uuid}`)
                 .setURL(`https://plancke.io/hypixel/player/stats/${user.player.displayname}`)
                 .setTimestamp()
-                .setFooter(embedFooter.text, embedFooter.image.green)
+                .setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green)
                 .addField(`**Coins**`, displayOldNewNumbers(data.coins, replaceError(TNTGames.coins, 0)), true)
                 .addField(`**TNT Wins**`, displayOldNewNumbers(data.w, replaceError(TNTGames.wins, 0)), true)
                 .addField(`**Winstreak**`, displayOldNewNumbers(data.streak, replaceError(TNTGames.winstreak, 0)), true)
@@ -813,7 +818,7 @@ client.on('message', async m => {
             .setThumbnail(`https://visage.surgeplay.com/head/128/{user.player.uuid}`)
             // .setImage(`https://visage.surgeplay.com/frontfull/512/${user.player.uuid}`)
             .setTimestamp()
-            .setFooter(embedFooter.text, embedFooter.image.green)
+            .setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green)
             .addField(`**Fire**`, displayOldNewNumbers(data.wizardKills.f_k, replaceError(TNTGames.new_firewizard_kills, 0)), true)
             .addField(`**Ice**`, displayOldNewNumbers(data.wizardKills.i_k, replaceError(TNTGames.new_icewizard_kills, 0)), true)
             .addField(`**Wither**`, displayOldNewNumbers(data.wizardKills.w_k, replaceError(TNTGames.new_witherwizard_kills, 0)), true)
