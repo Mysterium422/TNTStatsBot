@@ -1,5 +1,5 @@
 // FIND PACKAGES
-const Discord = require('discord.js'), client = new Discord.Client(), client2 = new Discord.Client()
+const Discord = require('discord.js'), client = new Discord.Client()
 const db = require('quick.db');
 const fs = require('fs');
 const yaml = require('js-yaml')
