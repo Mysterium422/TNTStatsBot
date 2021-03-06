@@ -2,7 +2,6 @@
 const Discord = require('discord.js'), client = new Discord.Client(), client2 = new Discord.Client()
 const db = require('quick.db');
 const fs = require('fs');
-const hypixel = require("hypixel-api-nodejs");
 const yaml = require('js-yaml')
 
 // FETCH UNUSED BUT WORKS FOR FUTURE
@@ -43,9 +42,6 @@ Possible 'setting' Parameters:
     verbose - Show more Wizards stats with /stats Default: false
     reset - When false /stats will not update cache so ()s stay till you do /reset. Only works on your own registered ign. Default: true
 **/reset** Updates your personal stats in the cache. Only useful if reset setting is false`
-
-const discordMsg = `__**Bot Development & Bot Server (also TNT Wizards Discord)**__
-https://discord.gg/Mappy28gZD`
 
 const ChatColor = {black:"#000000",
 dark_blue:"#0000AA",
@@ -925,7 +921,8 @@ client.on('message', async m => {
             return m.channel.send("Too many arguments")
         }
 
-        return m.channel.send(discordMsg)
+        return m.channel.send(`__**Bot Development & Bot Server (also TNT Wizards Discord)**__
+https://discord.gg/Mappy28gZD`)
 
     }
 })
