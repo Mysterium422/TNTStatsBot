@@ -1,0 +1,14 @@
+node_modules
+ignored
+config.yaml
+cookieData.json
+IDS.json
+json.sqlite
+leaderboard.json
+mafia.json
+mystFetch.js
+Procfile
+test.js
+.DS_Store
+indexUpload.js
+package-lock.json
