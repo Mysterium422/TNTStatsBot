@@ -20,7 +20,7 @@ const package = JSON.parse(fs.readFileSync('package.json'))
 
 // HELPER OBJECTS
 const embedFooter = {
-        text: ['TNT Stats Bot by Mysterium_', 'TNT Stats Bot by Mysterium_', 'TNT Stats Bot by Mysterium_', 'TNT Stats Bot by Mysterium_', 'Created by Mysterium_', 'Created by Mysterium_', 'Created by Mysterium_', 'Made by Mysterium_', 'Wizard Leaderboard Bot! (/discord)', 'TNT Stats Bot by Mysterium_', 'Suggest fixes! (/discord)', 'Join the discord! (/discord)', 'All bow to sensei Kidzyy', 'Check out my code! (/source)', `Version: ${package.version}`, 'Report any bugs! (/discord)'],
+        text: ['TNT Stats Bot by Mysterium_', 'TNT Stats Bot by Mysterium_', 'TNT Stats Bot by Mysterium_', 'Created by Mysterium_', 'Created by Mysterium_', 'Created by Mysterium_', 'Invite this bot to your own server! (/invite)', 'Invite this bot to your own server! (/invite)', 'Invite this bot to your own server! (/invite)', 'Wizard Leaderboard Bot! (/discord)', 'TNT Stats Bot by Mysterium_', 'Suggest fixes! (/discord)', 'Join the discord! (/discord)', 'All bow to sensei Kidzyy', 'Check out my code! (/source)', `Version: ${package.version}`, 'Report any bugs! (/discord)'],
         image: {
             'green': 'https://cdn.discordapp.com/emojis/722990201307398204.png?v=1',
             'red':   'https://cdn.discordapp.com/emojis/722990201302941756.png?v=1'
@@ -32,6 +32,7 @@ const helpMsg = `__Commands (Prefixes vary depending on your channel)__
 **/TNTconfigure** <game> <prefix> enables the bot with the default game and prefix (admin perms needed). Works anywhere this bot can read/send messages
 **/help** opens this page
 **/info** shows info about the bot
+**/invite** bot invite link
 **/source** links the bot source code
 **/discord** join link for the discord
 **/account** <mention> Looks for an MC account registered to this Discord account 
