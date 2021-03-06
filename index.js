@@ -30,6 +30,7 @@ const embedFooter = {
 const helpMsg = `__Commands (Prefixes vary depending on your channel)__
 **/TNThelp** opens this page. Works anywhere this bot can read/send messages
 **/TNTconfigure** <game> <prefix> enables the bot with the default game and prefix (admin perms needed). Works anywhere this bot can read/send messages
+**/TNTremove** This bot will no longer answer to queries in this channel (admin perms needed). Works anywhere this bot can read/send messages.
 **/help** opens this page
 **/info** shows info about the bot
 **/invite** bot invite link
@@ -365,7 +366,10 @@ client.on('message', async m => {
         .addField(`__Bot Prefix:__`, args[1], true)
         return m.channel.send(embed)
     }
-
+    else if (m.content.toLowerCase() == "/tntremove") {
+        await db.delete(`chan_${m.channel.id}`)
+        m.channel.send("I will no longer respond to messages in this channel")
+    }
     else if (m.content.toLowerCase().startsWith("/tnthelp")) {
         console.log(`${m.author.username}: ${m.content}`)
         return m.channel.send(helpMsg)
