@@ -15,6 +15,8 @@ let unix_time_start = Date.now()
 let yamlConfig = yaml.loadAll(fs.readFileSync('config.yaml', 'utf8'))
 const config = yamlConfig[0]
 
+const package = JSON.parse(fs.readFileSync('package.json'))
+
 // HELPER OBJECTS
 const embedFooter = {
         text: 'TNT Stats Bot by Mysterium_',
@@ -30,6 +32,7 @@ const helpMsg = `__Commands (Prefixes vary depending on your channel)__
 **/help** opens this page
 **/info** shows info about the bot
 **/source** links the bot source code
+**/discord** join link for the discord
 **/account** <mention> Looks for an MC account registered to this Discord account 
 **/stats** <game> <username> displays the TNT data. <game> will default to the channel game and <username> will default to your set username
 Possible 'Game' Parameters: all, wizards, bowspleef, tag, run, pvp
@@ -449,7 +452,7 @@ client.on('message', async m => {
         let allDb = await db.all().filter(a => a.ID.toLowerCase().startsWith('chan_')).length
 
         let result = `__Bot Information__
-**Version:** ${config.TNTStatsBotVersion}
+**Version:** ${package.version}
 **Creator:** Mysterium
     IGN: Mysterium_
     Discord: Mysterium#5229
@@ -883,7 +886,11 @@ client.on('message', async m => {
         return m.channel.send(`Reset counters for you!`)
     }
     else if (command.toLowerCase() == "source") {
-        return m.channel.send("Coming Soon :tm:")
+        if (args.length != 0) {
+            return m.channel.send("Too many arguments")
+        }
+
+        return m.channel.send("<https://github.com/Mysterium422/TNTStatsBot>")
     }
     else if (command.toLowerCase() == "account") {
         if (args.length != 1) { return m.channel.send("Incorrect amount of arguments")}
