@@ -367,6 +367,8 @@ client.on('message', async m => {
         return m.channel.send(embed)
     }
     else if (m.content.toLowerCase() == "/tntremove") {
+        if (!m.member.hasPermission('ADMINISTRATOR')) return
+
         await db.delete(`chan_${m.channel.id}`)
         m.channel.send("I will no longer respond to messages in this channel")
     }
