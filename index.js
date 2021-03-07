@@ -394,7 +394,7 @@ client.on('message', async m => {
     }
 
     else if(command.toLowerCase() == "invite") {
-        return m.channel.send("Use /TNTconfigure to setup the bot: \nhttps://discord.com/oauth2/authorize?client_id=735055542178938960&scope=bot&permissions=519232")
+        return m.channel.send("Use /TNTconfigure to setup the bot: \nhttps://discord.com/oauth2/authorize?client_id=735055542178938960&scope=bot&permissions=2147994688")
     }
     else if(command.toLowerCase() == "verify") {
         if (m.author.id != config.masterID) return;
@@ -409,7 +409,8 @@ client.on('message', async m => {
         }
 
         if(!data.success || data.success == false || data.player == null || data.player == undefined || !data.player || data.player.stats == undefined) return m.channel.send("Invalid Something");
-        
+        if(data.player.stats.TNTGames == undefined) return sendErrorEmbed(m.channel,`Unknown Player`,`Player has no Data in Hypixel's TNT Database`)
+
         let received = ""
         try {received = await fs.readFileSync('IDS.json')} catch{ console.log("Failure! File Invalid"); console.log("Terminating Program - Code 005"); process.exit(); }
         idData = JSON.parse(received)
@@ -438,7 +439,8 @@ client.on('message', async m => {
         }
 
         if(!data.success || data.success == false || data.player == null || data.player == undefined || !data.player || data.player.stats == undefined) return m.channel.send("Invalid Something");
-        
+        if(data.player.stats.TNTGames == undefined) return sendErrorEmbed(m.channel,`Unknown Player`,`Player has no Data in Hypixel's TNT Database`)
+
         let received = ""
         try {received = await fs.readFileSync('IDS.json')} catch{ console.log("Failure! File Invalid"); console.log("Terminating Program - Code 005"); process.exit(); }
         idData = JSON.parse(received)
@@ -482,6 +484,7 @@ client.on('message', async m => {
 
         if(!user.success || user.success == false || user.player == null || user.player == undefined || !user.player || user.player.stats == undefined) return sendErrorEmbed(m.channel, `Unknown Player`, `Player has no data in Hypixel's Database`);
         if(user.player.stats.TNTGames == undefined) return sendErrorEmbed(m.channel,`Unknown Player`,`Player has no Data in Hypixel's TNT Games Database`)
+        
         
         let received = ""
         try {received = await fs.readFileSync('IDS.json')} catch{ console.log("Failure! File Invalid"); console.log("Terminating Program - Code 005"); process.exit(); }
@@ -843,7 +846,7 @@ client.on('message', async m => {
     }
     else if (command.toLowerCase() == "settings") {
         if (args.length != 2) {
-            return sendErrorEmbed(m.channel, `Usage Error`,`Usage: ${prefix}settings [verbose/reset/game] [true/false]`)
+            return sendErrorEmbed(m.channel, `Usage Error`,`Usage: ${prefix}settings [verbose/reset] [true/false]`)
         }
 
         if (args[0] == "verbose") {
