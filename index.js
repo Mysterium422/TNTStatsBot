@@ -633,7 +633,7 @@ client.on('message', async m => {
                 .addField(`**Deaths**`, displayOldNewNumbers(data.pvp.l, replaceError(TNTGames.deaths_pvprun, 0)), true)
                 .addField(`**Kills**`, displayOldNewNumbers(data.pvp.k, replaceError(TNTGames.kills_pvprun, 0)), true)
                 .addField(`**W/L**`, displayOldNewNumbers(Math.round(data.pvp.wl*1000)/1000, Math.round(ratio(TNTGames.wins_pvprun, TNTGames.deaths_pvprun)*1000)/1000), true)
-                .addField(`**KDR**`, displayOldNewNumbers(Math.round(data.run.kd*1000)/1000, Math.round(ratio(TNTGames.kills_pvprun, TNTGames.deaths_pvprun)*1000)/1000), true)
+                .addField(`**KDR**`, displayOldNewNumbers(Math.round(data.pvp.kd*1000)/1000, Math.round(ratio(TNTGames.kills_pvprun, TNTGames.deaths_pvprun)*1000)/1000), true)
                 .setDescription(`()s show changes since your last ${prefix}stats call for this user`)
             if (reset) {
                 await setPVPDB(TNTGames, user.player.uuid, m.author.id)
@@ -671,7 +671,7 @@ client.on('message', async m => {
                 .setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green)
                 .addField(`**Wins**`, displayOldNewNumbers(data.tag.w, replaceError(TNTGames.wins_tntag, 0)), true)
                 .addField(`**Kills**`, displayOldNewNumbers(data.tag.k, replaceError(TNTGames.kills_tntag, 0)), true)
-                .addField(`**W/K**`, displayOldNewNumbers(Math.round(data.tag.kw*1000)/1000, Math.round(ratio(TNTGames.kills_tntag, TNTGames.wins_tntag)*1000)/1000, true))
+                .addField(`**K/W**`, displayOldNewNumbers(Math.round(data.tag.kw*1000)/1000, Math.round(ratio(TNTGames.kills_tntag, TNTGames.wins_tntag)*1000)/1000, true))
                 .setDescription(`()s show changes since your last ${prefix}stats call for this user`)
             if (reset) {
                 await setTagDB(TNTGames, user.player.uuid, m.author.id)
