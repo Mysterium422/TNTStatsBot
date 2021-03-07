@@ -337,6 +337,21 @@ client.on('message', async m => {
 
     if(m.author.bot) return;
 
+    if(m.content.startsWith("<@!735055542178938960>")) {
+        var channel = await db.get("chan_"+m.channel.id)
+        if (channel === null) {
+            if (m.member.hasPermission('ADMINISTRATOR')) {
+                return m.channel.send("Channel not configured (Use /TNTconfigure)")
+            }
+            else {
+                return m.channel.send("Channel not configured")
+            }
+        }
+        else {
+            return m.channel.send(`My prefix in this channel is: ${channel.prefix}\nMy default game in this channel is: ${channel.game}`)
+        }
+    }
+
     if(m.content.toLowerCase().startsWith("/tntconfigure")) {
         const configurationTool = {all:'All TNT Games',
     wizards:'TNT Wizards',
