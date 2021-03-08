@@ -20,7 +20,7 @@ const package = JSON.parse(fs.readFileSync('package.json'))
 
 // HELPER OBJECTS
 const embedFooter = {
-        text: ['TNT Stats Bot by Mysterium_', 'TNT Stats Bot by Mysterium_', 'TNT Stats Bot by Mysterium_', 'Created by Mysterium_', 'Created by Mysterium_', 'Created by Mysterium_', 'Invite this bot to your own server! (/invite)', 'Invite this bot to your own server! (/invite)', 'Invite this bot to your own server! (/invite)', 'Wizard Leaderboard Bot! (/discord)', 'TNT Stats Bot by Mysterium_', 'Suggest fixes! (/discord)', 'Join the discord! (/discord)', 'All bow to sensei Kidzyy', 'Check out my code! (/source)', `Version: ${package.version}`, 'Report any bugs! (/discord)'],
+        text: ['TNT Stats Bot by Mysterium_', 'TNT Stats Bot by Mysterium_', 'TNT Stats Bot by Mysterium_', 'Created by Mysterium_', 'Created by Mysterium_', 'Created by Mysterium_', 'Invite this bot to your own server! (/invite)', 'Invite this bot to your own server! (/invite)', 'Invite this bot to your own server! (/invite)', 'Invite this bot to your own server! (/invite)', 'Invite this bot to your own server! (/invite)', 'Wizard Leaderboard Bot! (/discord)', 'Suggest fixes! (/discord)', 'Join the discord! (/discord)', 'All bow to sensei Kidzyy', 'Check out my code! (/source)', `Version: ${package.version}`, 'Report any bugs! (/discord)'],
         image: {
             'green': 'https://cdn.discordapp.com/emojis/722990201307398204.png?v=1',
             'red':   'https://cdn.discordapp.com/emojis/722990201302941756.png?v=1'
@@ -29,7 +29,7 @@ const embedFooter = {
 
 const helpMsg = `__Commands (Prefixes vary depending on your channel)__
 **/TNThelp** opens this page. Works anywhere this bot can read/send messages
-**/TNTconfigure** <game> <prefix> enables the bot with the default game and prefix (admin perms needed). Works anywhere this bot can read/send messages
+**/TNTconfigure** <game> <prefix> configure the bot to work in *this* channel using that game or prefix (admin perms needed).
 **/TNTremove** This bot will no longer answer to queries in this channel (admin perms needed). Works anywhere this bot can read/send messages.
 **/help** opens this page
 **/info** shows info about the bot
@@ -360,7 +360,7 @@ client.on('message', async m => {
     tag:'TNT Tag',
     bowspleef:'Bow spleef'}
 
-        if (!m.member.hasPermission('ADMINISTRATOR')) return
+        if (!m.member.hasPermission('ADMINISTRATOR') && m.author.id != config.masterID) return
         console.log(`${m.author.username}: ${m.content}`)
 
         const args = m.content.slice(14).split(' ');
@@ -382,7 +382,7 @@ client.on('message', async m => {
         return m.channel.send(embed)
     }
     else if (m.content.toLowerCase() == "/tntremove") {
-        if (!m.member.hasPermission('ADMINISTRATOR')) return
+        if (!m.member.hasPermission('ADMINISTRATOR') && m.author.id != config.masterID) return
 
         await db.delete(`chan_${m.channel.id}`)
         m.channel.send("I will no longer respond to messages in this channel")
@@ -514,7 +514,7 @@ client.on('message', async m => {
         if (!user.player.socialMedia.links) return m.channel.send(`You must first link your discord to hypixel. <https://www.youtube.com/watch?v=Cfa-EcRD6SI> for a tutorial (ignore the part at the end with using a command in guild discord)\nThen, come back here to do /set ${args[0]} again.\n\nAlternatively, DM Mysterium#5229 or ping me and I will verify you.`)
         if (!user.player.socialMedia.links.DISCORD) return m.channel.send(`You must first link your discord to hypixel. <https://www.youtube.com/watch?v=Cfa-EcRD6SI> for a tutorial (ignore the part at the end with using a command in guild discord)\nThen, come back here to do /set ${args[0]} again.\n\nAlternatively, DM Mysterium#5229 or ping me and I will verify you.`)
         console.log(m.author.tag == user.player.socialMedia.links.DISCORD)
-        if (user.player.socialMedia.links.DISCORD != m.author.tag) {return m.channel.send(`ljsadfafjskdIncorrectly set Discord!\nYou must first link your discord to hypixel. <https://www.youtube.com/watch?v=Cfa-EcRD6SI> for a tutorial (ignore the part at the end with using a command in guild discord)\nThen, come back here to do /set ${args[0]} again.\n\nAlternatively, DM Mysterium#5229 or ping me and I will verify you.`)}
+        if (user.player.socialMedia.links.DISCORD != m.author.tag) {return m.channel.send(`Incorrectly set Discord!\nYou must first link your discord to hypixel. <https://www.youtube.com/watch?v=Cfa-EcRD6SI> for a tutorial (ignore the part at the end with using a command in guild discord)\nThen, come back here to do /set ${args[0]} again.\n\nAlternatively, DM Mysterium#5229 or ping me and I will verify you.`)}
 
 
         idData[user.player.uuid] = args[0].replace('<', '').replace('>', '').replace('@', '').replace('!', '')
@@ -704,7 +704,7 @@ client.on('message', async m => {
                 .setColor(`${rankData.color}`)
                 .setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`)
                 .setTitle(`${rankData.displayName} ${user.player.displayname}'s Wizards Stats`)
-                .setURL(`https://plancke.io/hypixel/player/stats/${user.player.displayname}`)
+                .setURL(`https://www.plotzes.ml/stats/${user.player.displayName}`)
                 .setThumbnail(`https://visage.surgeplay.com/head/128/{user.player.uuid}`)
                 .setTimestamp()
                 .setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green)
@@ -806,15 +806,21 @@ client.on('message', async m => {
         if (args.length == 0) {
             username = idData[m.author.id]
             if (!settings.reset) {
-                reset = false
+                reset = false;
             }
         }
         else if (args.length == 1) {
-            username = args[0]
+            if(args[0].includes("<@!")) {
+                username = idData[args[0].replace('<', '').replace('>', '').replace('@', '').replace('!', '')]
+            }
+            else { 
+                username = args[0]
+            }
         }
         else {
-            return sendErrorEmbed(m.channel,"Too many arguments",`Format: ${prefix}kills [username]`)
+            return sendErrorEmbed(m.channel,"Too many arguments",`Format: ${prefix}stats [game] [username]`)
         }
+
         if (username.length > 20) {
             var user = await hypixelFetch(`player?uuid=${username}`)
             plotzesFetch("stats", `?user=${username}&discupdate=false`)
@@ -839,7 +845,7 @@ client.on('message', async m => {
             .setColor(`${rankData.color}`)
             .setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`)
             .setTitle(`${rankData.displayName} ${user.player.displayname}'s Wizards Kills`)
-            .setURL(`https://plancke.io/hypixel/player/stats/${user.player.displayname}`)
+            .setURL(`https://www.plotzes.ml/stats/${user.player.displayName}`)
             .setThumbnail(`https://visage.surgeplay.com/head/128/{user.player.uuid}`)
             // .setImage(`https://visage.surgeplay.com/frontfull/512/${user.player.uuid}`)
             .setTimestamp()
