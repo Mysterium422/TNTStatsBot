@@ -412,7 +412,7 @@ client.on('message', async m => {
         return m.channel.send("Use /TNTconfigure to setup the bot: \nhttps://discord.com/oauth2/authorize?client_id=735055542178938960&scope=bot&permissions=2147994688")
     }
     else if(command.toLowerCase() == "verify") {
-        if (m.author.id != config.masterID) return;
+        if (m.author.id != config.masterID) return m.channel.send("This is a discord-bot-owner-only command");
         if (args.length != 2) { return m.channel.send("Incorrect amount of arguments")}
         if (!args[0].includes('@')) { return m.channel.send("First Arg must be a ping") }
 
@@ -423,8 +423,10 @@ client.on('message', async m => {
             data = await hypixelFetch(`player?name=${args[1]}`)
         }
 
+        if(data == "API ERROR") { return m.channel.send("API Connection Issues, Hypixel might be offline") }
         if(!data.success || data.success == false || data.player == null || data.player == undefined || !data.player || data.player.stats == undefined) return m.channel.send("Invalid Something");
         if(data.player.stats.TNTGames == undefined) return sendErrorEmbed(m.channel,`Unknown Player`,`Player has no Data in Hypixel's TNT Database`)
+
 
         let received = ""
         try {received = await fs.readFileSync('IDS.json')} catch{ console.log("Failure! File Invalid"); console.log("Terminating Program - Code 005"); process.exit(); }
@@ -452,6 +454,7 @@ client.on('message', async m => {
         else {
             data = await hypixelFetch(`player?name=${args[1]}`)
         }
+        if(data == "API ERROR") { return m.channel.send("API Connection Issues, Hypixel might be offline") }
 
         if(!data.success || data.success == false || data.player == null || data.player == undefined || !data.player || data.player.stats == undefined) return m.channel.send("Invalid Something");
         if(data.player.stats.TNTGames == undefined) return sendErrorEmbed(m.channel,`Unknown Player`,`Player has no Data in Hypixel's TNT Database`)
@@ -495,19 +498,19 @@ client.on('message', async m => {
         if(args.length !== 1) {return sendErrorEmbed(m.channel, `Usage Error`,`Usage: ${prefix}set [username]`)}
 
         var user = await hypixelFetch(`player?name=${args[0]}`)
+        if(user == "API ERROR") { return m.channel.send("API Connection Issues, Hypixel might be offline") }
+
         if (!user.success && user.cause == "Invalid API key") {return sendErrorEmbed(m.channel,"Im too busy!", "Please wait a few seconds and try again")}
 
         if(!user.success || user.success == false || user.player == null || user.player == undefined || !user.player || user.player.stats == undefined) return sendErrorEmbed(m.channel, `Unknown Player`, `Player has no data in Hypixel's Database`);
         if(user.player.stats.TNTGames == undefined) return sendErrorEmbed(m.channel,`Unknown Player`,`Player has no Data in Hypixel's TNT Games Database`)
         
         
-        let received = ""
-        try {received = await fs.readFileSync('IDS.json')} catch{ console.log("Failure! File Invalid"); console.log("Terminating Program - Code 005"); process.exit(); }
-        idData = JSON.parse(received)
 
-        if (idData[m.author.id] == user.player.uuid) {
-            return m.channel.send("This ign has already been set to this account!")
-        }
+
+        //if (idData[m.author.id] == user.player.uuid) {
+        //    return m.channel.send("This ign has already been set to this account!")
+        //}
 
         
         if (!user.player.socialMedia) return m.channel.send(`You must first link your discord to hypixel. <https://www.youtube.com/watch?v=Cfa-EcRD6SI> for a tutorial (ignore the part at the end with using a command in guild discord)\nThen, come back here to do /set ${args[0]} again.\n\nAlternatively, DM Mysterium#5229 or ping me and I will verify you.`)
@@ -516,8 +519,12 @@ client.on('message', async m => {
         console.log(m.author.tag == user.player.socialMedia.links.DISCORD)
         if (user.player.socialMedia.links.DISCORD != m.author.tag) {return m.channel.send(`Incorrectly set Discord!\nYou must first link your discord to hypixel. <https://www.youtube.com/watch?v=Cfa-EcRD6SI> for a tutorial (ignore the part at the end with using a command in guild discord)\nThen, come back here to do /set ${args[0]} again.\n\nAlternatively, DM Mysterium#5229 or ping me and I will verify you.`)}
 
+        let received = ""
+        try {received = await fs.readFileSync('IDS.json')} catch{ console.log("Failure! File Invalid"); console.log("Terminating Program - Code 005"); process.exit(); }
+        idData = JSON.parse(received)
 
-        idData[user.player.uuid] = args[0].replace('<', '').replace('>', '').replace('@', '').replace('!', '')
+        idData[user.player.uuid] = m.author.id
+        idData[m.author.id] = user.player.uuid
 
         fs.writeFileSync("IDS.json", JSON.stringify(idData));
 
@@ -582,12 +589,11 @@ client.on('message', async m => {
 
         if (username.length > 20) {
             var user = await hypixelFetch(`player?uuid=${username}`)
-            plotzesFetch("stats", `?user=${username}&discupdate=false`)
         }
         else {
             var user = await hypixelFetch(`player?name=${username}`)
-            plotzesFetch("stats", `?user=${username}&discupdate=false`)
         }
+        if(user == "API ERROR") { return m.channel.send("API Connection Issues, Hypixel might be offline") }
 
         if(!user.success || user.success == false || user.player == null || user.player == undefined || !user.player || user.player.stats == undefined) return sendErrorEmbed(m.channel, `Unknown Player`, `Player has no data in Hypixel's Database`);
         if(user.player.stats.TNTGames == undefined) return sendErrorEmbed(m.channel,`Unknown Player`,`Player has no Data in Hypixel's TNT Database`)
@@ -704,7 +710,7 @@ client.on('message', async m => {
                 .setColor(`${rankData.color}`)
                 .setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`)
                 .setTitle(`${rankData.displayName} ${user.player.displayname}'s Wizards Stats`)
-                .setURL(`https://www.plotzes.ml/stats/${user.player.displayName}`)
+                .setURL(`https://www.plotzes.ml/stats/${user.player.displayname}`)
                 .setThumbnail(`https://visage.surgeplay.com/head/128/{user.player.uuid}`)
                 .setTimestamp()
                 .setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green)
@@ -790,7 +796,7 @@ client.on('message', async m => {
             return m.channel.send(embed)
         }
     }
-    else if (command == "kills") {
+    else if (command.toLowerCase() == "kills") {
         let received = ""
         try {received = await fs.readFileSync('IDS.json')} catch{ console.log("Failure! File Invalid"); console.log("Terminating Program - Code 005"); process.exit(); }
         idData = JSON.parse(received) 
@@ -823,12 +829,11 @@ client.on('message', async m => {
 
         if (username.length > 20) {
             var user = await hypixelFetch(`player?uuid=${username}`)
-            plotzesFetch("stats", `?user=${username}&discupdate=false`)
         }
         else {
             var user = await hypixelFetch(`player?name=${username}`)
-            plotzesFetch("stats", `?user=${username}&discupdate=false`)
         }
+        if(user == "API ERROR") { return m.channel.send("API Connection Issues, Hypixel might be offline") }
 
         if(!user || !user.success || user.success == false || user.player == null || user.player == undefined || !user.player || user.player.stats == undefined) return sendErrorEmbed(m.channel, `Unknown Player`, `Player has no data in Hypixel's Database`);
         if(user.player.stats.TNTGames == undefined) return sendErrorEmbed(m.channel,`Unknown Player`,`Player has no Data in Hypixel's TNT Database`)
@@ -845,7 +850,7 @@ client.on('message', async m => {
             .setColor(`${rankData.color}`)
             .setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`)
             .setTitle(`${rankData.displayName} ${user.player.displayname}'s Wizards Kills`)
-            .setURL(`https://www.plotzes.ml/stats/${user.player.displayName}`)
+            .setURL(`https://www.plotzes.ml/stats/${user.player.displayname}`)
             .setThumbnail(`https://visage.surgeplay.com/head/128/{user.player.uuid}`)
             // .setImage(`https://visage.surgeplay.com/frontfull/512/${user.player.uuid}`)
             .setTimestamp()
@@ -910,6 +915,7 @@ client.on('message', async m => {
         if (m.author.id in idData) {
             var user = await hypixelFetch(`player?uuid=${idData[m.author.id]}`)
         }
+        if(user == "API ERROR") { return m.channel.send("API Connection Issues, Hypixel might be offline") }
 
         if(!user || !user.success || user.success == false || user.player == null || user.player == undefined || !user.player || user.player.stats == undefined) return sendErrorEmbed(m.channel, `Unknown Player`, `Player has no data in Hypixel's Database`);
         if(user.player.stats.TNTGames == undefined) return sendErrorEmbed(m.channel,`Unknown Player`,`Player has no Data in Hypixel's TNT Database`)
