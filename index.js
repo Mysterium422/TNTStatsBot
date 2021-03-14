@@ -5,7 +5,7 @@ const fs = require('fs');
 const yaml = require('js-yaml')
 
 // FETCH UNUSED BUT WORKS FOR FUTURE
-const { hypixelFetch, plotzesFetch, fetch } = require('./mystFetch.js')
+const { mojangUUIDFetch, hypixelFetch, plotzesFetch, fetch } = require('./mystFetch.js')
 
 // USED FOR INFO COMMAND
 let unix_time_start = Date.now()
@@ -454,7 +454,14 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
             data = await hypixelFetch(`player?uuid=${args[1]}`)
         }
         else {
-            data = await hypixelFetch(`player?name=${args[1]}`)
+            let uuidInput = await mojangUUIDFetch(args[1]).catch(() => {return {id:"UUIDINVALID12345678910"}})
+
+            if (uuidInput.id.length > 20) {
+                data = await hypixelFetch(`player?uuid=${uuidInput.id}`)
+            }
+            else {    
+                data = await hypixelFetch(`player?name=${args[1]}`)
+            }
         }
 
         if(data == "API ERROR") { return m.channel.send("API Connection Issues, Hypixel might be offline") }
@@ -486,8 +493,16 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
             data = await hypixelFetch(`player?uuid=${args[1]}`)
         }
         else {
-            data = await hypixelFetch(`player?name=${args[1]}`)
+            let uuidInput = await mojangUUIDFetch(args[1]).catch(() => {return {id:"UUIDINVALID12345678910"}})
+
+            if (uuidInput.id.length > 20) {
+                data = await hypixelFetch(`player?uuid=${uuidInput.id}`)
+            }
+            else {    
+                data = await hypixelFetch(`player?name=${args[1]}`)
+            }
         }
+
         if(data == "API ERROR") { return m.channel.send("API Connection Issues, Hypixel might be offline") }
 
         if(!data.success || data.success == false || data.player == null || data.player == undefined || !data.player || data.player.stats == undefined) return m.channel.send("Invalid Something");
@@ -531,7 +546,20 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
     else if (command.toLowerCase() == 'set') {
         if(args.length !== 1) {return sendErrorEmbed(m.channel, `Usage Error`,`Usage: ${prefix}set [username]`)}
 
-        var user = await hypixelFetch(`player?name=${args[0]}`)
+        if (args[0].length > 20) {
+            user = await hypixelFetch(`player?uuid=${args[0]}`)
+        }
+        else {
+            let uuidInput = await mojangUUIDFetch(args[0]).catch(() => {return {id:"UUIDINVALID12345678910"}})
+
+            if (uuidInput.id.length > 20) {
+                user = await hypixelFetch(`player?uuid=${uuidInput.id}`)
+            }
+            else {    
+                user = await hypixelFetch(`player?name=${args[0]}`)
+            }
+        }
+        
         if(user == "API ERROR") { return m.channel.send("API Connection Issues, Hypixel might be offline") }
 
         if (!user.success && user.cause == "Invalid API key") {return sendErrorEmbed(m.channel,"Im too busy!", "Please wait a few seconds and try again")}
@@ -567,8 +595,8 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
         await setCacheDB(user.player.stats.TNTGames, user.player.uuid, m.author.id)
         return m.channel.send("Successfully set your ign to " + args[0])
     }
-
     else if (command.toLowerCase() == "stats") {
+
         let received = ""
         try {received = await fs.readFileSync('IDS.json')} catch{ console.log("Failure! File Invalid"); console.log("Terminating Program - Code 005"); process.exit(); }
         idData = JSON.parse(received) 
@@ -620,13 +648,22 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
         if (!username) {
             return sendErrorEmbed(m.channel, "Invalid username", `User does not exist OR User has not set their IGN with ${prefix}set`)
         }
-
         if (username.length > 20) {
-            var user = await hypixelFetch(`player?uuid=${username}`)
+
+            user = await hypixelFetch(`player?uuid=${username}`)
         }
         else {
-            var user = await hypixelFetch(`player?name=${username}`)
+            var uuidInput = await mojangUUIDFetch(username).catch(() => {return {id:"UUIDINVALID12345678910"}})
+            console.log(uuidInput)
+
+            if (uuidInput.id.length > 20) {
+                user = await hypixelFetch(`player?uuid=${uuidInput.id}`)
+            }
+            else {    
+                user = await hypixelFetch(`player?name=${username}`)
+            }
         }
+        
         if(user == "API ERROR") { return m.channel.send("API Connection Issues, Hypixel might be offline") }
 
         if(!user.success || user.success == false || user.player == null || user.player == undefined || !user.player || user.player.stats == undefined) return sendErrorEmbed(m.channel, `Unknown Player`, `Player has no data in Hypixel's Database`);
@@ -862,11 +899,19 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
         }
 
         if (username.length > 20) {
-            var user = await hypixelFetch(`player?uuid=${username}`)
+            user = await hypixelFetch(`player?uuid=${username}`)
         }
         else {
-            var user = await hypixelFetch(`player?name=${username}`)
+            let uuidInput = await mojangUUIDFetch(username).catch(() => {return {id:"UUIDINVALID12345678910"}})
+
+            if (uuidInput.id.length > 20) {
+                user = await hypixelFetch(`player?uuid=${uuidInput.id}`)
+            }
+            else {    
+                user = await hypixelFetch(`player?name=${username}`)
+            }
         }
+
         if(user == "API ERROR") { return m.channel.send("API Connection Issues, Hypixel might be offline") }
 
         if(!user || !user.success || user.success == false || user.player == null || user.player == undefined || !user.player || user.player.stats == undefined) return sendErrorEmbed(m.channel, `Unknown Player`, `Player has no data in Hypixel's Database`);
