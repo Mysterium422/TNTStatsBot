@@ -153,6 +153,10 @@ Array.prototype.unique = function() {
     return b;
 };
 
+String.prototype.contains = function(substring) {
+    return this.indexOf(substring) !== -1
+};
+
 function min_sec(seconds) {
     var mins = Math.floor(seconds/60)
     var secondsNew = seconds - mins*60
@@ -336,6 +340,36 @@ client.on('ready', async () => {
 client.on('message', async m => {
 
     if(m.author.bot) return;
+
+    if(m.content.toLowerCase() == "/ping") {
+        let discordToBot = Date.now() - m.createdTimestamp
+
+        let now = Date.now()
+        await db.get("chan_"+m.channel.id)
+        let botToDB = Date.now() - now
+    
+        let now2 = Date.now()
+        let hypixelResponse = await hypixelFetch('key?')
+        let botToHypixel = Date.now() - now2
+        let botToHypixelString = ""    
+        if (hypixelResponse == "API ERROR") {
+            botToHypixelString = "No Response - "
+        }
+
+        let now3 = Date.now()
+        messageSent = await m.channel.send(`**Ping**\n
+Discord to Bot: ${discordToBot}
+Bot to Hypixel (round trip): ${botToHypixelString}${botToHypixel}
+Bot to Database (round trip): ${botToDB}`)
+        let botToDiscord = Date.now() - now3
+
+        messageSent.edit(`**Ping**
+Discord to Bot: ${discordToBot} ms
+Bot to Hypixel (round trip): ${botToHypixelString}${botToHypixel} ms
+Bot to Database (round trip): ${botToDB} ms
+Bot to Discord: ${botToDiscord} ms
+Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - botToDB - botToDiscord} ms`)
+    }
 
     if(m.content.startsWith("<@!735055542178938960>")) {
         var channel = await db.get("chan_"+m.channel.id)
