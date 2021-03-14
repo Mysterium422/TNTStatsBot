@@ -8,18 +8,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Awesom-AA/TNT-Stats-Bot.git"
+    "url": "git+https://github.com/Mysterium422/TNTStatsBot"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Awesom-AA/TNT-Stats-Bot/issues"
+    "url": "https://github.com/Mysterium422/TNTStatsBot/issues"
   },
-  "homepage": "https://github.com/Awesom-AA/TNT-Stats-Bot#readme",
+  "homepage": "https://github.com/Mysterium422/TNTStatsBot#readme",
   "dependencies": {
     "discord.js": "^12.2.0",
     "js-yaml": "^4.0.0",
+    "merge-files": "^0.1.2",
     "node-fetch": "^2.6.1",
     "node-schedule": "^2.0.0",
     "quick.db": "^7.1.1",
