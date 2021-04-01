@@ -5,7 +5,8 @@ const fs = require('fs');
 const yaml = require('js-yaml')
 
 // FETCH UNUSED BUT WORKS FOR FUTURE
-const { mojangUUIDFetch, hypixelFetch, plotzesFetch, fetch } = require('./mystFetch.js')
+const { mojangUUIDFetch, hypixelFetch, plotzesFetch, fetch } = require('../global/mystFetch.js')
+const { randInt, replaceError } = require('../global/globalUtils.js')
 
 // USED FOR INFO COMMAND
 let unix_time_start = Date.now()
@@ -92,10 +93,6 @@ const booleanPhrases = {"false":false,
     "1":true,
     "0":false}
 
-function randInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1) + min)
-}
-
 // USEFUL COMMON FUNCTIONS
 function findRank (user) {
     var rankData = {displayName:"", color:ChatColor.gray}
@@ -181,15 +178,6 @@ function displayOldNewNumbers(old, updated) {
     else {
         var diff = Math.round((updated-old)*1000)/1000
         return updatedRound.toString() + " (+" + diff.toString() + ")"
-    }
-}
-
-function replaceError(a, defaultVar) {
-    if (a == undefined) {
-        return defaultVar;
-    }
-    else {
-        return a;
     }
 }
 
@@ -470,7 +458,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
 
 
         let received = ""
-        try {received = await fs.readFileSync('IDS.json')} catch{ console.log("Failure! File Invalid"); console.log("Terminating Program - Code 005"); process.exit(); }
+        try {received = await fs.readFileSync('../global/IDS.json')} catch{ console.log("Failure! File Invalid"); console.log("Terminating Program - Code 005"); process.exit(); }
         idData = JSON.parse(received)
 
         idData[data.player.uuid] = args[0].replace('<', '').replace('>', '').replace('@', '').replace('!', '')
@@ -479,7 +467,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
         await setCacheDB(data.player.stats.TNTGames, data.player.uuid, m.author.id)
 
 
-        fs.writeFileSync("IDS.json", JSON.stringify(idData));
+        fs.writeFileSync("../global/IDS.json", JSON.stringify(idData));
         m.channel.send(`Registered ${data.player.displayname} to ${args[0]}`)
         return;
     }
@@ -509,12 +497,12 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
         if(data.player.stats.TNTGames == undefined) return sendErrorEmbed(m.channel,`Unknown Player`,`Player has no Data in Hypixel's TNT Database`)
 
         let received = ""
-        try {received = await fs.readFileSync('IDS.json')} catch{ console.log("Failure! File Invalid"); console.log("Terminating Program - Code 005"); process.exit(); }
+        try {received = await fs.readFileSync('../global/IDS.json')} catch{ console.log("Failure! File Invalid"); console.log("Terminating Program - Code 005"); process.exit(); }
         idData = JSON.parse(received)
 
         idData[data.player.uuid] = args[0].replace('<', '').replace('>', '').replace('@', '').replace('!', '')
 
-        fs.writeFileSync("IDS.json", JSON.stringify(idData));
+        fs.writeFileSync("../global/IDS.json", JSON.stringify(idData));
         m.channel.send(`Registered ${data.player.displayname} to ${args[0]}`)
         return;
     }
@@ -582,13 +570,13 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
         if (user.player.socialMedia.links.DISCORD != m.author.tag) {return m.channel.send(`Incorrectly set Discord!\nYou must first link your discord to hypixel. <https://www.youtube.com/watch?v=Cfa-EcRD6SI> for a tutorial (ignore the part at the end with using a command in guild discord)\nThen, come back here to do /set ${args[0]} again.\n\nAlternatively, DM Mysterium#5229 or ping me and I will verify you.`)}
 
         let received = ""
-        try {received = await fs.readFileSync('IDS.json')} catch{ console.log("Failure! File Invalid"); console.log("Terminating Program - Code 005"); process.exit(); }
+        try {received = await fs.readFileSync('../global/IDS.json')} catch{ console.log("Failure! File Invalid"); console.log("Terminating Program - Code 005"); process.exit(); }
         idData = JSON.parse(received)
 
         idData[user.player.uuid] = m.author.id
         idData[m.author.id] = user.player.uuid
 
-        fs.writeFileSync("IDS.json", JSON.stringify(idData));
+        fs.writeFileSync("../global/IDS.json", JSON.stringify(idData));
 
 
         await db.set(m.author.id, {verbose:false, reset:true})
@@ -598,7 +586,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
     else if (command.toLowerCase() == "stats") {
 
         let received = ""
-        try {received = await fs.readFileSync('IDS.json')} catch{ console.log("Failure! File Invalid"); console.log("Terminating Program - Code 005"); process.exit(); }
+        try {received = await fs.readFileSync('../global/IDS.json')} catch{ console.log("Failure! File Invalid"); console.log("Terminating Program - Code 005"); process.exit(); }
         idData = JSON.parse(received) 
 
         if (await db.get(m.author.id) == undefined) {
@@ -869,7 +857,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
     }
     else if (command.toLowerCase() == "kills") {
         let received = ""
-        try {received = await fs.readFileSync('IDS.json')} catch{ console.log("Failure! File Invalid"); console.log("Terminating Program - Code 005"); process.exit(); }
+        try {received = await fs.readFileSync('../global/IDS.json')} catch{ console.log("Failure! File Invalid"); console.log("Terminating Program - Code 005"); process.exit(); }
         idData = JSON.parse(received) 
 
         if (await db.get(m.author.id) == undefined) {
@@ -988,7 +976,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
     }
     else if (command.toLowerCase() == "reset") {
         let received = ""
-        try {received = await fs.readFileSync('IDS.json')} catch{ console.log("Failure! File Invalid"); console.log("Terminating Program - Code 005"); process.exit(); }
+        try {received = await fs.readFileSync('../global/IDS.json')} catch{ console.log("Failure! File Invalid"); console.log("Terminating Program - Code 005"); process.exit(); }
         idData = JSON.parse(received)
 
         if (m.author.id in idData) {
@@ -1012,7 +1000,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
     else if (command.toLowerCase() == "account") {
         if (args.length != 1) { return m.channel.send("Incorrect amount of arguments")}
         if (!args[0].includes('@')) { return m.channel.send("First Arg must be a ping") }
-        try {received = await fs.readFileSync('IDS.json')} catch{ console.log("Failure! File Invalid"); console.log("Terminating Program - Code 005"); process.exit(); }
+        try {received = await fs.readFileSync('../global/IDS.json')} catch{ console.log("Failure! File Invalid"); console.log("Terminating Program - Code 005"); process.exit(); }
         let idData = JSON.parse(received)
 
         if (args[0].replace('<', '').replace('>', '').replace('@', '').replace('!', '') in idData) {
@@ -1026,7 +1014,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
     else if (command.toLowerCase() == "account") {
         if (args.length != 1) { return m.channel.send("Incorrect amount of arguments")}
         if (!args[0].includes('@')) { return m.channel.send("First Arg must be a ping") }
-        try {received = await fs.readFileSync('IDS.json')} catch{ console.log("Failure! File Invalid"); console.log("Terminating Program - Code 005"); process.exit(); }
+        try {received = await fs.readFileSync('../global/IDS.json')} catch{ console.log("Failure! File Invalid"); console.log("Terminating Program - Code 005"); process.exit(); }
         let idData = JSON.parse(received)
 
         if (args[0].replace('<', '').replace('>', '').replace('@', '').replace('!', '') in idData) {
