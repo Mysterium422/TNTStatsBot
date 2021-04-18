@@ -192,131 +192,131 @@ function ratio(a, b) {
 
 
 // DB HANDLERS
-async function setRunDB(TNTGames, uuid, authorID) {
+async function setRunDB(data, uuid, authorID) {
 
     var runDBEntry = {
-        record:replaceError(TNTGames.record_tntrun, 0),
-        w:replaceError(TNTGames.wins_tntrun, 0),
-        l:replaceError(TNTGames.deaths_tntrun, 0),
-        wl:ratio(TNTGames.wins_tntrun, TNTGames.deaths_tntrun),
-        potions:replaceError(TNTGames.run_potions_splashed_on_players, 0)
+        record:replaceError(data.stats.TNTGames.record_tntrun, 0),
+        w:replaceError(data.stats.TNTGames.wins_tntrun, 0),
+        l:replaceError(data.stats.TNTGames.deaths_tntrun, 0),
+        wl:ratio(data.stats.TNTGames.wins_tntrun, data.stats.TNTGames.deaths_tntrun),
+        potions:replaceError(data.stats.TNTGames.run_potions_splashed_on_players, 0),
+        blocks:replaceError(data.achievements.tntgames_block_runner, 0)
     }
 
     await db.set(`cache.${authorID}.${uuid}.run`, runDBEntry)
     return
 }
 
-async function setPVPDB(TNTGames, uuid, authorID) {
+async function setPVPDB(data, uuid, authorID) {
 
     var pvpDBEntry = {
-        record:replaceError(TNTGames.record_pvprun, 0),
-        w:replaceError(TNTGames.wins_pvprun, 0),
-        l:replaceError(TNTGames.deaths_pvprun, 0),
-        k:replaceError(TNTGames.kills_pvprun, 0),
-        wl:ratio(TNTGames.wins_pvprun, TNTGames.deaths_pvprun),
-        kd:ratio(TNTGames.kills_pvprun, TNTGames.deaths_pvprun)
+        record:replaceError(data.stats.TNTGames.record_pvprun, 0),
+        w:replaceError(data.stats.TNTGames.wins_pvprun, 0),
+        l:replaceError(data.stats.TNTGames.deaths_pvprun, 0),
+        k:replaceError(data.stats.TNTGames.kills_pvprun, 0),
+        wl:ratio(data.stats.TNTGames.wins_pvprun, data.stats.TNTGames.deaths_pvprun),
+        kd:ratio(data.stats.TNTGames.kills_pvprun, data.stats.TNTGames.deaths_pvprun)
     }
 
     await db.set(`cache.${authorID}.${uuid}.pvp`, pvpDBEntry)
     return
 }
 
-async function setBowDB(TNTGames, uuid, authorID) {
+async function setBowDB(data, uuid, authorID) {
 
     var bowDBEntry = {
-        w:replaceError(TNTGames.wins_bowspleef, 0),
-        l:replaceError(TNTGames.deaths_bowspleef, 0),
-        shots:replaceError(TNTGames.tags_bowspleef, 0),
-        k:replaceError(TNTGames.kills_bowspleef, 0),
-        wl:ratio(TNTGames.wins_bowspleef, TNTGames.deaths_bowspleef)
+        w:replaceError(data.stats.TNTGames.wins_bowspleef, 0),
+        l:replaceError(data.stats.TNTGames.deaths_bowspleef, 0),
+        shots:replaceError(data.stats.TNTGames.tags_bowspleef, 0),
+        k:replaceError(data.stats.TNTGames.kills_bowspleef, 0),
+        wl:ratio(data.stats.TNTGames.wins_bowspleef, data.stats.TNTGames.deaths_bowspleef)
     }
 
     await db.set(`cache.${authorID}.${uuid}.bow`, bowDBEntry)
     return
 }
 
-async function setTagDB(TNTGames, uuid, authorID) {
+async function setTagDB(data, uuid, authorID) {
 
     var tagDBEntry = {
-        w:replaceError(TNTGames.wins_tntag, 0),
-        k:replaceError(TNTGames.kills_tntag, 0),
-        kw:ratio(TNTGames.kills_tntag, TNTGames.wins_tntag)
+        w:replaceError(data.stats.TNTGames.wins_tntag, 0),
+        k:replaceError(data.stats.TNTGames.kills_tntag, 0),
+        kw:ratio(data.stats.TNTGames.kills_tntag, data.stats.TNTGames.wins_tntag),
+        tags:replaceError(data.achievements.tntgames_clinic, 0),
+        tk:ratio(data.achievements.tntgames_clinic, data.stats.TNTGames.kills_tntag)
     }
 
     await db.set(`cache.${authorID}.${uuid}.tag`, tagDBEntry)
     return
 }
 
-async function setWizDB(TNTGames, uuid, authorID) {
+async function setWizDB(data, uuid, authorID) {
 
     var wizDBEntry = {
-        w:replaceError(TNTGames.wins_capture, 0),
-        k:replaceError(TNTGames.kills_capture, 0),
-        a:replaceError(TNTGames.assists_capture, 0),
-        d:replaceError(TNTGames.deaths_capture, 0),
-        p:replaceError(TNTGames.points_capture, 0),
-        kd:ratio(TNTGames.kills_capture, TNTGames.deaths_capture),
-        kad:ratio(replaceError(TNTGames.kills_capture, 0)+replaceError(TNTGames.assists_capture, 0), TNTGames.deaths_capture),
-        air:replaceError(TNTGames.air_time_capture, 0),
-        kw:ratio(TNTGames.kills_capture, TNTGames.wins_capture)
+        w:replaceError(data.stats.TNTGames.wins_capture, 0),
+        k:replaceError(data.stats.TNTGames.kills_capture, 0),
+        a:replaceError(data.stats.TNTGames.assists_capture, 0),
+        d:replaceError(data.stats.TNTGames.deaths_capture, 0),
+        p:replaceError(data.stats.TNTGames.points_capture, 0),
+        kd:ratio(data.stats.TNTGames.kills_capture, data.stats.TNTGames.deaths_capture),
+        kad:ratio(replaceError(data.stats.TNTGames.kills_capture, 0)+replaceError(data.stats.TNTGames.assists_capture, 0), data.stats.TNTGames.deaths_capture),
+        air:replaceError(data.stats.TNTGames.air_time_capture, 0),
+        kw:ratio(data.stats.TNTGames.kills_capture, data.stats.TNTGames.wins_capture)
     }
 
     await db.set(`cache.${authorID}.${uuid}.wizards`, wizDBEntry)
     return
 }
 
-async function setWizKillsDB(TNTGames, uuid, authorID) {
+async function setWizKillsDB(data, uuid, authorID) {
 
     var wizKillDBEntry = {
-        total_k:replaceError(TNTGames.kills_capture, 0),
-        f_k:replaceError(TNTGames.new_firewizard_kills, 0),
-        i_k:replaceError(TNTGames.new_icewizard_kills, 0),
-        w_k:replaceError(TNTGames.new_witherwizard_kills, 0),
-        k_k:replaceError(TNTGames.new_kineticwizard_kills, 0),
-        b_k:replaceError(TNTGames.new_bloodwizard_kills, 0),
-        t_k:replaceError(TNTGames.new_toxicwizard_kills, 0),
-        h_k:replaceError(TNTGames.new_hydrowizard_kills, 0),
-        a_k:replaceError(TNTGames.new_ancientwizard_kills, 0),
-        s_k:replaceError(TNTGames.new_stormwizard_kills, 0),
+        total_k:replaceError(data.stats.TNTGames.kills_capture, 0),
+        f_k:replaceError(data.stats.TNTGames.new_firewizard_kills, 0),
+        i_k:replaceError(data.stats.TNTGames.new_icewizard_kills, 0),
+        w_k:replaceError(data.stats.TNTGames.new_witherwizard_kills, 0),
+        k_k:replaceError(data.stats.TNTGames.new_kineticwizard_kills, 0),
+        b_k:replaceError(data.stats.TNTGames.new_bloodwizard_kills, 0),
+        t_k:replaceError(data.stats.TNTGames.new_toxicwizard_kills, 0),
+        h_k:replaceError(data.stats.TNTGames.new_hydrowizard_kills, 0),
+        a_k:replaceError(data.stats.TNTGames.new_ancientwizard_kills, 0),
+        s_k:replaceError(data.stats.TNTGames.new_stormwizard_kills, 0),
     }
 
     await db.set(`cache.${authorID}.${uuid}.wizardKills`, wizKillDBEntry)
     return
 }
 
-async function setAllDB(TNTGames, uuid, authorID) {
+async function setAllDB(data, uuid, authorID) {
 
-    await db.set(`cache.${authorID}.${uuid}.coins`, replaceError(TNTGames.coins, 0))
-    await db.set(`cache.${authorID}.${uuid}.w`, replaceError(TNTGames.wins, 0))
-    await db.set(`cache.${authorID}.${uuid}.streak`, replaceError(TNTGames.winstreak, 0))
+    var allDBEntry = {
+        coins:replaceError(data.stats.TNTGames.coins, 0),
+        total_wins:replaceError(data.stats.TNTGames.wins_tntrun, 0)+replaceError(data.stats.TNTGames.wins_pvprun, 0)+replaceError(data.stats.TNTGames.wins_tntag, 0)+replaceError(data.stats.TNTGames.wins_bowspleef, 0) + replaceError(data.stats.TNTGames.wins_capture, 0),
+        streak:replaceError(data.stats.TNTGames.winstreak, 0),
+        time:replaceError(data.achievements.tntgames_tnt_triathlon, 0),
+        run_wins:replaceError(data.stats.TNTGames.wins_tntrun, 0),
+        run_record:replaceError(data.stats.TNTGames.record_tntrun, 0),
+        pvp_wins:replaceError(data.stats.TNTGames.wins_pvprun, 0),
+        pvp_record:replaceError(data.stats.TNTGames.record_pvprun, 0),
+        tag_wins:replaceError(data.stats.TNTGames.wins_tntag, 0),
+        bow_wins:replaceError(data.stats.TNTGames.wins_bowspleef, 0),
+        wizards_wins:replaceError(data.stats.TNTGames.wins_capture, 0),
+        wizards_kills:replaceError(data.stats.TNTGames.kills_capture, 0)
+    }
 
-    await db.set(`cache.${authorID}.${uuid}.run,record`, replaceError(TNTGames.record_tntrun, 0))
-    await db.set(`cache.${authorID}.${uuid}.run.w`, replaceError(TNTGames.wins_tntrun, 0))
-
-    await db.set(`cache.${authorID}.${uuid}.pvp.record`, replaceError(TNTGames.record_pvprun, 0))
-    await db.set(`cache.${authorID}.${uuid}.pvp.w`, replaceError(TNTGames.wins_pvprun, 0))
-    await db.set(`cache.${authorID}.${uuid}.pvp.k`, replaceError(TNTGames.kills_pvprun, 0))
-
-    await db.set(`cache.${authorID}.${uuid}.tag.w`, replaceError(TNTGames.wins_tntag, 0))
-
-    await db.set(`cache.${authorID}.${uuid}.bow.w`, replaceError(TNTGames.wins_bowspleef, 0))
-
-    await db.set(`cache.${authorID}.${uuid}.wizards.w`, replaceError(TNTGames.wins_capture, 0))
-    await db.set(`cache.${authorID}.${uuid}.wizards.k`, replaceError(TNTGames.kills_capture, 0))
+    await db.set(`cache.${authorID}.${uuid}.allTNT`, allDBEntry)
     return
 }
 
-async function setCacheDB(TNTGames, uuid, authorID) {
-    await setRunDB(TNTGames, uuid, authorID);
-    await setPVPDB(TNTGames, uuid, authorID);
-    await setTagDB(TNTGames, uuid, authorID);
-    await setWizDB(TNTGames, uuid, authorID);
-    await setBowDB(TNTGames, uuid, authorID);
-    await setWizKillsDB(TNTGames, uuid, authorID);
+async function setCacheDB(data, uuid, authorID) {
+    await setRunDB(data, uuid, authorID);
+    await setPVPDB(data, uuid, authorID);
+    await setTagDB(data, uuid, authorID);
+    await setWizDB(data, uuid, authorID);
+    await setBowDB(data, uuid, authorID);
+    await setWizKillsDB(data, uuid, authorID);
+    await setAllDB(data, uuid, authorID)
 
-    await db.set(`cache.${authorID}.${uuid}.coins`, replaceError(TNTGames.coins, 0))
-    await db.set(`cache.${authorID}.${uuid}.w`, replaceError(TNTGames.wins, 0))
-    await db.set(`cache.${authorID}.${uuid}.streak`, replaceError(TNTGames.streak, 0))
     return
 }
 
@@ -328,6 +328,8 @@ client.on('ready', async () => {
 client.on('message', async m => {
 
     if(m.author.bot) return;
+
+    if(m.guild.id == "825593306640810026") return
 
     if(m.content.toLowerCase() == "/ping") {
         let discordToBot = Date.now() - m.createdTimestamp
@@ -422,13 +424,18 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
     var game = channel.game
 
     var args = m.content.slice(prefix.length).split(' ');
-    const command = args.shift()
+    const command = args.shift().toLowerCase()
 
     console.log(m.author.username+": " + m.content)
 
-    if(command.toLowerCase() == "help") {
+    if(command == "help") {
         return m.channel.send(helpMsg)
     }
+
+    if (command == "mysterium") {
+        m.channel.send("Hey! This bot was coded by Mysterium! Check out my server: https://discord.gg/7Qb5xuJD4C\nHere's my website (WIP): <https://mysterium.me>")
+    }
+
 
     else if(command.toLowerCase() == "invite") {
         return m.channel.send("Use /TNTconfigure to setup the bot: \nhttps://discord.com/oauth2/authorize?client_id=735055542178938960&scope=bot&permissions=2147994688")
@@ -464,7 +471,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
         idData[data.player.uuid] = args[0].replace('<', '').replace('>', '').replace('@', '').replace('!', '')
         idData[args[0].replace('<', '').replace('>', '').replace('@', '').replace('!', '')] = data.player.uuid
 
-        await setCacheDB(data.player.stats.TNTGames, data.player.uuid, m.author.id)
+        await setCacheDB(data.player, data.player.uuid, m.author.id)
 
 
         fs.writeFileSync("../global/IDS.json", JSON.stringify(idData));
@@ -580,7 +587,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
 
 
         await db.set(m.author.id, {verbose:false, reset:true})
-        await setCacheDB(user.player.stats.TNTGames, user.player.uuid, m.author.id)
+        await setCacheDB(user.player, user.player.uuid, m.author.id)
         return m.channel.send("Successfully set your ign to " + args[0])
     }
     else if (command.toLowerCase() == "stats") {
@@ -661,7 +668,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
 
         data = await db.get(`cache.${m.author.id}.${user.player.uuid}`)
         if (data == undefined) {
-            await setCacheDB(TNTGames, user.player.uuid, m.author.id)
+            await setCacheDB(user.player, user.player.uuid, m.author.id)
             data = await db.get(`cache.${m.author.id}.${user.player.uuid}`)
         }
 
@@ -689,11 +696,12 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
                 .addField(`**Deaths**`, displayOldNewNumbers(data.run.l, replaceError(TNTGames.deaths_tntrun, 0)), true)
                 .addField(`**Potions Thrown**`, displayOldNewNumbers(data.run.potions, replaceError(TNTGames.run_potions_splashed_on_players, 0)), true)
                 .addField(`**W/L**`, displayOldNewNumbers(Math.round(data.run.wl*1000)/1000, Math.round(ratio(TNTGames.wins_tntrun, TNTGames.deaths_tntrun)*1000)/1000), true)
+                .addField(`**Blocks Broken**`, displayOldNewNumbers(data.run.blocks, replaceError(user.player.achievements.tntgames_block_runner, 0)), true)
                 .setDescription(`()s show changes since your last ${prefix}stats call for this user`)
 
             
             if (reset) {
-                await setRunDB(TNTGames, user.player.uuid, m.author.id)
+                await setRunDB(user.player, user.player.uuid, m.author.id)
             }
             return m.channel.send(embed)
         }
@@ -721,7 +729,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
                 .addField(`**KDR**`, displayOldNewNumbers(Math.round(data.pvp.kd*1000)/1000, Math.round(ratio(TNTGames.kills_pvprun, TNTGames.deaths_pvprun)*1000)/1000), true)
                 .setDescription(`()s show changes since your last ${prefix}stats call for this user`)
             if (reset) {
-                await setPVPDB(TNTGames, user.player.uuid, m.author.id)
+                await setPVPDB(user.player, user.player.uuid, m.author.id)
             }
             return m.channel.send(embed)
         }
@@ -741,7 +749,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
                 .addField(`**W/L**`, displayOldNewNumbers(Math.round(data.bow.wl*1000)/1000, Math.round(ratio(TNTGames.wins_bowspleef, TNTGames.deaths_bowspleef)*1000)/1000), true)
                 .setDescription(`()s show changes since your last ${prefix}stats call for this user`)
             if (reset) {
-                await setBowDB(TNTGames, user.player.uuid, m.author.id)
+                await setBowDB(user.player, user.player.uuid, m.author.id)
             }
             return m.channel.send(embed)
         }
@@ -756,10 +764,12 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
                 .setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green)
                 .addField(`**Wins**`, displayOldNewNumbers(data.tag.w, replaceError(TNTGames.wins_tntag, 0)), true)
                 .addField(`**Kills**`, displayOldNewNumbers(data.tag.k, replaceError(TNTGames.kills_tntag, 0)), true)
-                .addField(`**K/W**`, displayOldNewNumbers(Math.round(data.tag.kw*1000)/1000, Math.round(ratio(TNTGames.kills_tntag, TNTGames.wins_tntag)*1000)/1000, true))
+                .addField(`**K/W**`, displayOldNewNumbers(Math.round(data.tag.kw*1000)/1000, Math.round(ratio(TNTGames.kills_tntag, TNTGames.wins_tntag)*1000)/1000), true)
+                .addField(`**Tags**`, displayOldNewNumbers(data.tag.tags, replaceError(user.player.achievements.tntgames_clinic, 0)), true)
+                .addField(`**Tags/Kill**`, displayOldNewNumbers(Math.round(data.tag.tk*1000)/1000, Math.round(ratio(user.player.achievements.tntgames_clinic, TNTGames.kills_tntag)*1000)/1000), true)
                 .setDescription(`()s show changes since your last ${prefix}stats call for this user`)
             if (reset) {
-                await setTagDB(TNTGames, user.player.uuid, m.author.id)
+                await setTagDB(user.player, user.player.uuid, m.author.id)
             }
             return m.channel.send(embed)
         }
@@ -804,15 +814,15 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
                 .addField(`**Storm**`, displayOldNewNumbers(data.wizardKills.s_k, replaceError(TNTGames.new_stormwizard_kills, 0)), true)
             }
             if (settings.verbose && reset) {
-                await setWizKillsDB(TNTGames, user.player.uuid, m.author.id)
+                await setWizKillsDB(user.player, user.player.uuid, m.author.id)
             }
             if (reset) {
-                await setWizDB(TNTGames, user.player.uuid, m.author.id)
+                await setWizDB(user.player, user.player.uuid, m.author.id)
             }
             return m.channel.send(embed)
         }
         else if (game == "all") {
-            if (TNTGames.record_tntrun == undefined) {var runRecordDifference = 0} else {var runRecordDifference = TNTGames.record_tntrun - data.run.record}
+            if (TNTGames.record_tntrun == undefined) {var runRecordDifference = 0} else {var runRecordDifference = TNTGames.record_tntrun - data.allTNT.record_tntrun}
             if (runRecordDifference > 0) {
                 var runRecordDisplay = min_sec(TNTGames.record_tntrun) + " (+" + min_sec(runRecordDifference) + ")"
             }
@@ -820,7 +830,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
                 var runRecordDisplay = min_sec(TNTGames.record_tntrun)
             }
 
-            if (TNTGames.record_pvprun == undefined) {var pvpRecordDifference = 0} else {var pvpRecordDifference = TNTGames.record_pvprun - data.pvp.record}
+            if (TNTGames.record_pvprun == undefined) {var pvpRecordDifference = 0} else {var pvpRecordDifference = TNTGames.record_pvprun - data.allTNT.record_pvprun}
             if (pvpRecordDifference > 0) {
                 var pvpRecordDisplay = min_sec(TNTGames.record_pvprun) + " (+" + min_sec(pvpRecordDifference) + ")"
             } else {
@@ -835,22 +845,22 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
                 .setURL(`https://plancke.io/hypixel/player/stats/${user.player.displayname}`)
                 .setTimestamp()
                 .setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green)
-                .addField(`**Coins**`, displayOldNewNumbers(data.coins, replaceError(TNTGames.coins, 0)), true)
-                .addField(`**TNT Wins**`, displayOldNewNumbers(data.w, replaceError(TNTGames.wins, 0)), true)
-                .addField(`**Winstreak**`, displayOldNewNumbers(data.streak, replaceError(TNTGames.winstreak, 0)), true)
-                .addField(`**Tag Wins**`, displayOldNewNumbers(data.tag.w, replaceError(TNTGames.wins_tntag, 0)), true)
+                .addField(`**Coins**`, displayOldNewNumbers(data.allTNT.coins, replaceError(TNTGames.coins, 0)), true)
+                .addField(`**Winstreak**`, displayOldNewNumbers(data.allTNT.streak, replaceError(TNTGames.winstreak, 0)), true)
+                .addField(`**Playtime**`, displayOldNewNumbers(data.allTNT.time, replaceError(user.player.achievements.tntgames_tnt_triathlon, 0)), true)
+                .addField(`**TNT Wins**`, displayOldNewNumbers(data.allTNT.total_wins, replaceError(TNTGames.wins_tntrun, 0)+replaceError(TNTGames.wins_pvprun, 0)+replaceError(TNTGames.wins_tntag, 0)+replaceError(TNTGames.wins_bowspleef, 0) + replaceError(TNTGames.wins_capture, 0),), true)
+                .addField(`**Tag Wins**`, displayOldNewNumbers(data.allTNT.tag_wins, replaceError(TNTGames.wins_tntag, 0)), true)
                 .addField(`**TNT Run Record**`, runRecordDisplay, true)
-                .addField(`**TNT Run Wins**`, displayOldNewNumbers(data.run.w, replaceError(TNTGames.wins_tntrun, 0)), true)
-                .addField(`**Bowspleef Wins**`, displayOldNewNumbers(data.bow.w, replaceError(TNTGames.wins_bowspleef, 0)), true)
-                .addField(`**Wizards Wins**`, displayOldNewNumbers(data.wizards.w, replaceError(TNTGames.wins_capture, 0)), true)
-                .addField(`**Wizards Kills**`, displayOldNewNumbers(data.wizards.k, replaceError(TNTGames.kills_capture, 0)), true)
+                .addField(`**TNT Run Wins**`, displayOldNewNumbers(data.allTNT.run_wins, replaceError(TNTGames.wins_tntrun, 0)), true)
+                .addField(`**Bowspleef Wins**`, displayOldNewNumbers(data.allTNT.bow_wins, replaceError(TNTGames.wins_bowspleef, 0)), true)
+                .addField(`**Wizards Wins**`, displayOldNewNumbers(data.allTNT.wizards_wins, replaceError(TNTGames.wins_capture, 0)), true)
+                .addField(`**Wizards Kills**`, displayOldNewNumbers(data.allTNT.wizards_kills  , replaceError(TNTGames.kills_capture, 0)), true)
                 .addField(`**PVP Run Record**`, pvpRecordDisplay, true)
-                .addField(`**PVP Run Wins**`, displayOldNewNumbers(data.pvp.w, replaceError(TNTGames.wins_pvprun, 0)), true)
-                .addField(`**PVP Run Kills**`, displayOldNewNumbers(data.pvp.k, replaceError(TNTGames.kills_pvprun, 0)), true)
+                .addField(`**PVP Run Wins**`, displayOldNewNumbers(data.allTNT.pvp_wins, replaceError(TNTGames.wins_pvprun, 0)), true)
                 .setDescription(`()s show changes since your last ${prefix}stats call for this user`)
 
             if (reset) {
-                await setAllDB(TNTGames, user.player.uuid, m.author.id)
+                await setAllDB(user.player, user.player.uuid, m.author.id)
             }
             return m.channel.send(embed)
         }
@@ -908,7 +918,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
         const TNTGames = user.player.stats.TNTGames
         data = await db.get("cache."+m.author.id+"."+user.player.uuid)
         if (data == undefined) {
-            await setCacheDB(TNTGames, user.player.uuid,m.author.id)
+            await setCacheDB(user.player, user.player.uuid,m.author.id)
             data = await db.get("cache."+m.author.id+"."+user.player.uuid)
         }
         rankData = findRank(user)
@@ -933,7 +943,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
             .addField(`**Storm**`, displayOldNewNumbers(data.wizardKills.s_k, replaceError(TNTGames.new_stormwizard_kills, 0)), true)
             .setDescription("Total Kills: " + displayOldNewNumbers(data.wizardKills.total_k, replaceError(TNTGames.kills_capture, 0)))
         if (reset) {
-            setWizKillsDB(TNTGames, user.player.uuid, m.author.id)
+            setWizKillsDB(user.player, user.player.uuid, m.author.id)
         }
         return m.channel.send(embed)
     }
@@ -987,7 +997,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
         if(!user || !user.success || user.success == false || user.player == null || user.player == undefined || !user.player || user.player.stats == undefined) return sendErrorEmbed(m.channel, `Unknown Player`, `Player has no data in Hypixel's Database`);
         if(user.player.stats.TNTGames == undefined) return sendErrorEmbed(m.channel,`Unknown Player`,`Player has no Data in Hypixel's TNT Database`)
 
-        await setCacheDB(user.player.stats.TNTGames, user.player.uuid, m.author.id)
+        await setCacheDB(user.player, user.player.uuid, m.author.id)
         return m.channel.send(`Reset counters for you!`)
     }
     else if (command.toLowerCase() == "source") {
@@ -1030,9 +1040,13 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
             return m.channel.send("Too many arguments")
         }
 
-        return m.channel.send(`__**Bot Development & Bot Server (also TNT Wizards Discord)**__
-https://discord.gg/Mappy28gZD`)
-
+        return m.channel.send("Hey! This bot was coded by Mysterium! Check out my server to report bugs and check out my other work: https://discord.gg/7Qb5xuJD4C\nHere's my website (WIP): <https://mysterium.me>")
+    }
+    else if (command == "mysterium") {
+        return m.channel.send("Hey! This bot was coded by Mysterium! Check out my server to report bugs and check out my other work: https://discord.gg/7Qb5xuJD4C\nHere's my website (WIP): <https://mysterium.me>")
+    }
+    else if (command == "bugs") {
+        return m.channel.send("Report any bugs here: https://discord.gg/7Qb5xuJD4C")
     }
 })
 
