@@ -1353,20 +1353,6 @@ client.on("message", async message => {
 			message.channel.send("No account registered to this ID");
 		}
 		return;
-	} else if (command.toLowerCase() == "discord") {
-		if (args.length != 0) {
-			return message.channel.send("Too many arguments");
-		}
-
-		return message.channel.send(`**Discord Links**
-	**TNT Games** - <https://discord.gg/5gTM5UZdQb>
-	**TNT Wizards** - <https://discord.gg/95T6ZHa>
-	**TNT Run** - <https://discord.gg/W9xBSjt>
-	**TNT Tag** - <https://discord.gg/FsneyHHRRt>
-	**PVP Run** - <https://discord.gg/DRX8Jkt>
-	**Bow Spleef** - <https://discord.gg/sE4uNVs6MF>
-
-	**My Server** - <https://discord.gg/7Qb5xuJD4C> `);
 	} else if (command == "mysterium") {
 		return message.channel.send("Hey! This bot was coded by Mysterium&Lebster!\nReport Bugs here: https://discord.gg/7Qb5xuJD4C\nHere's my website (WIP): <https://mysterium.me>");
 	} else if (command == "announcement") {
