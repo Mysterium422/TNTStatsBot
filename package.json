@@ -13,17 +13,17 @@
   "keywords": [],
   "contributors": [
     "Mysterium",
-    {"name": "LebsterFace", "url": "https://lebster.xyz/", "email": "samsalinsky@gmail.com"}
+    {
+      "name": "LebsterFace",
+      "url": "https://lebster.xyz/",
+      "email": "samsalinsky@gmail.com"
+    }
   ],
   "license": "AGPL-3.0-or-later",
   "homepage": "https://github.com/LebsterFace/TNTStatsBot/blob/main/README.md",
   "dependencies": {
     "discord.js": "^12.2.0",
-    "js-yaml": "^4.0.0",
-    "merge-files": "^0.1.2",
     "node-fetch": "^2.6.1",
-    "node-schedule": "^2.0.0",
-    "util": "^0.12.3",
-    "yaml": "^1.10.0"
+    "node-schedule": "^2.0.0"
   }
 }
