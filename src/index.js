@@ -687,28 +687,28 @@ client.on("ready", async () => {
 	console.log("Bot: TNT Stats Bot is online!");
 	client.user.setActivity("TNT Games  | Use /TNThelp");
 
-	const scheduleRule = new schedule.RecurrenceRule();
-	scheduleRule.second = 0;
-	scheduleRule.minute = 30;
-	scheduleRule.hour = 9;
-	scheduleRule.dayOfWeek = 0;
-	scheduleRule.tz = "America/New_York";
+	// const scheduleRule = new schedule.RecurrenceRule();
+	// scheduleRule.second = 0;
+	// scheduleRule.minute = 30;
+	// scheduleRule.hour = 9;
+	// scheduleRule.dayOfWeek = 0;
+	// scheduleRule.tz = "America/New_York";
 
-	schedule.scheduleJob(scheduleRule, async function() {
-		console.log("deconsting weekly");
-		db.deconste("weekly");
-	});
+	// schedule.scheduleJob(scheduleRule, async function() {
+	// 	console.log("deconsting weekly");
+	// 	db.deconste("weekly");
+	// });
 
-	const scheduleRule2 = new schedule.RecurrenceRule();
-	scheduleRule2.second = 0;
-	scheduleRule2.minute = 30;
-	scheduleRule2.hour = 9;
-	scheduleRule2.date = 1;
-	scheduleRule2.tz = "America/New_York";
+	// const scheduleRule2 = new schedule.RecurrenceRule();
+	// scheduleRule2.second = 0;
+	// scheduleRule2.minute = 30;
+	// scheduleRule2.hour = 9;
+	// scheduleRule2.date = 1;
+	// scheduleRule2.tz = "America/New_York";
 
-	schedule.scheduleJob(scheduleRule2, async function() {
-		db.deconste("weekly");
-	});
+	// schedule.scheduleJob(scheduleRule2, async function() {
+	// 	db.deconste("weekly");
+	// });
 
 	fs.readdirSync(path.resolve(__dirname, "commands")).forEach(fileName => {
 		const obj = require("./commands/" + fileName);
