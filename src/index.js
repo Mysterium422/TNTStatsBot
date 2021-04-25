@@ -885,8 +885,7 @@ client.on("message", async message => {
 			try {
 				received = await fs.readFileSync("../global/IDS.json");
 			} catch (e) {
-				console.log("Failure! File Invalid");
-				console.log("Terminating Program - Code 005");
+				console.warn("File is invalid!");
 				process.exit();
 			}
 			idData = JSON.parse(received);
@@ -981,8 +980,7 @@ client.on("message", async message => {
 			try {
 				received = await fs.readFileSync("../global/IDS.json");
 			} catch (e) {
-				console.log("Failure! File Invalid");
-				console.log("Terminating Program - Code 005");
+				console.warn("File is invalid!");
 				process.exit();
 			}
 			idData = JSON.parse(received);
@@ -1003,8 +1001,7 @@ client.on("message", async message => {
 			try {
 				received = await fs.readFileSync("../global/IDS.json");
 			} catch (e) {
-				console.log("Failure! File Invalid");
-				console.log("Terminating Program - Code 005");
+				console.warn("File is invalid!");
 				process.exit();
 			}
 			idData = JSON.parse(received);
@@ -1220,8 +1217,7 @@ client.on("message", async message => {
 			try {
 				received = await fs.readFileSync("../global/IDS.json");
 			} catch (e) {
-				console.log("Failure! File Invalid");
-				console.log("Terminating Program - Code 005");
+				console.warn("File is invalid!");
 				process.exit();
 			}
 			idData = JSON.parse(received);
@@ -1341,8 +1337,7 @@ client.on("message", async message => {
 			try {
 				received = await fs.readFileSync("../global/IDS.json");
 			} catch (e) {
-				console.log("Failure! File Invalid");
-				console.log("Terminating Program - Code 005");
+				console.warn("File is invalid!");
 				process.exit();
 			}
 			idData = JSON.parse(received);
@@ -1375,8 +1370,7 @@ client.on("message", async message => {
 			try {
 				received = await fs.readFileSync("../global/IDS.json");
 			} catch (e) {
-				console.log("Failure! File Invalid");
-				console.log("Terminating Program - Code 005");
+				console.warn("File is invalid!");
 				process.exit();
 			}
 			const idData = JSON.parse(received);
@@ -1452,8 +1446,7 @@ client.on("message", async message => {
 			try {
 				received = await fs.readFileSync("../global/IDS.json");
 			} catch (e) {
-				console.log("Failure! File Invalid");
-				console.log("Terminating Program - Code 005");
+				console.warn("File is invalid!");
 				process.exit();
 			}
 			idData = JSON.parse(received);

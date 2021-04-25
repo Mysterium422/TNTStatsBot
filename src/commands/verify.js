@@ -3,14 +3,14 @@ const config = require("../../config.json");
 module.exports = {
 	run: async (client, message, args) => {
 		if (message.author.id !== config.masterID) return message.channel.send("This is a discord-bot-owner-only command");
-        debugger;
+        
+        const mentioned = message.mentions.users.first();
+
 		if (args.length != 2) {
 			return message.channel.send("Incorrect amount of arguments");
-		} else if (!args[0].includes("@")) {
-			return message.channel.send("First Arg must be a ping");
-		}
-
-		if (args[1].length > 20) {
+		} else if (typeof mentioned === "undefined") {
+			return message.channel.send("First argument must mention the member to verify!");
+		} else if (args[1].length > 16) {
 			data = await hypixelFetch(`player?uuid=${args[1]}`);
 		} else {
 			const uuidInput = await mojangUUIDFetch(args[1]).catch(() => {
@@ -19,7 +19,7 @@ module.exports = {
 				};
 			});
 
-			if (uuidInput.id.length > 20) {
+			if (uuidInput.id.length > 16) {
 				data = await hypixelFetch(`player?uuid=${uuidInput.id}`);
 			} else {
 				data = await hypixelFetch(`player?name=${args[1]}`);
@@ -36,8 +36,7 @@ module.exports = {
 		try {
 			received = await fs.readFileSync("../global/IDS.json");
 		} catch (e) {
-			console.log("Failure! File Invalid");
-			console.log("Terminating Program - Code 005");
+			console.warn("File is invalid!");
 			process.exit();
 		}
 		idData = JSON.parse(received);
