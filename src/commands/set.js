@@ -19,7 +19,7 @@ module.exports = {
             }
         }
 
-		const user = await hypixelFetch("user?uuid=" + uuid);
+		const user = await hypixelFetch("player?uuid=" + uuid);
 
 		if (user === null) {
 			return message.channel.send(errorEmbed("Failed to reach Hypixel API", "Hypixel could be offline?"));
@@ -32,10 +32,11 @@ module.exports = {
 		} else if (
 			typeof user.player.socialMedia === "undefined" ||
 			typeof user.player.socialMedia.links === "undefined" ||
-			typeof user.player.socialMedia.links.DISCORD === "undefined" ||
-			user.player.socialMedia.links.DISCORD !== message.author.tag
+			typeof user.player.socialMedia.links.DISCORD === "undefined"
 		) {
 			return message.channel.send(errorEmbed("Discord account not linked", strings.unlinked(prefix, args[0])));
+		} else if (user.player.socialMedia.links.DISCORD !== message.author.tag) {
+			return message.channel.send(errorEmbed("Discord account incorrect", `${args[0]} has their Hypixel profile linked to a different user. Did you link the correct discord account?`));
 		}
 
 		await db.setData(uuid, message.author.id);

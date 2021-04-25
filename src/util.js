@@ -3,22 +3,14 @@ const Discord = require("discord.js");
 const embedFooter = {
 	text: [
 		"TNT Stats Bot by Mysterium_",
-		"TNT Stats Bot by Mysterium_",
-		"TNT Stats Bot by Mysterium_",
 		"Created by Mysterium_",
-		"Created by Mysterium_",
-		"Created by Mysterium_",
+		"Rewritten by Lebster",
+		"Version 5.0.0 By Lebster",
 		"Invite this bot to your own server! (/invite)",
-		"Invite this bot to your own server! (/invite)",
-		"Invite this bot to your own server! (/invite)",
-		"Invite this bot to your own server! (/invite)",
-		"Invite this bot to your own server! (/invite)",
-		"Wizard Leaderboard Bot! (/discord)",
-		"Suggest fixes! (/discord)",
+		"Found a bug? Report it! (/discord)",
 		"Join the discord! (/discord)",
 		"All bow to sensei Kidzyy",
-		"Check out my code! (/source)",
-		"Report any bugs! (/discord)"
+		"I'm open source! (/source)",
 	],
 	image: {
 		green: "https://cdn.discordapp.com/emojis/722990201307398204.png?v=1",
