@@ -717,209 +717,204 @@ client.on("ready", async () => {
 	console.log("Commands loaded");
 });
 
-client.on("message", async m => {
-	if (m.author.bot) return;
-
-	if (m.content.toLowerCase() == "/ping") {
-		const discordToBot = Date.now() - m.createdTimestamp;
-
-		const now = Date.now();
-		await db.get("chan_" + m.channel.id);
-		const botToDB = Date.now() - now;
-
-		const now2 = Date.now();
-		const hypixelResponse = await hypixelFetch("key?");
-		const botToHypixel = Date.now() - now2;
-		let botToHypixelString = "";
-		if (hypixelResponse == "API ERROR") {
-			botToHypixelString = "No Response - ";
-		}
-
-		const now3 = Date.now();
-		messageSent = await m.channel.send(`**Ping**\n
-Discord to Bot: ${discordToBot}
-Bot to Hypixel (round trip): ${botToHypixelString}${botToHypixel}
-Bot to Database (round trip): ${botToDB}`);
-		const botToDiscord = Date.now() - now3;
-
-		messageSent.edit(`**Ping**
-Discord to Bot: ${discordToBot} ms
-Bot to Hypixel (round trip): ${botToHypixelString}${botToHypixel} ms
-Bot to Database (round trip): ${botToDB} ms
-Bot to Discord: ${botToDiscord} ms
-Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - botToDB - botToDiscord} ms`);
-	}
-
-	if (m.content.startsWith("<@!735055542178938960>")) {
-		const channel = await db.get("chan_" + m.channel.id);
-		if (channel === null) {
-			if (m.member.hasPermission("ADMINISTRATOR")) {
-				return m.channel.send("Channel not configured (Use /TNTconfigure)");
-			} else {
-				return m.channel.send("Channel not configured");
-			}
-		} else {
-			return m.channel.send(`My prefix in this channel is: ${channel.prefix}\nMy default game in this channel is: ${channel.game}`);
-		}
-	}
-
-	if (m.content.toLowerCase().startsWith("/tntconfigure")) {
-		const configurationTool = {
-			all: "All TNT Games",
-			wizards: "TNT Wizards",
-			run: "TNT Run",
-			pvp: "PVP Run",
-			tag: "TNT Tag",
-			bowspleef: "Bow spleef"
-		};
-
-		if (!m.member.hasPermission("ADMINISTRATOR") && m.author.id != config.masterID) return;
-		console.log(`${m.author.username}: ${m.content}`);
-
-		const args = m.content.slice(14).split(" ");
-
-		if (!(args[0] in configurationTool)) {
-			return sendErrorEmbed(m.channel, `First Paramenter Invalid`, `Looking for: all, wizards, run, pvp, tag, or bowspleef`);
-		}
-		if (args.length == 1) {
-			return sendErrorEmbed(m.channel, `Second Parameter Invalid`, `No Parameter was found`);
-		}
-		if (args.length > 2) {
-			return sendErrorEmbed(m.channel, `Prefix Invalid`, `No Spaces in the prefix!`);
-		}
-
-		await db.set(`chan_${m.channel.id}`, {
-			game: args[0],
-			prefix: args[1]
-		});
-
-		const embed = new Discord.MessageEmbed().setColor("#00BF00").setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`).setTitle(`Success! Channel Configured`).setTimestamp().setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green).addField(`__Default Game:__`, configurationTool[args[0]], true).addField(`__Bot Prefix:__`, args[1], true);
-		return m.channel.send(embed);
-	} else if (m.content.toLowerCase() == "/tntremove") {
-		if (!m.member.hasPermission("ADMINISTRATOR") && m.author.id != config.masterID) return;
-
-		await db.deconste(`chan_${m.channel.id}`);
-		m.channel.send("I will no longer respond to messages in this channel");
-	} else if (m.content.toLowerCase().startsWith("/tnthelp")) {
-		const prefix = "/";
-		const msg = await m.channel.send(new Discord.MessageEmbed().setColor("#3bcc71").setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`).setTitle("Help Menu - Home").setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`).setTimestamp().setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green).setDescription(`:house:: Home\n:bar_chart:: Stat Commands\n:tools:: QoL Commands \n:information_source:: Bot Information Commands\n:track_next:: Latest Update Info`));
-		msg.react("🏠").then(msg.react("📊").then(msg.react("🛠").then(msg.react("ℹ").then(msg.react("⏭")))));
-
-		const filter = (reaction, user) => user.id === m.author.id;
-
-		const collector = msg.createReactionCollector(filter, {
-			time: 60000
-		});
-		collector.on("collect", async (reaction, user) => {
-			collector.resetTimer({
-				time: 60000
-			});
-
-			await reaction.users.remove(user.id).catch(() => {
-				return;
-			});
-
-			if (reaction.emoji.name == "🏠") {
-				if (reaction.message.reactions.cache.has("⚙")) {
-					await reaction.message.reactions.cache.get("⚙").users.remove(client.user.id);
-				}
-				msg.edit(
-					new Discord.MessageEmbed().setColor("#3bcc71").setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`).setTitle("Help Menu - Home").setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`).setTimestamp().setFooter("Created by Mysterium", embedFooter.image.green).setDescription(`:house:: Home\n:bar_chart:: Stat Commands
-:tools:: QoL Commands 
-:information_source:: Bot Information Commands
-:track_next:: Latest Update Info
-
-**/tntconfigure [game] [prefix]** - Configure the bot to *this* channel. Game options include All, Wizards, Bowspleef, TNT Tag, TNT Run, PVP Run.
-**/tntremove** - Remove this channel from the bot's list of channels.
-**/tnthelp** - Opens this menu
-**/ping** - Check Bot Connection`)
-				);
-			} else if (reaction.emoji.name == "📊") {
-				if (reaction.message.reactions.cache.has("⚙")) {
-					await reaction.message.reactions.cache.get("⚙").users.remove(client.user.id);
-				}
-				msg.edit(
-					new Discord.MessageEmbed().setColor("#3bcc71").setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`).setTitle("Help Menu - Stat Commands").setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`).setTimestamp().setFooter("Created by Mysterium_", embedFooter.image.green).setDescription(`**${prefix}stats all {username}** - Shows overall TNT Games Stats
-**${prefix}stats run {username}** - Shows TNT Run Stats
-**${prefix}stats tag {username}** - Shows TNT Tag Stats
-**${prefix}stats bowspleef {username}** - Shows Bowspleef Stats
-**${prefix}stats wizards {username}** - Shows TNT Wizards Stats
-**${prefix}stats pvp {username}** - Shows PVP Run Stats
-**${prefix}kills {username}** - Shows TNT Wizards kills by class
-			
-*()s show changes since your last stats call for that user*
-*Game defaults to your channel-configured game if not specified*
-*Username defaults to your verified username if not specified*`)
-				);
-			} else if (reaction.emoji.name == "🛠") {
-				await msg.react("⚙");
-				msg.edit(
-					new Discord.MessageEmbed().setColor("#3bcc71").setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`).setTitle("Help Menu - QoL Commands").setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`).setTimestamp().setFooter("Created by Mysterium_", embedFooter.image.green).setDescription(`**${prefix}account {User ping}** - Shows the account of the specified player if they are verified
-**${prefix}set {username}** - Sets your username. Requires you to set your discord tag in Hypixel
-**${prefix}settings {setting} {value}** - Configures the setting to the value specified
-**${prefix}reset** - Updates your personal stats in the cache. Only useful if reset setting is false
-			
-:gear:: Settings Info`)
-				);
-			} else if (reaction.emoji.name == "ℹ") {
-				if (reaction.message.reactions.cache.has("⚙")) {
-					await reaction.message.reactions.cache.get("⚙").users.remove(client.user.id);
-				}
-				msg.edit(
-					new Discord.MessageEmbed().setColor("#3bcc71").setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`).setTitle("Help Menu - Bot Info Commands").setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`).setTimestamp().setFooter("Created by Mysterium_", embedFooter.image.green).setDescription(`**${prefix}help** - Opens this menu
-**${prefix}info** - Shows bot info
-**${prefix}invite** - Pastes bot invite link
-**${prefix}source** - Pastes bot source code link
-**${prefix}discord** - Pastes the links of TNT Game discord servers
-**${prefix}mysterium** - See more about the bot creator
-**${prefix}bugs** - Pastes server invite link to report bugs`)
-				);
-			} else if (reaction.emoji.name == "⏭") {
-				if (reaction.message.reactions.cache.has("⚙")) {
-					await reaction.message.reactions.cache.get("⚙").users.remove(client.user.id);
-				}
-				msg.edit(
-					// MAINBOTEDIT
-					new Discord.MessageEmbed().setColor("#3bcc71").setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`).setTitle(`Latest Update v${pkg.version}${config.canary ? "dev" : ""}`).setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`).setTimestamp().setFooter("Created by Mysterium_", embedFooter.image.green).setDescription(`- Created Interactive Help Menu
-- Added duels gamemode support
-- Fixed ()s with time bug
-- Formatted playtime
-- Added owner-only announcement command
-- Added some command aliases
-- Added new weekly and monthly stats system`)
-				);
-			} else if (reaction.emoji.name == "⚙") {
-				msg.edit(
-					new Discord.MessageEmbed().setColor("#3bcc71").setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`).setTitle("Help Menu - Settings Info").setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`).setTimestamp().setFooter("Created by Mysterium_", embedFooter.image.green).setDescription(`Format: **Setting** *(Acceptable Values)* - Description - Default: __Value__
-			
-**Verbose** *(True/False)* - Show more stats - Default: __False__
-**Reset** *(True/False)* - Do not update cache so ()s will stay until you do /reset. Only works on your own registered ign - Default: __True__`)
-				);
-			}
-		});
-	}
-
-	let channel = await db.get("chan_" + m.channel.id);
-	if (channel === null) return;
-
-	const prefix = channel.prefix;
-	if (!m.content.startsWith(prefix)) return;
-	let game = channel.game;
-
-	const args = m.content.slice(prefix.length).split(" ");
+client.on("message", async message => {
+	const prefix = "!";
+	if (message.author.bot) return;
+	const args = message.content.slice(prefix.length).split(" ");
 	const command = args.shift().toLowerCase();
 
-	console.log(m.author.username + ": " + m.content);
-
 	if (command in commands) {
-		message.channel.send("Command recognized");
 		debugger;
+		message.channel.send("Command recognized");
 		await commands[command].run(client, message, args);
-		return;
 	} else {
 		message.channel.send("Command does not exist!");
 	}
+	
 
+// 	if (m.content.startsWith("<@!735055542178938960>")) {
+// 		const channel = await db.get("chan_" + m.channel.id);
+// 		if (channel === null) {
+// 			if (m.member.hasPermission("ADMINISTRATOR")) {
+// 				return m.channel.send("Channel not configured (Use /TNTconfigure)");
+// 			} else {
+// 				return m.channel.send("Channel not configured");
+// 			}
+// 		} else {
+// 			return m.channel.send(`My prefix in this channel is: ${channel.prefix}\nMy default game in this channel is: ${channel.game}`);
+// 		}
+// 	} else if (m.content.toLowerCase().startsWith("/tntconfigure")) {
+// 		const configurationTool = {
+// 			all: "All TNT Games",
+// 			wizards: "TNT Wizards",
+// 			run: "TNT Run",
+// 			pvp: "PVP Run",
+// 			tag: "TNT Tag",
+// 			bowspleef: "Bow spleef"
+// 		};
+
+// 		if (!m.member.hasPermission("ADMINISTRATOR") && m.author.id != config.masterID) return;
+// 		console.log(`${m.author.username}: ${m.content}`);
+
+// 		const args = m.content.slice(14).split(" ");
+
+// 		if (!(args[0] in configurationTool)) {
+// 			return sendErrorEmbed(m.channel, `First Paramenter Invalid`, `Looking for: all, wizards, run, pvp, tag, or bowspleef`);
+// 		}
+// 		if (args.length == 1) {
+// 			return sendErrorEmbed(m.channel, `Second Parameter Invalid`, `No Parameter was found`);
+// 		}
+// 		if (args.length > 2) {
+// 			return sendErrorEmbed(m.channel, `Prefix Invalid`, `No Spaces in the prefix!`);
+// 		}
+
+// 		await db.set(`chan_${m.channel.id}`, {
+// 			game: args[0],
+// 			prefix: args[1]
+// 		});
+
+// 		const embed = new Discord.MessageEmbed().setColor("#00BF00").setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`).setTitle(`Success! Channel Configured`).setTimestamp().setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green).addField(`__Default Game:__`, configurationTool[args[0]], true).addField(`__Bot Prefix:__`, args[1], true);
+// 		return m.channel.send(embed);
+// 	} else if (m.content.toLowerCase() == "/tntremove") {
+// 		if (!m.member.hasPermission("ADMINISTRATOR") && m.author.id != config.masterID) return;
+
+// 		await db.deconste(`chan_${m.channel.id}`);
+// 		m.channel.send("I will no longer respond to messages in this channel");
+// 	} else if (m.content.toLowerCase().startsWith("/tnthelp")) {
+// 		const prefix = "/";
+// 		const msg = await m.channel.send(new Discord.MessageEmbed().setColor("#3bcc71").setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`).setTitle("Help Menu - Home").setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`).setTimestamp().setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green).setDescription(`:house:: Home\n:bar_chart:: Stat Commands\n:tools:: QoL Commands \n:information_source:: Bot Information Commands\n:track_next:: Latest Update Info`));
+// 		msg.react("🏠").then(msg.react("📊").then(msg.react("🛠").then(msg.react("ℹ").then(msg.react("⏭")))));
+
+// 		const filter = (reaction, user) => user.id === m.author.id;
+
+// 		const collector = msg.createReactionCollector(filter, {
+// 			time: 60000
+// 		});
+// 		collector.on("collect", async (reaction, user) => {
+// 			collector.resetTimer({
+// 				time: 60000
+// 			});
+
+// 			await reaction.users.remove(user.id).catch(() => {
+// 				return;
+// 			});
+
+// 			if (reaction.emoji.name == "🏠") {
+// 				if (reaction.message.reactions.cache.has("⚙")) {
+// 					await reaction.message.reactions.cache.get("⚙").users.remove(client.user.id);
+// 				}
+// 				msg.edit(
+// 					new Discord.MessageEmbed().setColor("#3bcc71").setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`).setTitle("Help Menu - Home").setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`).setTimestamp().setFooter("Created by Mysterium", embedFooter.image.green).setDescription(`:house:: Home\n:bar_chart:: Stat Commands
+// :tools:: QoL Commands 
+// :information_source:: Bot Information Commands
+// :track_next:: Latest Update Info
+
+// **/tntconfigure [game] [prefix]** - Configure the bot to *this* channel. Game options include All, Wizards, Bowspleef, TNT Tag, TNT Run, PVP Run.
+// **/tntremove** - Remove this channel from the bot's list of channels.
+// **/tnthelp** - Opens this menu
+// **/ping** - Check Bot Connection`)
+// 				);
+// 			} else if (reaction.emoji.name == "📊") {
+// 				if (reaction.message.reactions.cache.has("⚙")) {
+// 					await reaction.message.reactions.cache.get("⚙").users.remove(client.user.id);
+// 				}
+// 				msg.edit(
+// 					new Discord.MessageEmbed().setColor("#3bcc71").setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`).setTitle("Help Menu - Stat Commands").setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`).setTimestamp().setFooter("Created by Mysterium_", embedFooter.image.green).setDescription(`**${prefix}stats all {username}** - Shows overall TNT Games Stats
+// **${prefix}stats run {username}** - Shows TNT Run Stats
+// **${prefix}stats tag {username}** - Shows TNT Tag Stats
+// **${prefix}stats bowspleef {username}** - Shows Bowspleef Stats
+// **${prefix}stats wizards {username}** - Shows TNT Wizards Stats
+// **${prefix}stats pvp {username}** - Shows PVP Run Stats
+// **${prefix}kills {username}** - Shows TNT Wizards kills by class
+			
+// *()s show changes since your last stats call for that user*
+// *Game defaults to your channel-configured game if not specified*
+// *Username defaults to your verified username if not specified*`)
+// 				);
+// 			} else if (reaction.emoji.name == "🛠") {
+// 				await msg.react("⚙");
+// 				msg.edit(
+// 					new Discord.MessageEmbed().setColor("#3bcc71").setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`).setTitle("Help Menu - QoL Commands").setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`).setTimestamp().setFooter("Created by Mysterium_", embedFooter.image.green).setDescription(`**${prefix}account {User ping}** - Shows the account of the specified player if they are verified
+// **${prefix}set {username}** - Sets your username. Requires you to set your discord tag in Hypixel
+// **${prefix}settings {setting} {value}** - Configures the setting to the value specified
+// **${prefix}reset** - Updates your personal stats in the cache. Only useful if reset setting is false
+			
+// :gear:: Settings Info`)
+// 				);
+// 			} else if (reaction.emoji.name == "ℹ") {
+// 				if (reaction.message.reactions.cache.has("⚙")) {
+// 					await reaction.message.reactions.cache.get("⚙").users.remove(client.user.id);
+// 				}
+// 				msg.edit(
+// 					new Discord.MessageEmbed().setColor("#3bcc71").setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`).setTitle("Help Menu - Bot Info Commands").setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`).setTimestamp().setFooter("Created by Mysterium_", embedFooter.image.green).setDescription(`**${prefix}help** - Opens this menu
+// **${prefix}info** - Shows bot info
+// **${prefix}invite** - Pastes bot invite link
+// **${prefix}source** - Pastes bot source code link
+// **${prefix}discord** - Pastes the links of TNT Game discord servers
+// **${prefix}mysterium** - See more about the bot creator
+// **${prefix}bugs** - Pastes server invite link to report bugs`)
+// 				);
+// 			} else if (reaction.emoji.name == "⏭") {
+// 				if (reaction.message.reactions.cache.has("⚙")) {
+// 					await reaction.message.reactions.cache.get("⚙").users.remove(client.user.id);
+// 				}
+// 				msg.edit(
+// 					// MAINBOTEDIT
+// 					new Discord.MessageEmbed().setColor("#3bcc71").setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`).setTitle(`Latest Update v${pkg.version}${config.canary ? "dev" : ""}`).setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`).setTimestamp().setFooter("Created by Mysterium_", embedFooter.image.green).setDescription(`- Created Interactive Help Menu
+// - Added duels gamemode support
+// - Fixed ()s with time bug
+// - Formatted playtime
+// - Added owner-only announcement command
+// - Added some command aliases
+// - Added new weekly and monthly stats system`)
+// 				);
+// 			} else if (reaction.emoji.name == "⚙") {
+// 				msg.edit(
+// 					new Discord.MessageEmbed().setColor("#3bcc71").setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`).setTitle("Help Menu - Settings Info").setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`).setTimestamp().setFooter("Created by Mysterium_", embedFooter.image.green).setDescription(`Format: **Setting** *(Acceptable Values)* - Description - Default: __Value__
+			
+// **Verbose** *(True/False)* - Show more stats - Default: __False__
+// **Reset** *(True/False)* - Do not update cache so ()s will stay until you do /reset. Only works on your own registered ign - Default: __True__`)
+// 				);
+// 			}
+// 		});
+// 	}
+
+	// let channel = await db.get("chan_" + m.channel.id);
+	// if (channel === null) return;
+	// const prefix = channel.prefix;
+	// if (!m.content.startsWith(prefix)) return;
+	// let game = channel.game;
+
+
+// 	if (m.content.toLowerCase() == "/ping") {
+// 		const discordToBot = Date.now() - m.createdTimestamp;
+
+// 		const now = Date.now();
+// 		await db.get("chan_" + m.channel.id);
+// 		const botToDB = Date.now() - now;
+
+// 		const now2 = Date.now();
+// 		const hypixelResponse = await hypixelFetch("key?");
+// 		const botToHypixel = Date.now() - now2;
+// 		let botToHypixelString = "";
+// 		if (hypixelResponse == "API ERROR") {
+// 			botToHypixelString = "No Response - ";
+// 		}
+
+// 		const now3 = Date.now();
+// 		messageSent = await m.channel.send(`**Ping**\n
+// Discord to Bot: ${discordToBot}
+// Bot to Hypixel (round trip): ${botToHypixelString}${botToHypixel}
+// Bot to Database (round trip): ${botToDB}`);
+// 		const botToDiscord = Date.now() - now3;
+
+// 		messageSent.edit(`**Ping**
+// Discord to Bot: ${discordToBot} ms
+// Bot to Hypixel (round trip): ${botToHypixelString}${botToHypixel} ms
+// Bot to Database (round trip): ${botToDB} ms
+// Bot to Discord: ${botToDiscord} ms
+// Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - botToDB - botToDiscord} ms`);
+// 	}	
 	// 	if (command == "help") {
 	// 		const msg = await m.channel.send(new Discord.MessageEmbed().setColor("#3bcc71").setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`).setTitle("Help Menu - Home").setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`).setTimestamp().setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green).setDescription(`:house:: Home\n:bar_chart:: Stat Commands\n:tools:: QoL Commands \n:information_source:: Bot Information Commands\n:track_next:: Latest Update Info`));
 	// 		msg.react("🏠").then(msg.react("📊").then(msg.react("🛠").then(msg.react("ℹ").then(msg.react("⏭")))));
