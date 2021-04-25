@@ -1,5 +1,6 @@
 const config = require("../../config.json");
 const {errorEmbed, mojangUUIDFetch} = require("../util.js");
+const db = require("../db");
 
 module.exports = {
 	run: async (client, message, args) => {
@@ -22,7 +23,9 @@ module.exports = {
             }
         }
 
-        message.channel.send(errorEmbed("Verifying is not currently supported", "There is no database"));
+        // message.channel.send(errorEmbed("Verifying is not currently supported", "There is no database"));
+        await db.setData(uuid, message.author.id);
+        message.channel.send("Database: ```\n" + JSON.stringify(await db.all()) + "\n```");
 	},
 	aliases: []
 };

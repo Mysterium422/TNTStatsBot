@@ -9,25 +9,45 @@ const {mojangUUIDFetch, hypixelFetch, randInt, replaceError, ChatCodes, ChatColo
 const client = new Discord.Client();
 const config = require("../config.json");
 
+let isReady = false;
 const commands = {};
+client.on("ready", async () => {
+	console.log("[INFO] Initializing...");
 
-client.on("ready", () => {
-	console.log("Ready...");
+	try {
+		await db.createTable();
+		console.log("[SUCCESS] Loaded database...");
+	} catch(e) {
+		console.error("[ERROR] Failed to load database! Aborting...");
+		throw e;
+	}
 
-	fs.readdirSync(path.resolve(__dirname, "commands")).forEach(fileName => {
-		const obj = require("./commands/" + fileName);
-		// Slice to remove `.js`
-		commands[fileName.slice(0, -3)] = obj;
-	});
+	try {
+		fs.readdirSync(path.resolve(__dirname, "commands")).forEach(fileName => {
+			const obj = require("./commands/" + fileName);
+			// Slice to remove `.js`
+			commands[fileName.slice(0, -3)] = obj;
+		});
+		console.log("[SUCCESS] Loaded commands...");
+	} catch(e) {
+		console.error("[ERROR] Failed to load commands! Aborting...");
+		throw e;
+	}
 
-	console.log("Successfully loaded all commands...");
-	console.log(" -- Bot is now online! -- ");
+	console.log("[SUCCESS] Bot is now online and listening for commands!");
 	client.user.setActivity("TNT Games | Use /TNThelp");
+	isReady = true;
 });
 
 client.on("message", async message => {
 	const prefix = "!";
-	if (message.author.bot) return;
+	if (message.author.bot || !message.content.startsWith(prefix)) return;
+
+	if (!isReady) {
+		message.channel.send("I'm not ready, please try again in a few seconds...");
+		return;
+	}
+
 	const args = message.content.slice(prefix.length).split(" ");
 	const command = args.shift().toLowerCase();
 
