@@ -17,26 +17,6 @@ const config = require("../config.json");
 
 // HELPER OBJECTS
 
-const helpMsg = `__Commands (Prefixes consty depending on your channel)__
-**/TNThelp** opens this page. Works anywhere this bot can read/send messages
-**/TNTconfigure** <game> <prefix> configure the bot to work in *this* channel using that game or prefix (admin perms needed).
-**/TNTremove** This bot will no longer answer to queries in this channel (admin perms needed). Works anywhere this bot can read/send messages.
-**/help** opens this page
-**/info** shows info about the bot
-**/invite** bot invite link
-**/source** links the bot source code
-**/discord** join link for the discord
-**/account** <mention> Looks for an MC account registered to this Discord account 
-**/stats** <game> <username> displays the TNT data. <game> will default to the channel game and <username> will default to your set username
-Possible 'Game' Parameters: all, wizards, bowspleef, tag, run, pvp
-**/kills** <username> gives a breakdown of wizards class by class kills
-**/set** <username> sets your username.
-**/settings** <setting> <true/false>
-Possible 'setting' Parameters:
-    verbose - Show more Wizards stats with /stats Default: false
-    reset - When false /stats will not update cache so ()s stay till you do /reset. Only works on your own registered ign. Default: true
-**/reset** Updates your personal stats in the cache. Only useful if reset setting is false`;
-
 const booleanPhrases = {
 	false: false,
 	true: true,
