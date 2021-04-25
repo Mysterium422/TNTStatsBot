@@ -1335,12 +1335,6 @@ client.on("message", async message => {
 
 		await setCacheDB(user.player, user.player.uuid, message.author.id);
 		return message.channel.send(`Reset counters for you!`);
-	} else if (command.toLowerCase() == "source") {
-		if (args.length != 0) {
-			return message.channel.send("Too many arguments");
-		}
-
-		return message.channel.send("<https://github.com/Mysterium422/TNTStatsBot>");
 	} else if (command.toLowerCase() == "account") {
 		if (args.length != 1) {
 			return message.channel.send("Incorrect amount of arguments");
