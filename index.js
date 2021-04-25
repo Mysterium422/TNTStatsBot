@@ -5,9 +5,8 @@ const db = require("quick.db");
 const fs = require("fs");
 const yaml = require("js-yaml");
 
-// FETCH UNUSED BUT WORKS FOR FUTURE
-const {mojangUUIDFetch, hypixelFetch, plotzesFetch, fetch} = require("../global/mystFetch.js");
-const {randInt, replaceError} = require("../global/globalUtils.js");
+const {mojangUUIDFetch, hypixelFetch} = require("./mystFetch.js");
+const {randInt, replaceError} = require("./globalUtils.js");
 
 // USED FOR INFO COMMAND
 let unix_time_start = Date.now();
