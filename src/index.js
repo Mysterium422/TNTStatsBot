@@ -3,7 +3,6 @@ const Discord = require("discord.js"),
 	client = new Discord.Client();
 const fs = require("fs");
 const path = require("path");
-const yaml = require("js-yaml");
 const schedule = require("node-schedule");
 
 // FETCH UNUSED BUT WORKS FOR FUTURE
@@ -14,10 +13,7 @@ const {randInt, replaceError, ChatCodes, ChatColor, ownerID, timeConverter} = re
 const unix_time_start = Date.now();
 
 // SETUP CONFIG
-const yamlConfig = yaml.loadAll(fs.readFileSync(path.resolve(__dirname, "../config.yaml"), "utf8"));
-const config = yamlConfig[0];
-
-
+const config = require("../config.json");
 
 // HELPER OBJECTS
 

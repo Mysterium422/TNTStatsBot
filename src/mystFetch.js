@@ -6,12 +6,8 @@ function newMojangQuery() {
     }, 10 * 60 * 1000);
 }
 
-const yaml = require("js-yaml"),
-	path = require("path"),
-      fs = require("fs");
 // SETUP CONFIG
-const yamlConfig = yaml.loadAll(fs.readFileSync(path.resolve(__dirname, "../config.yaml"), "utf8"));
-const config = yamlConfig[0];
+const config = require("../config.json");
 const key = config.hypixelToken;
 
 module.exports = {
