@@ -16,8 +16,6 @@ const key = config.hypixelToken;
 
 module.exports = {
 	hypixelFetch: async function(query) {
-		console.log(`https://api.hypixel.net/${query}&key=${key}`);
-
 		let variable;
 		try {
 			variable = await nodeFetch(`https://api.hypixel.net/${query}&key=${key}`).then(res => res.json());
