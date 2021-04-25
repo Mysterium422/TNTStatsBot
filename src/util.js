@@ -1,4 +1,5 @@
 const Discord = require("discord.js");
+
 const embedFooter = {
 	text: [
 		"TNT Stats Bot by Mysterium_",
@@ -26,5 +27,6 @@ const embedFooter = {
 };
 
 const randomChoice = arr => arr[Math.floor(Math.random() * arr.length)];
+const noop = () => {};
 
-module.exports = {embedFooter, randomChoice};
+module.exports = {embedFooter, randomChoice, noop};
