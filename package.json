@@ -23,7 +23,6 @@
     "merge-files": "^0.1.2",
     "node-fetch": "^2.6.1",
     "node-schedule": "^2.0.0",
-    "quick.db": "^7.1.1",
     "util": "^0.12.3",
     "yaml": "^1.10.0"
   }
