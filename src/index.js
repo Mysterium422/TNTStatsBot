@@ -1369,8 +1369,6 @@ client.on("message", async message => {
 	**My Server** - <https://discord.gg/7Qb5xuJD4C> `);
 	} else if (command == "mysterium") {
 		return message.channel.send("Hey! This bot was coded by Mysterium&Lebster!\nReport Bugs here: https://discord.gg/7Qb5xuJD4C\nHere's my website (WIP): <https://mysterium.me>");
-	} else if (command == "bugs") {
-		return message.channel.send("Report any bugs here: https://discord.gg/7Qb5xuJD4C");
 	} else if (command == "announcement") {
 		if (message.author.id != config.masterID) return;
 

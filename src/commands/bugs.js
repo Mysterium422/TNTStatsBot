@@ -1,6 +1,6 @@
 module.exports = {
-    run: async (client, message, args) => {
-        message.channel.send("Message Handled!");
-    },
-    aliases: ["bug","reportbug","report","issue","issues"]
+	run: async (client, message, args) => {
+		return message.channel.send("Report any bugs here: https://discord.gg/7Qb5xuJD4C");
+	},
+	aliases: [ "bug", "reportbug", "report", "issue", "issues" ]
 };
