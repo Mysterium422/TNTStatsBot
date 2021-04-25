@@ -1,9 +1,12 @@
 const Discord = require("discord.js");
 const {performance} = require("perf_hooks");
-const {embedFooter, randomChoice, hypixelFetch} = require("../util.js");
+const {embedFooter, randomChoice, hypixelFetch, errorEmbed} = require("../util.js");
 
 module.exports = {
 	run: async (client, message, args) => {
+		// TODO: Fix this
+		if (1 + 1 === 2) return message.channel.send(errorEmbed("Command Failed", "The ping command is under construction..."));
+
 		const discordToBot = Date.now() - message.createdTimestamp;
 
 		let START = performance.now();
@@ -11,7 +14,7 @@ module.exports = {
 		const botToDB = performance.now() - START;
 
 		START = performance.now();
-		const hypixelResponse = await hypixelFetch("key?");
+		const hypixelResponse = await hypixelFetch("?");
 		const botToHypixel = performance.now() - START;
 		const hypixelString = hypixelResponse === "API ERROR" ? "No Response" : Math.round(botToHypixel) + "ms";
 
@@ -26,9 +29,7 @@ module.exports = {
 		embed.addField("Bot to Hypixel", hypixelString, true);
 		embed.addField("Bot to Database", Math.round(botToDB) + "ms", true);
 
-		message.channel.send(embed);
+		return message.channel.send(embed);
 	},
-	aliases: [
-		"latency"
-	]
+	aliases: [ "latency" ]
 };

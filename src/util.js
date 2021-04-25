@@ -44,7 +44,7 @@ const key = config.hypixelToken;
 const nodeFetch = require("node-fetch");
 
 // TODO: Caching with keyv (npm install keyv)
-const hypixelFetch = query => nodeFetch(`https://api.hypixel.net/${query}&key=${key}`).then(response => (response.status === 200 ? response.json() : null));
+const hypixelFetch = query => nodeFetch(`https://api.hypixel.net/${query}&key=${key}`).then(response => response.json());
 const mojangUUIDFetch = query => nodeFetch(`https://api.mojang.com/users/profiles/minecraft/${query}`).then(response => (response.status === 204 ? null : response.json()));
 
 const randInt = (max, min) => Math.floor(Math.random() * (max - min + 1) + min);
