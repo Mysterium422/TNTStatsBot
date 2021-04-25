@@ -96,10 +96,7 @@ function findRank(user) {
 	return rankData;
 }
 
-function sendErrorEmbed(channel, error, description) {
-	const errorEmbed = new Discord.MessageEmbed().setColor("#F64B4B").setTitle(`Oops!`).addField(`${error}`, `${description}`).setTimestamp().setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.red);
-	return channel.send(errorEmbed);
-}
+
 
 function min_sec(seconds) {
 	const mins = Math.floor(seconds / 60);

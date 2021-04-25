@@ -28,5 +28,14 @@ const embedFooter = {
 
 const randomChoice = arr => arr[Math.floor(Math.random() * arr.length)];
 const noop = () => {};
+const errorEmbed = (error = "Something went wrong...", description  = "") => {
+	const embed = new Discord.MessageEmbed();
+	embed.setColor("#F64B4B");
+	embed.setTitle(`Oops!`);
+	embed.addField(error, description);
+	embed.setTimestamp();
+	embed.setFooter(randomChoice(embedFooter.text), embedFooter.image.red);
+	return embed;
+};
 
-module.exports = {embedFooter, randomChoice, noop};
+module.exports = {embedFooter, randomChoice, noop, errorEmbed};
