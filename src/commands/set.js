@@ -5,15 +5,15 @@ const {errorEmbed, hypixelFetch, mojangUUIDFetch} = require("../util.js");
 
 module.exports = {
 	run: async (client, message, args) => {
-		if (args.length !== 2) {
-			return message.channel.send(errorEmbed("Incorrect number of arguments for *set*!", "Expected [uuid/playername]"));
+		if (args.length !== 1) {
+			return message.channel.send(errorEmbed("Incorrect number of arguments for set!", "Expected [uuid/playername]"));
 		}
 
-		let uuid = args[1];
-        if (args[1].length <= 16) {
-            const mojangResponse = await mojangUUIDFetch(args[1]);
+		let uuid = args[0];
+        if (args[0].length <= 16) {
+            const mojangResponse = await mojangUUIDFetch(args[0]);
             if (mojangResponse === null) {
-                return message.channel.send(errorEmbed("Invalid playername", `Failed to fetch the UUID of '${args[1]}' from the Mojang API`));
+                return message.channel.send(errorEmbed("Invalid playername", `Failed to fetch the UUID of '${args[0]}' from the Mojang API`));
             } else {
                 uuid = mojangResponse.id;
             }
@@ -37,28 +37,8 @@ module.exports = {
 		) {
 			return message.channel.send(errorEmbed("Discord account not linked", strings.unlinked(prefix, args[0])));
 		}
-		
-		let received = "";
-		try {
-			received = await fs.readFileSync("../global/IDS.json");
-		} catch (e) {
-			console.warn("File is invalid!");
-			process.exit();
-		}
-		idData = JSON.parse(received);
 
-		idData[user.player.uuid] = message.author.id;
-		idData[message.author.id] = user.player.uuid;
-
-		fs.writeFileSync("../global/IDS.json", JSON.stringify(idData));
-
-		await db.set(message.author.id, {
-			verbose: false,
-			reset: true
-		});
-
-		aait;
-
-		return message.channel.send("Successfully set your ign to " + args[0]);
+		await db.setData(uuid, message.author.id);
+		return message.channel.send("Successfully set your IGN to `" + args[0] + "`");
 	}
 };
