@@ -999,10 +999,6 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
 				);
 			}
 		});
-	}
-
-	if (command == "mysterium") {
-		m.channel.send("Hey! This bot was coded by Mysterium! Check out my server: https://discord.gg/7Qb5xuJD4C\nHere's my website (WIP): <https://mysterium.me>");
 	} else if (command.toLowerCase() == "invite") {
 		return m.channel.send("Use /TNTconfigure to setup the bot: \nhttps://discord.com/oauth2/authorize?client_id=735055542178938960&scope=bot&permissions=2147994688");
 	} else if (command.toLowerCase() == "verify") {
@@ -1607,7 +1603,7 @@ Discord: Mysterium#5229
 
 **My Server** - <https://discord.gg/7Qb5xuJD4C> `);
 	} else if (command == "mysterium") {
-		return m.channel.send("Hey! This bot was coded by Mysterium! Check out my server to report bugs and check out my other work: https://discord.gg/7Qb5xuJD4C\nHere's my website (WIP): <https://mysterium.me>");
+		return m.channel.send("Hey! This bot was coded by Mysterium&Lebster!\nReport Bugs here: https://discord.gg/7Qb5xuJD4C\nHere's my website (WIP): <https://mysterium.me>");
 	} else if (command == "bugs") {
 		return m.channel.send("Report any bugs here: https://discord.gg/7Qb5xuJD4C");
 	} else if (command == "announcement") {
