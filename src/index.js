@@ -3,10 +3,9 @@ const Discord = require("discord.js"),
 	Database = require("better-sqlite3"),
 	fs = require("fs"),
 	path = require("path"),
-	schedule = require("node-schedule");
-
-const {mojangUUIDFetch, hypixelFetch} = require("./mystFetch.js");
-const {randInt, replaceError, ChatCodes, ChatColor, ownerID, timeConverter} = require("./globalUtils.js");
+	schedule = require("node-schedule"),
+	{randInt, replaceError, ChatCodes, ChatColor, formatTimestamp, booleanPhrases} = require("./util.js"),
+	{mojangUUIDFetch, hypixelFetch} = require("./mystFetch.js");
 
 const client = new Discord.Client();
 
@@ -17,17 +16,6 @@ const unix_time_start = Date.now();
 const config = require("../config.json");
 
 // HELPER OBJECTS
-
-const booleanPhrases = {
-	true: true,
-	"1": true,
-	yes: true,
-	y: true,
-	no: false,
-	n: false,
-	false: false,
-	"0": false
-};
 
 // USEFUL COMMON FUNCTIONS
 function findRank(user) {
@@ -1410,7 +1398,7 @@ client.on("message", async message => {
 	} else if (command == "bugs") {
 		return message.channel.send("Report any bugs here: https://discord.gg/7Qb5xuJD4C");
 	} else if (command == "announcement") {
-		if (message.author.id != ownerID) return;
+		if (message.author.id != config.masterID) return;
 
 		channelList = db.all().filter(a => {
 			return a.ID.includes("chan_");
@@ -1422,7 +1410,7 @@ client.on("message", async message => {
 			}
 		}
 	} else if (command == "ownercommand") {
-		if (message.author.id != ownerID) return;
+		if (message.author.id != config.masterID) return;
 
 		channelList = db.all().filter(a => {
 			return a.ID.includes("chan_");
