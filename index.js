@@ -3,10 +3,11 @@ const Discord = require('discord.js'), client = new Discord.Client()
 const db = require('quick.db');
 const fs = require('fs');
 const yaml = require('js-yaml')
+const schedule = require('node-schedule');
 
 // FETCH UNUSED BUT WORKS FOR FUTURE
 const { mojangUUIDFetch, hypixelFetch, plotzesFetch, fetch } = require('../global/mystFetch.js')
-const { randInt, replaceError } = require('../global/globalUtils.js')
+const { randInt, replaceError, ChatCodes, ChatColor, ownerID, timeConverter } = require('../global/globalUtils.js');
 
 // USED FOR INFO COMMAND
 let unix_time_start = Date.now()
@@ -47,40 +48,6 @@ Possible 'setting' Parameters:
     verbose - Show more Wizards stats with /stats Default: false
     reset - When false /stats will not update cache so ()s stay till you do /reset. Only works on your own registered ign. Default: true
 **/reset** Updates your personal stats in the cache. Only useful if reset setting is false`
-
-const ChatColor = {black:"#000000",
-dark_blue:"#0000AA",
-dark_green:"#00AA00",
-dark_aqua:"#00AAAA",
-dark_red:"#AA0000",
-dark_purple:"#AA00AA",
-gold:"#FFAA00",
-gray:"#AAAAAA",
-dark_gray:"#555555",
-blue:"#5555FF",
-green:"#55FF55",
-aqua:"#55FFFF",
-red:"#FF5555",
-light_purple:"#FF55FF",
-yellow:"#FFFF55",
-white:"#FFFFFF"}
-
-const ChatCodes = {0:"black",
-1:"dark_blue",
-2:"dark_green",
-3:"dark_aqua",
-4:"dark_red",
-5:"dark_purple",
-6:"gold",
-7:"gray",
-8:"dark_gray",
-9:"blue",
-a:"green",
-b:"aqua",
-c:"red",
-d:"light_purple",
-e:"yellow",
-f:"white"}
 
 const booleanPhrases = {"false":false,
     "true":true,
@@ -194,6 +161,8 @@ function ratio(a, b) {
 // DB HANDLERS
 async function setRunDB(data, uuid, authorID) {
 
+    if (!data.stats.TNTGames) return
+
     var runDBEntry = {
         record:replaceError(data.stats.TNTGames.record_tntrun, 0),
         w:replaceError(data.stats.TNTGames.wins_tntrun, 0),
@@ -208,6 +177,8 @@ async function setRunDB(data, uuid, authorID) {
 }
 
 async function setPVPDB(data, uuid, authorID) {
+
+    if (!data.stats.TNTGames) return
 
     var pvpDBEntry = {
         record:replaceError(data.stats.TNTGames.record_pvprun, 0),
@@ -224,6 +195,8 @@ async function setPVPDB(data, uuid, authorID) {
 
 async function setBowDB(data, uuid, authorID) {
 
+    if (!data.stats.TNTGames) return
+
     var bowDBEntry = {
         w:replaceError(data.stats.TNTGames.wins_bowspleef, 0),
         l:replaceError(data.stats.TNTGames.deaths_bowspleef, 0),
@@ -238,6 +211,8 @@ async function setBowDB(data, uuid, authorID) {
 
 async function setTagDB(data, uuid, authorID) {
 
+    if (!data.stats.TNTGames) return
+
     var tagDBEntry = {
         w:replaceError(data.stats.TNTGames.wins_tntag, 0),
         k:replaceError(data.stats.TNTGames.kills_tntag, 0),
@@ -251,6 +226,8 @@ async function setTagDB(data, uuid, authorID) {
 }
 
 async function setWizDB(data, uuid, authorID) {
+
+    if (!data.stats.TNTGames) return
 
     var wizDBEntry = {
         w:replaceError(data.stats.TNTGames.wins_capture, 0),
@@ -270,6 +247,8 @@ async function setWizDB(data, uuid, authorID) {
 
 async function setWizKillsDB(data, uuid, authorID) {
 
+    if (!data.stats.TNTGames) return
+
     var wizKillDBEntry = {
         total_k:replaceError(data.stats.TNTGames.kills_capture, 0),
         f_k:replaceError(data.stats.TNTGames.new_firewizard_kills, 0),
@@ -285,6 +264,22 @@ async function setWizKillsDB(data, uuid, authorID) {
 
     await db.set(`cache.${authorID}.${uuid}.wizardKills`, wizKillDBEntry)
     return
+}
+
+async function setDuelDB(data, uuid, authorID) {
+
+    if (!data.stats.Duels) return
+
+    var duelDBEntry = {
+        w:replaceError(data.stats.Duels.bowspleef_duel_wins, 0),
+        l:replaceError(data.stats.Duels.bowspleef_duel_rounds_played, 0)-replaceError(data.stats.Duels.bowspleef_duel_wins, 0),
+        shots:replaceError(data.stats.Duels.bowspleef_duel_bow_shots, 0),
+        wl: ratio(data.stats.Duels.bowspleef_duel_wins, replaceError(data.stats.Duels.bowspleef_duel_rounds_played, 0)-replaceError(data.stats.Duels.bowspleef_duel_wins, 0)),
+        streak: replaceError(data.stats.Duels.best_tnt_games_winstreak, 0),
+        currentStreak: replaceError(data.stats.Duels.current_tnt_games_winstreak, 0)
+    }
+
+    await db.set(`cache.${authorID}.${uuid}.duels`, duelDBEntry)
 }
 
 async function setAllDB(data, uuid, authorID) {
@@ -315,21 +310,403 @@ async function setCacheDB(data, uuid, authorID) {
     await setWizDB(data, uuid, authorID);
     await setBowDB(data, uuid, authorID);
     await setWizKillsDB(data, uuid, authorID);
+    await setDuelDB(data, uuid, authorID)
     await setAllDB(data, uuid, authorID)
 
+    return
+}
+
+async function setWeeklyDB(data, uuid) {
+    var weeklyDBEntry = {}
+    if (data.stats.TNTGames) {
+        weeklyDBEntry.run = {
+            record:replaceError(data.stats.TNTGames.record_tntrun, 0),
+            w:replaceError(data.stats.TNTGames.wins_tntrun, 0),
+            l:replaceError(data.stats.TNTGames.deaths_tntrun, 0),
+            wl:ratio(data.stats.TNTGames.wins_tntrun, data.stats.TNTGames.deaths_tntrun),
+            potions:replaceError(data.stats.TNTGames.run_potions_splashed_on_players, 0)
+        }
+        weeklyDBEntry.pvp = {
+            record:replaceError(data.stats.TNTGames.record_pvprun, 0),
+            w:replaceError(data.stats.TNTGames.wins_pvprun, 0),
+            l:replaceError(data.stats.TNTGames.deaths_pvprun, 0),
+            k:replaceError(data.stats.TNTGames.kills_pvprun, 0),
+            wl:ratio(data.stats.TNTGames.wins_pvprun, data.stats.TNTGames.deaths_pvprun),
+            kd:ratio(data.stats.TNTGames.kills_pvprun, data.stats.TNTGames.deaths_pvprun)
+        }
+        weeklyDBEntry.bow = {
+            w:replaceError(data.stats.TNTGames.wins_bowspleef, 0),
+            l:replaceError(data.stats.TNTGames.deaths_bowspleef, 0),
+            shots:replaceError(data.stats.TNTGames.tags_bowspleef, 0),
+            k:replaceError(data.stats.TNTGames.kills_bowspleef, 0),
+            wl:ratio(data.stats.TNTGames.wins_bowspleef, data.stats.TNTGames.deaths_bowspleef)
+        }
+        weeklyDBEntry.tag = {
+            w:replaceError(data.stats.TNTGames.wins_tntag, 0),
+            k:replaceError(data.stats.TNTGames.kills_tntag, 0),
+            kw:ratio(data.stats.TNTGames.kills_tntag, data.stats.TNTGames.wins_tntag),
+        }
+
+        weeklyDBEntry.wizards = {
+            w:replaceError(data.stats.TNTGames.wins_capture, 0),
+            k:replaceError(data.stats.TNTGames.kills_capture, 0),
+            a:replaceError(data.stats.TNTGames.assists_capture, 0),
+            d:replaceError(data.stats.TNTGames.deaths_capture, 0),
+            p:replaceError(data.stats.TNTGames.points_capture, 0),
+            kd:ratio(data.stats.TNTGames.kills_capture, data.stats.TNTGames.deaths_capture),
+            kad:ratio(replaceError(data.stats.TNTGames.kills_capture, 0)+replaceError(data.stats.TNTGames.assists_capture, 0), data.stats.TNTGames.deaths_capture),
+            air:replaceError(data.stats.TNTGames.air_time_capture, 0),
+            kw:ratio(data.stats.TNTGames.kills_capture, data.stats.TNTGames.wins_capture)
+        }
+
+        weeklyDBEntry.wizardKills = {
+            total_k:replaceError(data.stats.TNTGames.kills_capture, 0),
+            f_k:replaceError(data.stats.TNTGames.new_firewizard_kills, 0),
+            i_k:replaceError(data.stats.TNTGames.new_icewizard_kills, 0),
+            w_k:replaceError(data.stats.TNTGames.new_witherwizard_kills, 0),
+            k_k:replaceError(data.stats.TNTGames.new_kineticwizard_kills, 0),
+            b_k:replaceError(data.stats.TNTGames.new_bloodwizard_kills, 0),
+            t_k:replaceError(data.stats.TNTGames.new_toxicwizard_kills, 0),
+            h_k:replaceError(data.stats.TNTGames.new_hydrowizard_kills, 0),
+            a_k:replaceError(data.stats.TNTGames.new_ancientwizard_kills, 0),
+            s_k:replaceError(data.stats.TNTGames.new_stormwizard_kills, 0),
+        }
+
+        weeklyDBEntry.allTNT = {
+                coins:replaceError(data.stats.TNTGames.coins, 0),
+                total_wins:replaceError(data.stats.TNTGames.wins_tntrun, 0)+replaceError(data.stats.TNTGames.wins_pvprun, 0)+replaceError(data.stats.TNTGames.wins_tntag, 0)+replaceError(data.stats.TNTGames.wins_bowspleef, 0) + replaceError(data.stats.TNTGames.wins_capture, 0),
+                streak:replaceError(data.stats.TNTGames.winstreak, 0),
+                run_wins:replaceError(data.stats.TNTGames.wins_tntrun, 0),
+                run_record:replaceError(data.stats.TNTGames.record_tntrun, 0),
+                pvp_wins:replaceError(data.stats.TNTGames.wins_pvprun, 0),
+                pvp_record:replaceError(data.stats.TNTGames.record_pvprun, 0),
+                tag_wins:replaceError(data.stats.TNTGames.wins_tntag, 0),
+                bow_wins:replaceError(data.stats.TNTGames.wins_bowspleef, 0),
+                wizards_wins:replaceError(data.stats.TNTGames.wins_capture, 0),
+                wizards_kills:replaceError(data.stats.TNTGames.kills_capture, 0)
+        }
+    }
+    else {
+        weeklyDBEntry.run = {
+            record:0,
+            w:0,
+            l:0,
+            wl:0,
+            potions:0
+        }
+        weeklyDBEntry.pvp = {
+            record:0,
+            w:0,
+            l:0,
+            k:0,
+            wl:0,
+            kd:0
+        }
+        weeklyDBEntry.bow = {
+            w:0,
+            l:0,
+            shots:0,
+            k:0,
+            wl:0
+        }
+        weeklyDBEntry.tag = {
+            w:0,
+            k:0,
+            kw:0,
+        }
+        weeklyDBEntry.wizards = {
+            w:0,
+            k:0,
+            a:0,
+            d:0,
+            p:0,
+            kd:0,
+            kad:0,
+            air:0,
+            kw:0            
+        }
+        weeklyDBEntry.wizardKills = {
+            total_k:0,
+            f_k:0,
+            i_k:0,
+            w_k:0,
+            k_k:0,
+            b_k:0,
+            t_k:0,
+            h_k:0,
+            a_k:0,
+            s_k:0,
+        }
+        weeklyDBEntry.allTNT = {
+            coins:0,
+            total_wins:0,
+            streak:0,
+            run_wins:0,
+            run_record:0,
+            pvp_wins:0,
+            pvp_record:0,
+            tag_wins:0,
+            bow_wins:0,
+            wizards_wins:0,
+            wizards_kills:0
+        }
+    }
+    if (data.stats.duels) {
+        weeklyDBEntry.duels = {
+            w:replaceError(data.stats.Duels.bowspleef_duel_wins, 0),
+            l:replaceError(data.stats.Duels.bowspleef_duel_rounds_played, 0)-replaceError(data.stats.Duels.bowspleef_duel_wins, 0),
+            shots:replaceError(data.stats.Duels.bowspleef_duel_bow_shots, 0),
+            wl: ratio(data.stats.Duels.bowspleef_duel_wins, replaceError(data.stats.Duels.bowspleef_duel_rounds_played, 0)-replaceError(data.stats.Duels.bowspleef_duel_wins, 0)),
+            streak: replaceError(data.stats.Duels.best_tnt_games_winstreak, 0),
+            currentStreak: replaceError(data.stats.Duels.current_tnt_games_winstreak, 0)
+        }
+    }
+    else {
+        weeklyDBEntry.duels = {
+            w:0,
+            l:0,
+            shots:0,
+            wl:0,
+            streak:0,
+            currentStreak:0
+        }
+    }
+
+    if (data.achievements) {
+        weeklyDBEntry.allTNT.time = replaceError(data.achievements.tntgames_tnt_triathlon, 0)
+        weeklyDBEntry.run.blocks = replaceError(data.achievements.tntgames_block_runner, 0),
+        weeklyDBEntry.tag.tags = replaceError(data.achievements.tntgames_clinic, 0)
+    }
+    else {
+        weeklyDBEntry.allTNT.time = 0
+        weeklyDBEntry.run.blocks = 0
+        weeklyDBEntry.tag.tags = 0
+    }
+
+    if (data.achievements && data.stats.TNTGames) {
+        weeklyDBEntry.tag.tk = ratio(data.achievements.tntgames_clinic, data.stats.TNTGames.kills_tntag)
+    }
+    else {
+        weeklyDBEntry.tag.tk = 0
+    }
+
+    weeklyDBEntry.time = Date.now()
+
+    await db.set(`weekly.${uuid}`, weeklyDBEntry)
+    return
+}
+
+async function setMonthlyDB(data, uuid) {
+    var monthlyDBEntry = {}
+    if (data.stats.TNTGames) {
+        monthlyDBEntry.run = {
+            record:replaceError(data.stats.TNTGames.record_tntrun, 0),
+            w:replaceError(data.stats.TNTGames.wins_tntrun, 0),
+            l:replaceError(data.stats.TNTGames.deaths_tntrun, 0),
+            wl:ratio(data.stats.TNTGames.wins_tntrun, data.stats.TNTGames.deaths_tntrun),
+            potions:replaceError(data.stats.TNTGames.run_potions_splashed_on_players, 0)
+        }
+        monthlyDBEntry.pvp = {
+            record:replaceError(data.stats.TNTGames.record_pvprun, 0),
+            w:replaceError(data.stats.TNTGames.wins_pvprun, 0),
+            l:replaceError(data.stats.TNTGames.deaths_pvprun, 0),
+            k:replaceError(data.stats.TNTGames.kills_pvprun, 0),
+            wl:ratio(data.stats.TNTGames.wins_pvprun, data.stats.TNTGames.deaths_pvprun),
+            kd:ratio(data.stats.TNTGames.kills_pvprun, data.stats.TNTGames.deaths_pvprun)
+        }
+        monthlyDBEntry.bow = {
+            w:replaceError(data.stats.TNTGames.wins_bowspleef, 0),
+            l:replaceError(data.stats.TNTGames.deaths_bowspleef, 0),
+            shots:replaceError(data.stats.TNTGames.tags_bowspleef, 0),
+            k:replaceError(data.stats.TNTGames.kills_bowspleef, 0),
+            wl:ratio(data.stats.TNTGames.wins_bowspleef, data.stats.TNTGames.deaths_bowspleef)
+        }
+        monthlyDBEntry.tag = {
+            w:replaceError(data.stats.TNTGames.wins_tntag, 0),
+            k:replaceError(data.stats.TNTGames.kills_tntag, 0),
+            kw:ratio(data.stats.TNTGames.kills_tntag, data.stats.TNTGames.wins_tntag),
+        }
+
+        monthlyDBEntry.wizards = {
+            w:replaceError(data.stats.TNTGames.wins_capture, 0),
+            k:replaceError(data.stats.TNTGames.kills_capture, 0),
+            a:replaceError(data.stats.TNTGames.assists_capture, 0),
+            d:replaceError(data.stats.TNTGames.deaths_capture, 0),
+            p:replaceError(data.stats.TNTGames.points_capture, 0),
+            kd:ratio(data.stats.TNTGames.kills_capture, data.stats.TNTGames.deaths_capture),
+            kad:ratio(replaceError(data.stats.TNTGames.kills_capture, 0)+replaceError(data.stats.TNTGames.assists_capture, 0), data.stats.TNTGames.deaths_capture),
+            air:replaceError(data.stats.TNTGames.air_time_capture, 0),
+            kw:ratio(data.stats.TNTGames.kills_capture, data.stats.TNTGames.wins_capture)
+        }
+
+        monthlyDBEntry.wizardKills = {
+            total_k:replaceError(data.stats.TNTGames.kills_capture, 0),
+            f_k:replaceError(data.stats.TNTGames.new_firewizard_kills, 0),
+            i_k:replaceError(data.stats.TNTGames.new_icewizard_kills, 0),
+            w_k:replaceError(data.stats.TNTGames.new_witherwizard_kills, 0),
+            k_k:replaceError(data.stats.TNTGames.new_kineticwizard_kills, 0),
+            b_k:replaceError(data.stats.TNTGames.new_bloodwizard_kills, 0),
+            t_k:replaceError(data.stats.TNTGames.new_toxicwizard_kills, 0),
+            h_k:replaceError(data.stats.TNTGames.new_hydrowizard_kills, 0),
+            a_k:replaceError(data.stats.TNTGames.new_ancientwizard_kills, 0),
+            s_k:replaceError(data.stats.TNTGames.new_stormwizard_kills, 0),
+        }
+
+        monthlyDBEntry.allTNT = {
+                coins:replaceError(data.stats.TNTGames.coins, 0),
+                total_wins:replaceError(data.stats.TNTGames.wins_tntrun, 0)+replaceError(data.stats.TNTGames.wins_pvprun, 0)+replaceError(data.stats.TNTGames.wins_tntag, 0)+replaceError(data.stats.TNTGames.wins_bowspleef, 0) + replaceError(data.stats.TNTGames.wins_capture, 0),
+                streak:replaceError(data.stats.TNTGames.winstreak, 0),
+                run_wins:replaceError(data.stats.TNTGames.wins_tntrun, 0),
+                run_record:replaceError(data.stats.TNTGames.record_tntrun, 0),
+                pvp_wins:replaceError(data.stats.TNTGames.wins_pvprun, 0),
+                pvp_record:replaceError(data.stats.TNTGames.record_pvprun, 0),
+                tag_wins:replaceError(data.stats.TNTGames.wins_tntag, 0),
+                bow_wins:replaceError(data.stats.TNTGames.wins_bowspleef, 0),
+                wizards_wins:replaceError(data.stats.TNTGames.wins_capture, 0),
+                wizards_kills:replaceError(data.stats.TNTGames.kills_capture, 0)
+        }
+    }
+    else {
+        monthlyDBEntry.run = {
+            record:0,
+            w:0,
+            l:0,
+            wl:0,
+            potions:0
+        }
+        monthlyDBEntry.pvp = {
+            record:0,
+            w:0,
+            l:0,
+            k:0,
+            wl:0,
+            kd:0
+        }
+        monthlyDBEntry.bow = {
+            w:0,
+            l:0,
+            shots:0,
+            k:0,
+            wl:0
+        }
+        monthlyDBEntry.tag = {
+            w:0,
+            k:0,
+            kw:0,
+        }
+        monthlyDBEntry.wizards = {
+            w:0,
+            k:0,
+            a:0,
+            d:0,
+            p:0,
+            kd:0,
+            kad:0,
+            air:0,
+            kw:0            
+        }
+        monthlyDBEntry.wizardKills = {
+            total_k:0,
+            f_k:0,
+            i_k:0,
+            w_k:0,
+            k_k:0,
+            b_k:0,
+            t_k:0,
+            h_k:0,
+            a_k:0,
+            s_k:0,
+        }
+        monthlyDBEntry.allTNT = {
+            coins:0,
+            total_wins:0,
+            streak:0,
+            run_wins:0,
+            run_record:0,
+            pvp_wins:0,
+            pvp_record:0,
+            tag_wins:0,
+            bow_wins:0,
+            wizards_wins:0,
+            wizards_kills:0
+        }
+    }
+    if (data.stats.duels) {
+        monthlyDBEntry.duels = {
+            w:replaceError(data.stats.Duels.bowspleef_duel_wins, 0),
+            l:replaceError(data.stats.Duels.bowspleef_duel_rounds_played, 0)-replaceError(data.stats.Duels.bowspleef_duel_wins, 0),
+            shots:replaceError(data.stats.Duels.bowspleef_duel_bow_shots, 0),
+            wl: ratio(data.stats.Duels.bowspleef_duel_wins, replaceError(data.stats.Duels.bowspleef_duel_rounds_played, 0)-replaceError(data.stats.Duels.bowspleef_duel_wins, 0)),
+            streak: replaceError(data.stats.Duels.best_tnt_games_winstreak, 0),
+            currentStreak: replaceError(data.stats.Duels.current_tnt_games_winstreak, 0)
+        }
+    }
+    else {
+        monthlyDBEntry.duels = {
+            w:0,
+            l:0,
+            shots:0,
+            wl:0,
+            streak:0,
+            currentStreak:0
+        }
+    }
+
+    if (data.achievements) {
+        monthlyDBEntry.allTNT.time = replaceError(data.achievements.tntgames_tnt_triathlon, 0)
+        monthlyDBEntry.run.blocks = replaceError(data.achievements.tntgames_block_runner, 0),
+        monthlyDBEntry.tag.tags = replaceError(data.achievements.tntgames_clinic, 0)
+    }
+    else {
+        monthlyDBEntry.allTNT.time = 0
+        monthlyDBEntry.run.blocks = 0
+        monthlyDBEntry.tag.tags = 0
+    }
+
+    if (data.achievements && data.stats.TNTGames) {
+        monthlyDBEntry.tag.tk = ratio(data.achievements.tntgames_clinic, data.stats.TNTGames.kills_tntag)
+    }
+    else {
+        monthlyDBEntry.tag.tk = 0
+    }
+
+    monthlyDBEntry.time = Date.now()
+
+    await db.set(`monthly.${uuid}`, monthlyDBEntry)
     return
 }
 
 client.on('ready', async () => {
     console.log('Bot: TNT Stats Bot is online!');
     client.user.setActivity("TNT Games  | Use /TNThelp");
+
+    const scheduleRule = new schedule.RecurrenceRule()
+    scheduleRule.second = 0;
+    scheduleRule.minute = 30;
+    scheduleRule.hour = 9;
+    scheduleRule.dayOfWeek = 0;
+    scheduleRule.tz = 'America/New_York'
+
+    schedule.scheduleJob(scheduleRule, async function() {
+        console.log("deleting weekly")
+        db.delete('weekly')
+    })
+
+    const scheduleRule2 = new schedule.RecurrenceRule()
+    scheduleRule2.second = 0;
+    scheduleRule2.minute = 30;
+    scheduleRule2.hour = 9;
+    scheduleRule2.date = 1;
+    scheduleRule2.tz = 'America/New_York'
+
+    schedule.scheduleJob(scheduleRule2, async function() {
+        db.delete('weekly')
+    })
 });
 
 client.on('message', async m => {
 
     if(m.author.bot) return;
-
-    if(m.guild.id == "825593306640810026") return
 
     if(m.content.toLowerCase() == "/ping") {
         let discordToBot = Date.now() - m.createdTimestamp
@@ -412,8 +789,139 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
         m.channel.send("I will no longer respond to messages in this channel")
     }
     else if (m.content.toLowerCase().startsWith("/tnthelp")) {
-        console.log(`${m.author.username}: ${m.content}`)
-        return m.channel.send(helpMsg)
+        let prefix = "/"
+        let msg = await m.channel.send(new Discord.MessageEmbed()
+        .setColor('#3bcc71')
+        .setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`)
+        .setTitle("Help Menu - Home")
+        .setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`)
+        .setTimestamp()
+        .setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green)
+        .setDescription(`:house:: Home\n:bar_chart:: Stat Commands\n:tools:: QoL Commands \n:information_source:: Bot Information Commands\n:track_next:: Latest Update Info`)
+        )
+        msg.react('🏠').then(msg.react('📊').then(msg.react('🛠').then(msg.react('ℹ').then(msg.react('⏭')))))
+
+        const filter = (reaction, user) => (user.id === m.author.id)
+
+        const collector = msg.createReactionCollector(filter, {time: 60000})
+        collector.on('collect', async (reaction, user) => {
+            collector.resetTimer({time: 60000})
+
+            await reaction.users.remove(user.id).catch(() => {return})
+
+            if (reaction.emoji.name == "🏠") {
+                if (reaction.message.reactions.cache.has('⚙')) {
+                    await reaction.message.reactions.cache.get('⚙').users.remove(client.user.id)
+                }
+                msg.edit(new Discord.MessageEmbed()
+                .setColor('#3bcc71')
+                .setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`)
+                .setTitle("Help Menu - Home")
+                .setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`)
+                .setTimestamp()
+                .setFooter("Created by Mysterium", embedFooter.image.green)
+                .setDescription(`:house:: Home\n:bar_chart:: Stat Commands
+:tools:: QoL Commands 
+:information_source:: Bot Information Commands
+:track_next:: Latest Update Info
+
+**/tntconfigure [game] [prefix]** - Configure the bot to *this* channel. Game options include All, Wizards, Bowspleef, TNT Tag, TNT Run, PVP Run.
+**/tntremove** - Remove this channel from the bot's list of channels.
+**/tnthelp** - Opens this menu
+**/ping** - Check Bot Connection`))
+            }
+            else if (reaction.emoji.name == "📊") {
+                if (reaction.message.reactions.cache.has('⚙')) {
+                    await reaction.message.reactions.cache.get('⚙').users.remove(client.user.id)
+                }
+                msg.edit(new Discord.MessageEmbed()
+                .setColor('#3bcc71')
+                .setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`)
+                .setTitle("Help Menu - Stat Commands")
+                .setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`)
+                .setTimestamp()
+                .setFooter("Created by Mysterium_", embedFooter.image.green)
+                .setDescription(`**${prefix}stats all {username}** - Shows overall TNT Games Stats
+**${prefix}stats run {username}** - Shows TNT Run Stats
+**${prefix}stats tag {username}** - Shows TNT Tag Stats
+**${prefix}stats bowspleef {username}** - Shows Bowspleef Stats
+**${prefix}stats wizards {username}** - Shows TNT Wizards Stats
+**${prefix}stats pvp {username}** - Shows PVP Run Stats
+**${prefix}kills {username}** - Shows TNT Wizards kills by class
+                
+*()s show changes since your last stats call for that user*
+*Game defaults to your channel-configured game if not specified*
+*Username defaults to your verified username if not specified*`))
+            }
+            else if (reaction.emoji.name == "🛠") {
+                await msg.react('⚙')
+                msg.edit(new Discord.MessageEmbed()
+                .setColor('#3bcc71')
+                .setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`)
+                .setTitle("Help Menu - QoL Commands")
+                .setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`)
+                .setTimestamp()
+                .setFooter("Created by Mysterium_", embedFooter.image.green)
+                .setDescription(`**${prefix}account {User ping}** - Shows the account of the specified player if they are verified
+**${prefix}set {username}** - Sets your username. Requires you to set your discord tag in Hypixel
+**${prefix}settings {setting} {value}** - Configures the setting to the value specified
+**${prefix}reset** - Updates your personal stats in the cache. Only useful if reset setting is false
+                
+:gear:: Settings Info`))
+            }
+            else if (reaction.emoji.name == "ℹ") {
+                if (reaction.message.reactions.cache.has('⚙')) {
+                    await reaction.message.reactions.cache.get('⚙').users.remove(client.user.id)
+                }
+                msg.edit(new Discord.MessageEmbed()
+                .setColor('#3bcc71')
+                .setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`)
+                .setTitle("Help Menu - Bot Info Commands")
+                .setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`)
+                .setTimestamp()
+                .setFooter("Created by Mysterium_", embedFooter.image.green)
+                .setDescription(`**${prefix}help** - Opens this menu
+**${prefix}info** - Shows bot info
+**${prefix}invite** - Pastes bot invite link
+**${prefix}source** - Pastes bot source code link
+**${prefix}discord** - Pastes the links of TNT Game discord servers
+**${prefix}mysterium** - See more about the bot creator
+**${prefix}bugs** - Pastes server invite link to report bugs`))
+            }
+            else if (reaction.emoji.name == "⏭") {
+                if (reaction.message.reactions.cache.has('⚙')) {
+                    await reaction.message.reactions.cache.get('⚙').users.remove(client.user.id)
+                }
+                msg.edit(new Discord.MessageEmbed()
+                .setColor('#3bcc71')
+                .setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`)
+                .setTitle(`Latest Update v${package.version}${config.canary ? "dev" : ""}`)
+                .setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`)
+                .setTimestamp()
+                .setFooter("Created by Mysterium_", embedFooter.image.green)
+                // MAINBOTEDIT
+                .setDescription(`- Created Interactive Help Menu
+- Added duels gamemode support
+- Fixed ()s with time bug
+- Formatted playtime
+- Added owner-only announcement command
+- Added some command aliases
+- Added new weekly and monthly stats system`))
+            }
+            else if (reaction.emoji.name == "⚙") {
+                msg.edit(new Discord.MessageEmbed()
+                .setColor('#3bcc71')
+                .setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`)
+                .setTitle("Help Menu - Settings Info")
+                .setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`)
+                .setTimestamp()
+                .setFooter("Created by Mysterium_", embedFooter.image.green)
+                .setDescription(`Format: **Setting** *(Acceptable Values)* - Description - Default: __Value__
+                
+**Verbose** *(True/False)* - Show more stats - Default: __False__
+**Reset** *(True/False)* - Do not update cache so ()s will stay until you do /reset. Only works on your own registered ign - Default: __True__`))
+            }
+        })
     }
 
     var channel = await db.get("chan_"+m.channel.id)
@@ -429,7 +937,138 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
     console.log(m.author.username+": " + m.content)
 
     if(command == "help") {
-        return m.channel.send(helpMsg)
+        let msg = await m.channel.send(new Discord.MessageEmbed()
+        .setColor('#3bcc71')
+        .setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`)
+        .setTitle("Help Menu - Home")
+        .setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`)
+        .setTimestamp()
+        .setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green)
+        .setDescription(`:house:: Home\n:bar_chart:: Stat Commands\n:tools:: QoL Commands \n:information_source:: Bot Information Commands\n:track_next:: Latest Update Info`)
+        )
+        msg.react('🏠').then(msg.react('📊').then(msg.react('🛠').then(msg.react('ℹ').then(msg.react('⏭')))))
+
+        const filter = (reaction, user) => (user.id === m.author.id)
+
+        const collector = msg.createReactionCollector(filter, {time: 60000})
+        collector.on('collect', async (reaction, user) => {
+            collector.resetTimer({time: 60000})
+
+            await reaction.users.remove(user.id).catch(() => {return})
+
+            if (reaction.emoji.name == "🏠") {
+                if (reaction.message.reactions.cache.has('⚙')) {
+                    await reaction.message.reactions.cache.get('⚙').users.remove(client.user.id)
+                }
+                msg.edit(new Discord.MessageEmbed()
+                .setColor('#3bcc71')
+                .setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`)
+                .setTitle("Help Menu - Home")
+                .setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`)
+                .setTimestamp()
+                .setFooter("Created by Mysterium", embedFooter.image.green)
+                .setDescription(`:house:: Home\n:bar_chart:: Stat Commands
+:tools:: QoL Commands 
+:information_source:: Bot Information Commands
+:track_next:: Latest Update Info
+
+**/tntconfigure [game] [prefix]** - Configure the bot to *this* channel. Game options include All, Wizards, Bowspleef, TNT Tag, TNT Run, PVP Run.
+**/tntremove** - Remove this channel from the bot's list of channels.
+**/tnthelp** - Opens this menu
+**/ping** - Check Bot Connection`))
+            }
+            else if (reaction.emoji.name == "📊") {
+                if (reaction.message.reactions.cache.has('⚙')) {
+                    await reaction.message.reactions.cache.get('⚙').users.remove(client.user.id)
+                }
+                msg.edit(new Discord.MessageEmbed()
+                .setColor('#3bcc71')
+                .setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`)
+                .setTitle("Help Menu - Stat Commands")
+                .setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`)
+                .setTimestamp()
+                .setFooter("Created by Mysterium_", embedFooter.image.green)
+                .setDescription(`**${prefix}stats all {username}** - Shows overall TNT Games Stats
+**${prefix}stats run {username}** - Shows TNT Run Stats
+**${prefix}stats tag {username}** - Shows TNT Tag Stats
+**${prefix}stats bowspleef {username}** - Shows Bowspleef Stats
+**${prefix}stats wizards {username}** - Shows TNT Wizards Stats
+**${prefix}stats pvp {username}** - Shows PVP Run Stats
+**${prefix}kills {username}** - Shows TNT Wizards kills by class
+                
+*()s show changes since your last stats call for that user*
+*Game defaults to your channel-configured game if not specified*
+*Username defaults to your verified username if not specified*`))
+            }
+            else if (reaction.emoji.name == "🛠") {
+                await msg.react('⚙')
+                msg.edit(new Discord.MessageEmbed()
+                .setColor('#3bcc71')
+                .setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`)
+                .setTitle("Help Menu - QoL Commands")
+                .setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`)
+                .setTimestamp()
+                .setFooter("Created by Mysterium_", embedFooter.image.green)
+                .setDescription(`**${prefix}account {User ping}** - Shows the account of the specified player if they are verified
+**${prefix}set {username}** - Sets your username. Requires you to set your discord tag in Hypixel
+**${prefix}settings {setting} {value}** - Configures the setting to the value specified
+**${prefix}reset** - Updates your personal stats in the cache. Only useful if reset setting is false
+                
+:gear:: Settings Info`))
+            }
+            else if (reaction.emoji.name == "ℹ") {
+                if (reaction.message.reactions.cache.has('⚙')) {
+                    await reaction.message.reactions.cache.get('⚙').users.remove(client.user.id)
+                }
+                msg.edit(new Discord.MessageEmbed()
+                .setColor('#3bcc71')
+                .setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`)
+                .setTitle("Help Menu - Bot Info Commands")
+                .setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`)
+                .setTimestamp()
+                .setFooter("Created by Mysterium_", embedFooter.image.green)
+                .setDescription(`**${prefix}help** - Opens this menu
+**${prefix}info** - Shows bot info
+**${prefix}invite** - Pastes bot invite link
+**${prefix}source** - Pastes bot source code link
+**${prefix}discord** - Pastes the links of TNT Game discord servers
+**${prefix}mysterium** - See more about the bot creator
+**${prefix}bugs** - Pastes server invite link to report bugs`))
+            }
+            else if (reaction.emoji.name == "⏭") {
+                if (reaction.message.reactions.cache.has('⚙')) {
+                    await reaction.message.reactions.cache.get('⚙').users.remove(client.user.id)
+                }
+                msg.edit(new Discord.MessageEmbed()
+                .setColor('#3bcc71')
+                .setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`)
+                .setTitle(`Latest Update v${package.version}${config.canary ? "dev" : ""}`)
+                .setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`)
+                .setTimestamp()
+                .setFooter("Created by Mysterium_", embedFooter.image.green)
+                // MAINBOTEDIT
+                .setDescription(`- Created Interactive Help Menu
+- Added duels gamemode support
+- Fixed ()s with time bug
+- Formatted playtime
+- Added owner-only announcement command
+- Added some command aliases
+- Added new weekly and monthly stats system`))
+            }
+            else if (reaction.emoji.name == "⚙") {
+                msg.edit(new Discord.MessageEmbed()
+                .setColor('#3bcc71')
+                .setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`)
+                .setTitle("Help Menu - Settings Info")
+                .setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`)
+                .setTimestamp()
+                .setFooter("Created by Mysterium_", embedFooter.image.green)
+                .setDescription(`Format: **Setting** *(Acceptable Values)* - Description - Default: __Value__
+                
+**Verbose** *(True/False)* - Show more stats - Default: __False__
+**Reset** *(True/False)* - Do not update cache so ()s will stay until you do /reset. Only works on your own registered ign - Default: __True__`))
+            }
+        })
     }
 
     if (command == "mysterium") {
@@ -611,9 +1250,9 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
             }
         }
         else if (args.length == 1) {
-            let games = ['all','wizards','run','pvp','tag','bowspleef']
-            if (games.includes(args[0])) {
-                game = args[0]
+            let games = ['all', 'overall', 'wiz', 'wizard', 'wizards', 'tntrun', 'run', 'pvprun', 'pvp', 'tnttag', 'tag', 'bow', 'spleef', 'bowspleef', 'duel', 'duels', 'tntduels']
+            if (games.includes(args[0].toLowerCase())) {
+                game = args[0].toLowerCase()
                 username = idData[m.author.id]
             } 
             else if(args[0].includes("<@!")) {
@@ -662,6 +1301,12 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
         if(user == "API ERROR") { return m.channel.send("API Connection Issues, Hypixel might be offline") }
 
         if(!user.success || user.success == false || user.player == null || user.player == undefined || !user.player || user.player.stats == undefined) return sendErrorEmbed(m.channel, `Unknown Player`, `Player has no data in Hypixel's Database`);
+        if (await db.get(`weekly.${user.player.uuid}`) == undefined) {
+            await setWeeklyDB(user.player, user.player.uuid)
+        }
+        if (await db.get(`monthly.${user.player.uuid}`) == undefined) {
+            await setMonthlyDB(user.player, user.player.uuid)
+        }
         if(user.player.stats.TNTGames == undefined) return sendErrorEmbed(m.channel,`Unknown Player`,`Player has no Data in Hypixel's TNT Database`)
     
         const TNTGames = user.player.stats.TNTGames
@@ -674,7 +1319,8 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
 
         rankData = findRank(user)
 
-        if (game == "run") {
+        if (game == "run" || game == "tntrun") {
+
             if (TNTGames.record_tntrun == undefined) {var runRecordDifference = 0} else {var runRecordDifference = TNTGames.record_tntrun - data.run.record}
             if (runRecordDifference > 0) {
                 var runRecordDisplay = min_sec(replaceError(TNTGames.record_tntrun, 0)) + " (+" + min_sec(runRecordDifference) + ")"
@@ -687,7 +1333,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
                 .setColor(`${rankData.color}`)
                 .setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`)
                 .setTitle(`${rankData.displayName} ${user.player.displayname}'s TNT Run Stats`)
-                .setThumbnail(`https://visage.surgeplay.com/head/128/{user.player.uuid}`)
+                .setThumbnail(`https://visage.surgeplay.com/head/128/${user.player.uuid}`)
                 .setURL(`https://plancke.io/hypixel/player/stats/${user.player.displayname}`)
                 .setTimestamp()
                 .setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green)
@@ -705,7 +1351,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
             }
             return m.channel.send(embed)
         }
-        else if (game == "pvp") {
+        else if (game == "pvp" || game == "pvprun") {
             if (TNTGames.record_pvprun == undefined) {var pvpRecordDifference = 0} else {var pvpRecordDifference = TNTGames.record_pvprun - data.pvp.record}
             if (pvpRecordDifference > 0) {
                 var pvpRecordDisplay = min_sec(replaceError(TNTGames.record_pvprun, 0)) + " (+" + min_sec(pvpRecordDifference) + ")"
@@ -717,7 +1363,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
                 .setColor(`${rankData.color}`)
                 .setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`)
                 .setTitle(`${rankData.displayName} ${user.player.displayname}'s PVP Run Stats`)
-                .setThumbnail(`https://visage.surgeplay.com/head/128/{user.player.uuid}`)
+                .setThumbnail(`https://visage.surgeplay.com/head/128/${user.player.uuid}`)
                 .setURL(`https://plancke.io/hypixel/player/stats/${user.player.displayname}`)
                 .setTimestamp()
                 .setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green)
@@ -733,12 +1379,12 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
             }
             return m.channel.send(embed)
         }
-        else if (game == "bowspleef") {
+        else if (game == "bowspleef" || game == "bow" || game == "spleef") {
             const embed = new Discord.MessageEmbed()
                 .setColor(`${rankData.color}`)
                 .setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`)
                 .setTitle(`${rankData.displayName} ${user.player.displayname}'s Bowspleef Stats`)
-                .setThumbnail(`https://visage.surgeplay.com/head/128/{user.player.uuid}`)
+                .setThumbnail(`https://visage.surgeplay.com/head/128/${user.player.uuid}`)
                 .setURL(`https://plancke.io/hypixel/player/stats/${user.player.displayname}`)
                 .setTimestamp()
                 .setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green)
@@ -753,12 +1399,12 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
             }
             return m.channel.send(embed)
         }
-        else if (game == "tag") {
+        else if (game == "tag" || game == "tnttag") {
             const embed = new Discord.MessageEmbed()
                 .setColor(`${rankData.color}`)
                 .setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`)
                 .setTitle(`${rankData.displayName} ${user.player.displayname}'s TNT Tag Stats`)
-                .setThumbnail(`https://visage.surgeplay.com/head/128/{user.player.uuid}`)
+                .setThumbnail(`https://visage.surgeplay.com/head/128/${user.player.uuid}`)
                 .setURL(`https://plancke.io/hypixel/player/stats/${user.player.displayname}`)
                 .setTimestamp()
                 .setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green)
@@ -773,14 +1419,14 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
             }
             return m.channel.send(embed)
         }
-        else if (game == "wizards") {
+        else if (game == "wizards" || game == "wiz" || game == "wizard") {
 
             const embed = new Discord.MessageEmbed()
                 .setColor(`${rankData.color}`)
                 .setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`)
                 .setTitle(`${rankData.displayName} ${user.player.displayname}'s Wizards Stats`)
                 .setURL(`https://www.plotzes.ml/stats/${user.player.displayname}`)
-                .setThumbnail(`https://visage.surgeplay.com/head/128/{user.player.uuid}`)
+                .setThumbnail(`https://visage.surgeplay.com/head/128/${user.player.uuid}`)
                 .setTimestamp()
                 .setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green)
                 .addField(`**Wins**`, displayOldNewNumbers(data.wizards.w, replaceError(TNTGames.wins_capture, 0)), true)
@@ -792,7 +1438,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
                 .setDescription(`()s show changes since your last ${prefix}stats call for this user`)
             
             if (settings.verbose) {
-                if (TNTGames.air_time_capture == undefined) {var airTimeDifference = 0} else {var airTimeDifference = TNTGames.air_time_capture - data.air}
+                if (TNTGames.air_time_capture == undefined) {var airTimeDifference = 0} else {var airTimeDifference = TNTGames.air_time_capture - data.wizards.air}
                 if (airTimeDifference > 0) {
                     var airTimeDisplay = min_sec(Math.floor(replaceError(TNTGames.air_time_capture, 0)/1200)) + " (+" + min_sec(Math.floor(airTimeDifference/1200)) + ")"
                 }
@@ -821,7 +1467,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
             }
             return m.channel.send(embed)
         }
-        else if (game == "all") {
+        else if (game == "all" || game == "overall") {
             if (TNTGames.record_tntrun == undefined) {var runRecordDifference = 0} else {var runRecordDifference = TNTGames.record_tntrun - data.allTNT.record_tntrun}
             if (runRecordDifference > 0) {
                 var runRecordDisplay = min_sec(TNTGames.record_tntrun) + " (+" + min_sec(runRecordDifference) + ")"
@@ -837,17 +1483,26 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
                 var pvpRecordDisplay = min_sec(TNTGames.record_pvprun)
             }
 
+            if (user.player.achievements.tntgames_tnt_triathlon == undefined) {var playTimeDifference = 0} else {var playTimeDifference = user.player.achievements.tntgames_tnt_triathlon - data.allTNT.time}
+            
+            if (playTimeDifference > 0) {
+                var playTimeDisplay = min_sec(replaceError(user.player.achievements.tntgames_tnt_triathlon, 0)) + " (+" + min_sec(playTimeDifference) + ")"
+            }
+            else {
+                var playTimeDisplay = min_sec(user.player.achievements.tntgames_tnt_triathlon)
+            }
+
             const embed = new Discord.MessageEmbed()
                 .setColor(`${rankData.color}`)
                 .setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`)
                 .setTitle(`${rankData.displayName} ${user.player.displayname}'s TNT Games Stats`)
-                .setThumbnail(`https://visage.surgeplay.com/head/128/{user.player.uuid}`)
+                .setThumbnail(`https://visage.surgeplay.com/head/128/${user.player.uuid}`)
                 .setURL(`https://plancke.io/hypixel/player/stats/${user.player.displayname}`)
                 .setTimestamp()
                 .setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green)
                 .addField(`**Coins**`, displayOldNewNumbers(data.allTNT.coins, replaceError(TNTGames.coins, 0)), true)
                 .addField(`**Winstreak**`, displayOldNewNumbers(data.allTNT.streak, replaceError(TNTGames.winstreak, 0)), true)
-                .addField(`**Playtime**`, displayOldNewNumbers(data.allTNT.time, replaceError(user.player.achievements.tntgames_tnt_triathlon, 0)), true)
+                .addField(`**Playtime**`, playTimeDisplay, true)
                 .addField(`**TNT Wins**`, displayOldNewNumbers(data.allTNT.total_wins, replaceError(TNTGames.wins_tntrun, 0)+replaceError(TNTGames.wins_pvprun, 0)+replaceError(TNTGames.wins_tntag, 0)+replaceError(TNTGames.wins_bowspleef, 0) + replaceError(TNTGames.wins_capture, 0),), true)
                 .addField(`**Tag Wins**`, displayOldNewNumbers(data.allTNT.tag_wins, replaceError(TNTGames.wins_tntag, 0)), true)
                 .addField(`**TNT Run Record**`, runRecordDisplay, true)
@@ -861,6 +1516,30 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
 
             if (reset) {
                 await setAllDB(user.player, user.player.uuid, m.author.id)
+            }
+            return m.channel.send(embed)
+        }
+        else if (game == "duel" || game == "duels") {
+            if(user.player.stats.Duels == undefined) return sendErrorEmbed(m.channel,`Unknown Player`,`Player has no Data in Hypixel's TNT Database`)
+
+            const embed = new Discord.MessageEmbed()
+                .setColor(`${rankData.color}`)
+                .setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`)
+                .setTitle(`${rankData.displayName} ${user.player.displayname}'s Bowspleef Duels Stats`)
+                .setThumbnail(`https://visage.surgeplay.com/head/128/${user.player.uuid}`)
+                .setURL(`https://plancke.io/hypixel/player/stats/${user.player.displayname}`)
+                .setTimestamp()
+                .setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green)
+                .addField(`**Wins**`, displayOldNewNumbers(replaceError(data.duels.w, 0), replaceError(user.player.stats.Duels.bowspleef_duel_wins, 0)), true)
+                .addField(`**Losses**`, displayOldNewNumbers(replaceError(data.duels.l, 0), replaceError(user.player.stats.Duels.bowspleef_duel_rounds_played, 0)-replaceError(user.player.stats.Duels.bowspleef_duel_wins, 0),), true)
+                .addField(`**Shots**`, displayOldNewNumbers(replaceError(data.duels.shots, 0), replaceError(user.player.stats.Duels.bowspleef_duel_bow_shots, 0)), true)
+                .addField(`**W/L**`, displayOldNewNumbers(replaceError(data.duels.wl, 0), ratio(user.player.stats.Duels.bowspleef_duel_wins, replaceError(user.player.stats.Duels.bowspleef_duel_rounds_played, 0)-replaceError(user.player.stats.Duels.bowspleef_duel_wins, 0))), true)
+                .addField(`**Best Streak**`, displayOldNewNumbers(replaceError(data.duels.streak, 0), replaceError(user.player.stats.Duels.best_tnt_games_winstreak, 0)), true)
+                .addField(`**Current Streak**`, displayOldNewNumbers(replaceError(data.duels.currentStreak, 0), replaceError(user.player.stats.Duels.current_tnt_games_winstreak, 0)), true)
+                .setDescription(`()s show changes since your last ${prefix}stats call for this user`)
+
+            if (reset) {
+                await setDuelDB(user.player, user.player.uuid, m.author.id)
             }
             return m.channel.send(embed)
         }
@@ -949,7 +1628,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
     }
     else if (command.toLowerCase() == "settings") {
         if (args.length != 2) {
-            return sendErrorEmbed(m.channel, `Usage Error`,`Usage: ${prefix}settings [verbose/reset] [true/false]`)
+            return sendErrorEmbed(m.channel, `Usage Error`,`Usage: ${prefix}settings [setting] [true/false]`)
         }
 
         if (args[0] == "verbose") {
@@ -968,7 +1647,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
                 return sendErrorEmbed(m.channel, `Usage Error`,`Usage: ${prefix}settings verbose [true/false]`)
             }
         }
-        if (args[0] == "reset") {
+        else if (args[0] == "reset") {
             if (args[1] in booleanPhrases) {
                 if (await db.get(`${m.author.id}.reset`) == booleanPhrases[args[1]]) {
                     m.channel.send("This setting was already set!")
@@ -994,7 +1673,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
         }
         if(user == "API ERROR") { return m.channel.send("API Connection Issues, Hypixel might be offline") }
 
-        if(!user || !user.success || user.success == false || user.player == null || user.player == undefined || !user.player || user.player.stats == undefined) return sendErrorEmbed(m.channel, `Unknown Player`, `Player has no data in Hypixel's Database`);
+        if(!user || !user.sjuccess || user.success == false || user.player == null || user.player == undefined || !user.player || user.player.stats == undefined) return sendErrorEmbed(m.channel, `Unknown Player`, `Player has no data in Hypixel's Database`);
         if(user.player.stats.TNTGames == undefined) return sendErrorEmbed(m.channel,`Unknown Player`,`Player has no Data in Hypixel's TNT Database`)
 
         await setCacheDB(user.player, user.player.uuid, m.author.id)
@@ -1021,32 +1700,290 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
         }
         return;
     }
-    else if (command.toLowerCase() == "account") {
-        if (args.length != 1) { return m.channel.send("Incorrect amount of arguments")}
-        if (!args[0].includes('@')) { return m.channel.send("First Arg must be a ping") }
-        try {received = await fs.readFileSync('../global/IDS.json')} catch{ console.log("Failure! File Invalid"); console.log("Terminating Program - Code 005"); process.exit(); }
-        let idData = JSON.parse(received)
-
-        if (args[0].replace('<', '').replace('>', '').replace('@', '').replace('!', '') in idData) {
-            m.channel.send("https://namemc.com/profile/" + idData[args[0].replace('<', '').replace('>', '').replace('@', '').replace('!', '')])
-        }
-        else {
-            m.channel.send("No account registered to this ID")
-        }
-        return;
-    }
     else if (command.toLowerCase() == "discord") {
         if (args.length != 0) {
             return m.channel.send("Too many arguments")
         }
 
-        return m.channel.send("Hey! This bot was coded by Mysterium! Check out my server to report bugs and check out my other work: https://discord.gg/7Qb5xuJD4C\nHere's my website (WIP): <https://mysterium.me>")
+        return m.channel.send(`**Discord Links**
+**TNT Games** - <https://discord.gg/5gTM5UZdQb>
+**TNT Wizards** - <https://discord.gg/95T6ZHa>
+**TNT Run** - <https://discord.gg/W9xBSjt>
+**TNT Tag** - <https://discord.gg/FsneyHHRRt>
+**PVP Run** - <https://discord.gg/DRX8Jkt>
+**Bow Spleef** - <https://discord.gg/sE4uNVs6MF>
+
+**My Server** - <https://discord.gg/7Qb5xuJD4C> `)
     }
     else if (command == "mysterium") {
         return m.channel.send("Hey! This bot was coded by Mysterium! Check out my server to report bugs and check out my other work: https://discord.gg/7Qb5xuJD4C\nHere's my website (WIP): <https://mysterium.me>")
     }
     else if (command == "bugs") {
         return m.channel.send("Report any bugs here: https://discord.gg/7Qb5xuJD4C")
+    }
+    else if (command == "announcement") {
+        if (m.author.id != ownerID) return
+
+        channelList = db.all().filter(a => {return a.ID.contains("chan_")})
+        for (let i = 0; i < channelList.length; i++) {
+            if (client.channels.cache.has(channelList[i].ID.slice(5))) {
+                channel = await client.channels.cache.get(channelList[i].ID.slice(5))
+                channel.send(m.content.slice("/announcement ".length)).catch()
+            }
+        }
+    }
+    else if (command == "ownercommand") {
+        if (m.author.id != ownerID) return
+
+        channelList = db.all().filter(a => {return a.ID.contains("chan_")})
+        for (let i = 0; i < channelList.length; i++) {
+            if (client.channels.cache.has(channelList[i].ID.slice(5))) {
+                channel = await client.channels.cache.get(channelList[i].ID.slice(5))
+                channel.send(new Discord.MessageEmbed()
+                    .setTitle("New Version: v4.0.0")
+                    .setDescription(`**- New Dynamic Help Menu** (do /help or /tnthelp to check it out) *Please give bot manage reactions perms for the best experience*
+**- Added TNT Duels stats!** /stats duels [username] to try that out (slightly unstable)
+**- Formatted Playtime** in all stats menu
+**- More command Aliases**
+**- Bug Squashing**
+- Groundwork for some new features`)
+                    .setTimestamp()
+                    .setColor("#3bcc71")
+                    .setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green)).catch(() => {return})
+            }
+        }
+    }
+
+    else if (command == "weekly" || command == "monthly") {
+        
+        let received = ""
+        try {received = await fs.readFileSync('../global/IDS.json')} catch{ console.log("Failure! File Invalid"); console.log("Terminating Program - Code 005"); process.exit(); }
+        idData = JSON.parse(received) 
+
+        if (await db.get(m.author.id) == undefined) {
+            await db.set(m.author.id, {verbose:false, reset:true})
+        }
+
+        var settings = await db.get(m.author.id)
+        var reset = true;
+
+        // Parse Args
+        if (args.length == 0) {
+            username = idData[m.author.id]
+            if (!settings.reset) {
+                reset = false;
+            }
+        }
+        else if (args.length == 1) {
+            let games = ['all', 'overall', 'wiz', 'wizard', 'wizards', 'tntrun', 'run', 'pvprun', 'pvp', 'tnttag', 'tag', 'bow', 'spleef', 'bowspleef', 'duel', 'duels', 'tntduels']
+            if (games.includes(args[0].toLowerCase())) {
+                game = args[0].toLowerCase()
+                username = idData[m.author.id]
+            } 
+            else if(args[0].includes("<@!")) {
+                username = idData[args[0].replace('<', '').replace('>', '').replace('@', '').replace('!', '')]
+                game = await db.get("chan_"+m.channel.id+".game")
+                if (!settings.reset) {
+                    reset = false;
+                }
+            }
+            else {
+                game = await db.get("chan_"+m.channel.id+".game")
+                username = args[0]
+            }
+        }
+        else if (args.length == 2) {
+            game = args[0]
+            if (args[1].includes("<@")) {
+                username = idData[args[1].replace('<', '').replace('>', '').replace('@', '').replace('!', '')]
+            }
+            else {
+                username = args[1]
+            }
+        }
+        else {
+            return sendErrorEmbed(m.channel,"Too many arguments",`Format: ${prefix}stats [game] [username]`)
+        }
+        if (!username) {
+            return sendErrorEmbed(m.channel, "Invalid username", `User does not exist OR User has not set their IGN with ${prefix}set`)
+        }
+        if (username.length > 20) {
+
+            user = await hypixelFetch(`player?uuid=${username}`)
+        }
+        else {
+            var uuidInput = await mojangUUIDFetch(username).catch(() => {return {id:"UUIDINVALID12345678910"}})
+            console.log(uuidInput)
+
+            if (uuidInput.id.length > 20) {
+                user = await hypixelFetch(`player?uuid=${uuidInput.id}`)
+            }
+            else {    
+                user = await hypixelFetch(`player?name=${username}`)
+            }
+        }
+        
+        if(user == "API ERROR") { return m.channel.send("API Connection Issues, Hypixel might be offline") }
+
+        if(!user.success || user.success == false || user.player == null || user.player == undefined || !user.player || user.player.stats == undefined) return sendErrorEmbed(m.channel, `Unknown Player`, `Player has no data in Hypixel's Database`);
+        if(user.player.stats.TNTGames == undefined) return sendErrorEmbed(m.channel,`Unknown Player`,`Player has no Data in Hypixel's TNT Database`)
+        if (await db.get(`weekly.${user.player.uuid}`) == undefined) {
+            await setWeeklyDB(user.player, user.player.uuid)
+        }
+        if (await db.get(`monthly.${user.player.uuid}`) == undefined) {
+            await setMonthlyDB(user.player, user.player.uuid)
+        }
+        data = await db.get(`${command}.${user.player.uuid}`)
+
+        const TNTGames = user.player.stats.TNTGames
+
+        rankData = await findRank(user)
+
+        if (game == "run" || game == "tntrun") {
+
+            const embed = new Discord.MessageEmbed()
+                .setColor(`${rankData.color}`)
+                .setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`)
+                .setTitle(`${rankData.displayName} ${user.player.displayname}'s ${command == "weekly" ? "Weekly" : "Monthly"} TNT Run Stats`)
+                .setThumbnail(`https://visage.surgeplay.com/head/128/${user.player.uuid}`)
+                .setURL(`https://plancke.io/hypixel/player/stats/${user.player.displayname}`)
+                .setTimestamp()
+                .setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green)
+                .addField(`**Wins**`, replaceError(TNTGames.wins_tntrun, 0) - data.run.w, true)
+                .addField(`**Deaths**`, replaceError(TNTGames.deaths_tntrun, 0) - data.run.l, true)
+                .addField(`**Potions Thrown**`, replaceError(TNTGames.run_potions_splashed_on_players, 0) - data.run.potions, true)
+                .addField(`**W/L**`, Math.round(ratio(replaceError(TNTGames.wins_tntrun, 0) - data.run.w, replaceError(TNTGames.deaths_tntrun, 0) - data.run.l)*1000)/1000, true)
+                .addField(`**Blocks Broken**`, replaceError(user.player.achievements.tntgames_block_runner, 0) - data.run.blocks, true)
+                .setDescription(`Showing changes since: ${timeConverter(Math.floor(data.time))}`)
+            return m.channel.send(embed)
+        }
+        else if (game == "pvp" || game == "pvprun") {
+            const embed = new Discord.MessageEmbed()
+                .setColor(`${rankData.color}`)
+                .setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`)
+                .setTitle(`${rankData.displayName} ${user.player.displayname}'s ${command == "weekly" ? "Weekly" : "Monthly"} PVP Run Stats`)
+                .setThumbnail(`https://visage.surgeplay.com/head/128/${user.player.uuid}`)
+                .setURL(`https://plancke.io/hypixel/player/stats/${user.player.displayname}`)
+                .setTimestamp()
+                .setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green)
+                .addField(`**Wins**`, replaceError(TNTGames.wins_pvprun, 0) - data.pvp.w, true)
+                .addField(`**Deaths**`, replaceError(TNTGames.deaths_pvprun, 0) - data.pvp.l, true)
+                .addField(`**Kills**`, replaceError(TNTGames.kills_pvprun, 0) - data.pvp.k, true)
+                .addField(`**W/L**`, Math.round(ratio(replaceError(TNTGames.wins_pvprun, 0) - data.pvp.w, replaceError(TNTGames.deaths_pvprun, 0) - data.pvp.l)*1000)/1000, true)
+                .addField(`**KDR**`, Math.round(ratio(replaceError(TNTGames.kills_pvprun, 0) - data.pvp.k, replaceError(TNTGames.deaths_pvprun, 0) - data.pvp.l)*1000)/1000, true)
+                .setDescription(`Showing changes since: ${timeConverter(Math.floor(data.time))}`)
+            return m.channel.send(embed)
+        }
+        else if (game == "bowspleef" || game == "bow" || game == "spleef") {
+            const embed = new Discord.MessageEmbed()
+                .setColor(`${rankData.color}`)
+                .setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`)
+                .setTitle(`${rankData.displayName} ${user.player.displayname}'s ${command == "weekly" ? "Weekly" : "Monthly"} Bowspleef Stats`)
+                .setThumbnail(`https://visage.surgeplay.com/head/128/${user.player.uuid}`)
+                .setURL(`https://plancke.io/hypixel/player/stats/${user.player.displayname}`)
+                .setTimestamp()
+                .setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green)
+                .addField(`**Wins**`, replaceError(TNTGames.wins_bowspleef, 0) - data.bow.w, true)
+                .addField(`**Deaths**`, replaceError(TNTGames.deaths_bowspleef, 0) - data.bow.l, true)
+                .addField(`**Kills**`, replaceError(TNTGames.kills_bowspleef, 0) - data.bow.k, true)
+                .addField(`**Shots**`, replaceError(TNTGames.tags_bowspleef, 0) - data.bow.shots, true)
+                .addField(`**W/L**`, Math.round(ratio(replaceError(TNTGames.wins_bowspleef, 0) - data.bow.w, replaceError(TNTGames.deaths_bowspleef, 0) - data.bow.l)*1000)/1000, true)
+                .setDescription(`Showing changes since: ${timeConverter(Math.floor(data.time))}`)
+            return m.channel.send(embed)
+        }
+        else if (game == "tag" || game == "tnttag") {
+            const embed = new Discord.MessageEmbed()
+                .setColor(`${rankData.color}`)
+                .setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`)
+                .setTitle(`${rankData.displayName} ${user.player.displayname}'s ${command == "weekly" ? "Weekly" : "Monthly"} TNT Tag Stats`)
+                .setThumbnail(`https://visage.surgeplay.com/head/128/${user.player.uuid}`)
+                .setURL(`https://plancke.io/hypixel/player/stats/${user.player.displayname}`)
+                .setTimestamp()
+                .setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green)
+                .addField(`**Wins**`, replaceError(TNTGames.wins_tntag, 0) - data.tag.w, true)
+                .addField(`**Kills**`, displayOldNewNumbers(data.tag.k, replaceError(TNTGames.kills_tntag, 0)), true)
+                .addField(`**K/W**`, Math.round(ratio(replaceError(TNTGames.kills_tntag, 0) - data.tag.k, replaceError(TNTGames.wins_tntag, 0) - data.tag.w)*1000)/1000, true)
+                .addField(`**Tags**`, replaceError(user.player.achievements.tntgames_clinic, 0) - data.tag.tags, true)
+                .addField(`**Tags/Kill**`, Math.round(ratio(replaceError(user.player.achievements.tntgames_clinic, 0) - data.tag.tags, replaceError(TNTGames.kills_tntag, 0) - data.tag.k)*1000)/1000, true)
+                .setDescription(`Showing changes since: ${timeConverter(Math.floor(data.time))}`)
+            return m.channel.send(embed)
+        }
+        else if (game == "wizards" || game == "wiz" || game == "wizard") {
+
+            const embed = new Discord.MessageEmbed()
+                .setColor(`${rankData.color}`)
+                .setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`)
+                .setTitle(`${rankData.displayName} ${user.player.displayname}'s ${command == "weekly" ? "Weekly" : "Monthly"} Wizards Stats`)
+                .setURL(`https://www.plotzes.ml/stats/${user.player.displayname}`)
+                .setThumbnail(`https://visage.surgeplay.com/head/128/${user.player.uuid}`)
+                .setTimestamp()
+                .setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green)
+                .addField(`**Wins**`, replaceError(TNTGames.wins_capture, 0) - data.wizards.w, true)
+                .addField(`**Kills**`, replaceError(TNTGames.kills_capture, 0) - data.wizards.k, true)
+                .addField(`**Assists**`, replaceError(TNTGames.assists_capture, 0) - data.wizards.a, true)
+                .addField(`**Deaths**`, replaceError(TNTGames.deaths_capture, 0) - data.wizards.d, true)
+                .addField(`**Points Captured**`, replaceError(TNTGames.points_capture, 0) - data.wizards.p, true)
+                .addField(`**KDR**`, Math.round(ratio(replaceError(TNTGames.kills_capture, 0) - data.wizards.k, replaceError(TNTGames.deaths_capture, 0) - data.wizards.d)*1000)/1000, true)
+                .setDescription(`Showing changes since: ${timeConverter(Math.floor(data.time))}`)
+            
+            if (settings.verbose) {
+                embed.addField(`**Airtime**`, min_sec(Math.floor((replaceError(TNTGames.air_time_capture, 0) - data.wizards.air)/1200)),)
+                    .addField(`**KADR**`, Math.round(ratio(replaceError(TNTGames.kills_capture, 0) + replaceError(TNTGames.assists_capture, 0) - data.wizards.k - data.wizards.a, replaceError(TNTGames.deaths_capture, 0) - data.wizards.d)*1000)/1000, true)
+                    .addField(`**K/W**`, Math.round(ratio(replaceError(TNTGames.kills_capture, 0) - data.wizards.k, replaceError(TNTGames.wins_capture, 0) - data.wizards.w)*1000)/1000, true)
+                    .addField(`**Fire**`, replaceError(TNTGames.new_firewizard_kills, 0) - data.wizardKills.f_k, true)
+                    .addField(`**Ice**`, replaceError(TNTGames.new_icewizard_kills, 0) - data.wizardKills.i_k, true)
+                    .addField(`**Wither**`, replaceError(TNTGames.new_witherwizard_kills, 0) - data.wizardKills.w_k, true)
+                    .addField(`**Kinetic**`, replaceError(TNTGames.new_kineticwizard_kills, 0) - data.wizardKills.k_k, true)
+                    .addField(`**Blood**`, replaceError(TNTGames.new_bloodwizard_kills, 0) - data.wizardKills.b_k, true)
+                    .addField(`**Toxic**`, replaceError(TNTGames.new_toxicwizard_kills, 0) - data.wizardKills.t_k, true)
+                    .addField(`**Hydro**`, replaceError(TNTGames.new_hydrowizard_kills, 0) - data.wizardKills.h_k, true)
+                    .addField(`**Ancient**`, replaceError(TNTGames.new_ancientwizard_kills, 0) - data.wizardKills.a_k, true)
+                    .addField(`**Storm**`, replaceError(TNTGames.new_stormwizard_kills, 0) - data.wizardKills.s_k, true)
+            }
+            return m.channel.send(embed)
+        }
+        else if (game == "all" || game == "overall") {
+            const embed = new Discord.MessageEmbed()
+                .setColor(`${rankData.color}`)
+                .setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`)
+                .setTitle(`${rankData.displayName} ${user.player.displayname}'s ${command == "weekly" ? "Weekly" : "Monthly"} TNT Games Stats`)
+                .setThumbnail(`https://visage.surgeplay.com/head/128/${user.player.uuid}`)
+                .setURL(`https://plancke.io/hypixel/player/stats/${user.player.displayname}`)
+                .setTimestamp()
+                .setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green)
+                .addField(`**Coins**`, replaceError(TNTGames.coins, 0) - data.allTNT.coins, true)
+                .addField(`**Playtime**`, min_sec(replaceError(user.player.achievements.tntgames_tnt_triathlon, 0) - data.allTNT.time), true)
+                .addField(`**TNT Wins**`, replaceError(TNTGames.wins_tntrun, 0)+replaceError(TNTGames.wins_pvprun, 0)+replaceError(TNTGames.wins_tntag, 0)+replaceError(TNTGames.wins_bowspleef, 0) + replaceError(TNTGames.wins_capture, 0) - data.allTNT.total_wins, true)
+                .addField(`**Tag Wins**`, replaceError(TNTGames.wins_tntag, 0) - data.allTNT.tag_wins, true)
+                .addField(`**TNT Run Wins**`, replaceError(TNTGames.wins_tntrun, 0) - data.allTNT.run_wins, true)
+                .addField(`**Bowspleef Wins**`, replaceError(TNTGames.wins_bowspleef, 0) - data.allTNT.bow_wins, true)
+                .addField(`**Wizards Wins**`, replaceError(TNTGames.wins_capture, 0) - data.allTNT.wizards_wins, true)
+                .addField(`**Wizards Kills**`, replaceError(TNTGames.kills_capture, 0) - data.allTNT.wizards_kills, true)
+                .addField(`**PVP Run Wins**`, replaceError(TNTGames.wins_pvprun, 0) - data.allTNT.pvp_wins, true)
+                .setDescription(`Showing changes since: ${timeConverter(Math.floor(data.time))}`)
+            return m.channel.send(embed)
+        }
+        else if (game == "duel" || game == "duels") {
+            if(user.player.stats.Duels == undefined) return sendErrorEmbed(m.channel,`Unknown Player`,`Player has no Data in Hypixel's Duel Database`)
+
+            console.log(Math.round(ratio(replaceError(user.player.stats.Duels.bowspleef_duel_wins, 0) - data.duels.w, replaceError(user.player.stats.Duels.bowspleef_duel_rounds_played, 0)-replaceError(user.player.stats.Duels.bowspleef_duel_wins, 0)-data.duels.l)*1000)/1000)
+            console.log(replaceError(user.player.stats.Duels.bowspleef_duel_rounds_played, 0)-replaceError(user.player.stats.Duels.bowspleef_duel_wins, 0)-data.duels.l)
+            
+            const embed = new Discord.MessageEmbed()
+                .setColor(`${rankData.color}`)
+                .setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`)
+                .setTitle(`${rankData.displayName} ${user.player.displayname}'s ${command == "weekly" ? "Weekly" : "Monthly"} Bowspleef Duels Stats`)
+                .setThumbnail(`https://visage.surgeplay.com/head/128/${user.player.uuid}`)
+                .setURL(`https://plancke.io/hypixel/player/stats/${user.player.displayname}`)
+                .setTimestamp()
+                .setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green)
+                .addField(`**Wins**`, replaceError(user.player.stats.Duels.bowspleef_duel_wins, 0) - data.duels.w, true)
+                .addField(`**Losses**`, replaceError(user.player.stats.Duels.bowspleef_duel_rounds_played, 0)-replaceError(user.player.stats.Duels.bowspleef_duel_wins, 0) - data.duels.l, true)
+                .addField(`**Shots**`, replaceError(user.player.stats.Duels.bowspleef_duel_bow_shots, 0) - data.duels.shots, true)
+                .addField(`**W/L**`, Math.round(ratio(replaceError(user.player.stats.Duels.bowspleef_duel_wins, 0) - data.duels.w, replaceError(user.player.stats.Duels.bowspleef_duel_rounds_played, 0)-replaceError(user.player.stats.Duels.bowspleef_duel_wins, 0)-data.duels.l)*1000)/1000, true)
+                .setDescription(`Showing changes since: ${timeConverter(Math.floor(data.time))}`)
+            return m.channel.send(embed)
+        }
     }
 })
 
