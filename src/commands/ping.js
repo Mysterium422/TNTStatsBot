@@ -1,6 +1,7 @@
+const Discord = require("discord.js");
 const {performance} = require("perf_hooks");
 const {hypixelFetch} = require("../mystFetch.js");
-const Discord = require("discord.js");
+const {embedFooter, randomChoice} = require("../util.js");
 
 module.exports = {
 	run: async (client, message, args) => {
@@ -14,23 +15,18 @@ module.exports = {
 		const hypixelResponse = await hypixelFetch("key?");
 		const botToHypixel = performance.now() - START;
 
-		const embed = new Discord.MessageEmbed()
-        .setColor("#3bcc71")
-        .setAuthor(`${message.author.tag}`, `https://cdn.discordapp.com/avatars/${message.author.id}/${message.author.avatar}?size=128`)
-        .setTitle("Help Menu - Home")
-        .setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`)
-        .setTimestamp()
-        .setFooter("Created by Mysterium", embedFooter.image.green);
+		const embed = new Discord.MessageEmbed();
+		embed.setColor("#3bcc71");
+		embed.setAuthor(`${message.author.tag}`, `https://cdn.discordapp.com/avatars/${message.author.id}/${message.author.avatar}?size=128`);
+		embed.setTitle("Ping");
+		embed.setTimestamp();
+		embed.setFooter(randomChoice(embedFooter), embedFooter.image.green);
 
-		messageSent = await message.channel.send(
-			[
-				"**Ping**",
-				"",
-				`Discord to Bot: ${discordToBot.toFixed(1)}ms`,
-				`Bot to Hypixel (round trip): ${hypixelResponse === "API ERROR" ? "No Response" : botToHypixel.toFixed(1) + "ms"}`,
-				`Bot to Database (round trip): ${botToDB.toFixed(1)}ms`
-			].join("\n")
-		);
+		embed.addField('Discord to Bot', discordToBot.toFixed(1) + 'ms');
+		embed.addField('Bot to Hypixel (round trip)', hypixelResponse === "API ERROR" ? "No Response" : botToHypixel.toFixed(1) + "ms");
+		embed.addField('Bot to Database (round trip)t', botToDB.toFixed(1) + 'ms');
+
+		message.channel.send(embed);
 	},
 	aliases: [
 		"latency"

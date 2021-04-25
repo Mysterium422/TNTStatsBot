@@ -17,16 +17,9 @@ const unix_time_start = Date.now();
 const yamlConfig = yaml.loadAll(fs.readFileSync(path.resolve(__dirname, "../config.yaml"), "utf8"));
 const config = yamlConfig[0];
 
-const pkg = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../package.json")));
+
 
 // HELPER OBJECTS
-const embedFooter = {
-	text: ["TNT Stats Bot by Mysterium_", "TNT Stats Bot by Mysterium_", "TNT Stats Bot by Mysterium_", "Created by Mysterium_", "Created by Mysterium_", "Created by Mysterium_", "Invite this bot to your own server! (/invite)", "Invite this bot to your own server! (/invite)", "Invite this bot to your own server! (/invite)", "Invite this bot to your own server! (/invite)", "Invite this bot to your own server! (/invite)", "Wizard Leaderboard Bot! (/discord)", "Suggest fixes! (/discord)", "Join the discord! (/discord)", "All bow to sensei Kidzyy", "Check out my code! (/source)", `Version: ${pkg.version}`, "Report any bugs! (/discord)"],
-	image: {
-		green: "https://cdn.discordapp.com/emojis/722990201307398204.png?v=1",
-		red: "https://cdn.discordapp.com/emojis/722990201302941756.png?v=1"
-	}
-};
 
 const helpMsg = `__Commands (Prefixes consty depending on your channel)__
 **/TNThelp** opens this page. Works anywhere this bot can read/send messages
@@ -724,7 +717,6 @@ client.on("message", async message => {
 	const args = message.content.slice(prefix.length).split(" ");
 	const command = args.shift().toLowerCase();
 
-	debugger;
 	if (command in commands) {
 		message.channel.send("Command recognized");
 		await commands[command].run(client, message, args);
@@ -888,33 +880,7 @@ client.on("message", async message => {
 
 
 // 	if (m.content.toLowerCase() == "/ping") {
-// 		const discordToBot = Date.now() - m.createdTimestamp;
 
-// 		const now = Date.now();
-// 		await db.get("chan_" + m.channel.id);
-// 		const botToDB = Date.now() - now;
-
-// 		const now2 = Date.now();
-// 		const hypixelResponse = await hypixelFetch("key?");
-// 		const botToHypixel = Date.now() - now2;
-// 		let botToHypixelString = "";
-// 		if (hypixelResponse == "API ERROR") {
-// 			botToHypixelString = "No Response - ";
-// 		}
-
-// 		const now3 = Date.now();
-// 		messageSent = await m.channel.send(`**Ping**\n
-// Discord to Bot: ${discordToBot}
-// Bot to Hypixel (round trip): ${botToHypixelString}${botToHypixel}
-// Bot to Database (round trip): ${botToDB}`);
-// 		const botToDiscord = Date.now() - now3;
-
-// 		messageSent.edit(`**Ping**
-// Discord to Bot: ${discordToBot} ms
-// Bot to Hypixel (round trip): ${botToHypixelString}${botToHypixel} ms
-// Bot to Database (round trip): ${botToDB} ms
-// Bot to Discord: ${botToDiscord} ms
-// Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - botToDB - botToDiscord} ms`);
 // 	}	
 	// 	if (command == "help") {
 	// 		const msg = await m.channel.send(new Discord.MessageEmbed().setColor("#3bcc71").setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`).setTitle("Help Menu - Home").setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`).setTimestamp().setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green).setDescription(`:house:: Home\n:bar_chart:: Stat Commands\n:tools:: QoL Commands \n:information_source:: Bot Information Commands\n:track_next:: Latest Update Info`));
