@@ -1,32 +1,20 @@
-let mojangQueries = 0;
-function newMojangQuery() {
-    mojangQueries = mojangQueries+1;
-    setTimeout(function () {
-        mojangQueries = mojangQueries - 1;
-    }, 10 * 60 * 1000);
-}
-
 // SETUP CONFIG
 const config = require("../config.json");
 const key = config.hypixelToken;
+const nodeFetch = require("node-fetch");
 
+// TODO: Caching with keyv (npm install keyv)
 module.exports = {
 	hypixelFetch: async function(query) {
-		let variable;
+		console.log("FETCHING :: ", `https://api.hypixel.net/${query}&key=${key}`);
 		try {
-			variable = await nodeFetch(`https://api.hypixel.net/${query}&key=${key}`).then(res => res.json());
+			return await nodeFetch(`https://api.hypixel.net/${query}&key=${key}`).then(res => res.json());
 		} catch (e) {
-			variable = "API ERROR";
+			return "API ERROR";
 		}
-
-		return variable;
 	},
 	mojangUUIDFetch: async function(query) {
-		if (mojangQueries > 599) {
-			return {name: query, id: query};
-		} else {
-			newMojangQuery();
-			return await nodeFetch(`https://api.mojang.com/users/profiles/minecraft/${query}`).then(res => res.json());
-		}
+		return await nodeFetch(`https://api.mojang.com/users/profiles/minecraft/${query}`)
+			.then(response => response.status === 204 ? null : response.json());
 	}
 };
