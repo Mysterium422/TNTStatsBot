@@ -311,9 +311,7 @@ client.on("ready", async () => {
 
 client.on("message", async m => {
 	if (m.author.bot) return;
-	console.log(m.guild.id);
 	if (m.guild.id == "825593306640810026") return;
-	console.log(m.content.toLowerCase());
 	if (m.content.toLowerCase() == "/ping") {
 		const discordToBot = Date.now() - m.createdTimestamp;
 
@@ -405,6 +403,8 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
 
 	const args = m.content.slice(prefix.length).split(" ");
 	const command = args.shift().toLowerCase();
+
+	debugger;
 
 	console.log(m.author.username + ": " + m.content);
 
@@ -593,6 +593,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
 		await setCacheDB(user.player, user.player.uuid, m.author.id);
 		return m.channel.send("Successfully set your ign to " + args[0]);
 	} else if (command.toLowerCase() == "stats") {
+		debugger;
 		let received = "";
 		try {
 			received = await fs.readFileSync("../global/IDS.json");
