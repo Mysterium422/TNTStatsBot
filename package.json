@@ -22,7 +22,7 @@
   "license": "AGPL-3.0-or-later",
   "homepage": "https://github.com/LebsterFace/TNTStatsBot/blob/main/README.md",
   "dependencies": {
-    "discord.js": "^12.2.0",
+    "discord.js": "^12.5.3",
     "node-fetch": "^2.6.1",
     "node-schedule": "^2.0.0"
   }
