@@ -1,7 +1,6 @@
 const Discord = require("discord.js");
 const {performance} = require("perf_hooks");
-const {hypixelFetch} = require("../mystFetch.js");
-const {embedFooter, randomChoice} = require("../util.js");
+const {embedFooter, randomChoice, hypixelFetch} = require("../util.js");
 
 module.exports = {
 	run: async (client, message, args) => {

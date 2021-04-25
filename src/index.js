@@ -3,9 +3,18 @@ const Discord = require("discord.js"),
 	Database = require("better-sqlite3"),
 	fs = require("fs"),
 	path = require("path"),
-	schedule = require("node-schedule"),
-	{randInt, replaceError, ChatCodes, ChatColor, formatTimestamp, booleanPhrases} = require("./util.js"),
-	{mojangUUIDFetch, hypixelFetch} = require("./mystFetch.js");
+	schedule = require("node-schedule");
+
+const {
+	mojangUUIDFetch,
+	hypixelFetch,
+	randInt,
+	replaceError,
+	ChatCodes,
+	ChatColor,
+	formatTimestamp,
+	booleanPhrases
+} = require("./util.js");
 
 const client = new Discord.Client();
 const config = require("../config.json");

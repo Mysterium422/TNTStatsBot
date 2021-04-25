@@ -1,6 +1,5 @@
 const config = require("../../config.json");
-const {mojangUUIDFetch, hypixelFetch} = require("../mystFetch.js");
-const {errorEmbed} = require("../util.js");
+const {errorEmbed, mojangUUIDFetch} = require("../util.js");
 
 module.exports = {
 	run: async (client, message, args) => {
