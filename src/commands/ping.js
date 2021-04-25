@@ -14,17 +14,18 @@ module.exports = {
 		START = performance.now();
 		const hypixelResponse = await hypixelFetch("key?");
 		const botToHypixel = performance.now() - START;
+		const hypixelString = hypixelResponse === "API ERROR" ? "No Response" : Math.round(botToHypixel) + "ms";
 
 		const embed = new Discord.MessageEmbed();
 		embed.setColor("#3bcc71");
 		embed.setAuthor(`${message.author.tag}`, `https://cdn.discordapp.com/avatars/${message.author.id}/${message.author.avatar}?size=128`);
 		embed.setTitle("Ping");
 		embed.setTimestamp();
-		embed.setFooter(randomChoice(embedFooter), embedFooter.image.green);
+		embed.setFooter(randomChoice(embedFooter.text), embedFooter.image.green);
 
-		embed.addField('Discord to Bot', discordToBot.toFixed(1) + 'ms');
-		embed.addField('Bot to Hypixel (round trip)', hypixelResponse === "API ERROR" ? "No Response" : botToHypixel.toFixed(1) + "ms");
-		embed.addField('Bot to Database (round trip)t', botToDB.toFixed(1) + 'ms');
+		embed.addField("Discord to Bot", Math.round(discordToBot) + "ms", true);
+		embed.addField("Bot to Hypixel", hypixelString, true);
+		embed.addField("Bot to Database", Math.round(botToDB) + "ms", true);
 
 		message.channel.send(embed);
 	},
