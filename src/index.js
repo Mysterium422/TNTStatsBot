@@ -846,7 +846,7 @@ client.on("message", async message => {
 		if (command == "help") {
 			
 		} else if (command.toLowerCase() == "invite") {
-			return m.channel.send("Use /TNTconfigure to setup the bot: \nhttps://discord.com/oauth2/authorize?client_id=735055542178938960&scope=bot&permissions=2147994688");
+			
 		} else if (command.toLowerCase() == "verify") {
 			if (m.author.id != config.masterID) return m.channel.send("This is a discord-bot-owner-only command");
 			if (args.length != 2) {
