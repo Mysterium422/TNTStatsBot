@@ -712,7 +712,8 @@ client.on("ready", async () => {
 
 	fs.readdirSync(path.resolve(__dirname, "commands")).forEach(fileName => {
 		const obj = require("./commands/" + fileName);
-		commands[fileName] = obj;
+		// Slice to remove `.js`
+		commands[fileName.slice(0, -3)] = obj;
 	});
 	console.log("Commands loaded");
 });
@@ -723,8 +724,8 @@ client.on("message", async message => {
 	const args = message.content.slice(prefix.length).split(" ");
 	const command = args.shift().toLowerCase();
 
+	debugger;
 	if (command in commands) {
-		debugger;
 		message.channel.send("Command recognized");
 		await commands[command].run(client, message, args);
 	} else {
