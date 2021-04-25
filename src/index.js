@@ -58,7 +58,7 @@ client.on("message", async message => {
 
 	if (command in commands) {
 		try {
-			await commands[command].run(client, message, args);
+			await commands[command].run(client, message, args, prefix);
 		} catch (up) {
 			// Debug
 			message.channel.send("An internal error occoured, see the stacktrace below:");

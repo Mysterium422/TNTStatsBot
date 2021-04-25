@@ -4,7 +4,7 @@ const strings = require("../strings.js");
 const {errorEmbed, hypixelFetch, mojangUUIDFetch} = require("../util.js");
 
 module.exports = {
-	run: async (client, message, args) => {
+	run: async (client, message, args, prefix) => {
 		if (args.length !== 1) {
 			return message.channel.send(errorEmbed("Incorrect number of arguments for set!", "Expected [uuid/playername]"));
 		}
