@@ -271,69 +271,7 @@ client.on("message", async message => {
 		message.channel.send(`Registered ${data.player.displayname} to ${args[0]}`);
 		return;
 	} else if (command.toLowerCase() === "set") {
-		if (args.length !== 1) {
-			return sendErrorEmbed(message.channel, `Usage Error`, `Usage: ${prefix}set [username]`);
-		}
-
-		if (args[0].length > 20) {
-			user = await hypixelFetch(`player?uuid=${args[0]}`);
-		} else {
-			const uuidInput = await mojangUUIDFetch(args[0]).catch(() => {
-				return {
-					id: "UUIDINVALID12345678910"
-				};
-			});
-
-			if (uuidInput.id.length > 20) {
-				user = await hypixelFetch(`player?uuid=${uuidInput.id}`);
-			} else {
-				user = await hypixelFetch(`player?name=${args[0]}`);
-			}
-		}
-
-		if (user == "API ERROR") {
-			return message.channel.send("API Connection Issues, Hypixel might be offline");
-		}
-
-		if (!user.success && user.cause == "Invalid API key") {
-			return sendErrorEmbed(message.channel, "Im too busy!", "Please wait a few seconds and try again");
-		}
-
-		if (!user.success || user.success == false || user.player == null || user.player == undefined || !user.player || user.player.stats == undefined) return sendErrorEmbed(message.channel, `Unknown Player`, `Player has no data in Hypixel's Database`);
-		if (user.player.stats.TNTGames == undefined) return sendErrorEmbed(message.channel, `Unknown Player`, `Player has no Data in Hypixel's TNT Games Database`);
-
-		//if (idData[m.author.id] == user.player.uuid) {
-		//    return m.channel.send("This ign has already been set to this account!")
-		//}
-
-		if (!user.player.socialMedia) return message.channel.send(`You must first link your discord to hypixel. <https://www.youtube.com/watch?v=Cfa-EcRD6SI> for a tutorial (ignore the part at the end with using a command in guild discord)\nThen, come back here to do /set ${args[0]} again.\n\nAlternatively, DM Mysterium#5229 or ping me and I will verify you.`);
-		if (!user.player.socialMedia.links) return message.channel.send(`You must first link your discord to hypixel. <https://www.youtube.com/watch?v=Cfa-EcRD6SI> for a tutorial (ignore the part at the end with using a command in guild discord)\nThen, come back here to do /set ${args[0]} again.\n\nAlternatively, DM Mysterium#5229 or ping me and I will verify you.`);
-		if (!user.player.socialMedia.links.DISCORD) return message.channel.send(`You must first link your discord to hypixel. <https://www.youtube.com/watch?v=Cfa-EcRD6SI> for a tutorial (ignore the part at the end with using a command in guild discord)\nThen, come back here to do /set ${args[0]} again.\n\nAlternatively, DM Mysterium#5229 or ping me and I will verify you.`);
-		console.log(message.author.tag == user.player.socialMedia.links.DISCORD);
-		if (user.player.socialMedia.links.DISCORD != message.author.tag) {
-			return message.channel.send(`Incorrectly set Discord!\nYou must first link your discord to hypixel. <https://www.youtube.com/watch?v=Cfa-EcRD6SI> for a tutorial (ignore the part at the end with using a command in guild discord)\nThen, come back here to do /set ${args[0]} again.\n\nAlternatively, DM Mysterium#5229 or ping me and I will verify you.`);
-		}
-
-		let received = "";
-		try {
-			received = await fs.readFileSync("../global/IDS.json");
-		} catch (e) {
-			console.warn("File is invalid!");
-			process.exit();
-		}
-		idData = JSON.parse(received);
-
-		idData[user.player.uuid] = message.author.id;
-		idData[message.author.id] = user.player.uuid;
-
-		fs.writeFileSync("../global/IDS.json", JSON.stringify(idData));
-
-		await db.set(message.author.id, {
-			verbose: false,
-			reset: true
-		});
-		await setCacheDB(user.player, user.player.uuid, message.author.id);
-		return message.channel.send("Successfully set your ign to " + args[0]);
+		
 	} else if (command.toLowerCase() === "stats") {
 		let received = "";
 		try {

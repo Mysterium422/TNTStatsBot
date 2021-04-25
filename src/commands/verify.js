@@ -8,7 +8,7 @@ module.exports = {
 
 		const mentioned = message.mentions.users.first();
 		if (args.length !== 2) {
-            return message.channel.send(errorEmbed("Incorrect number of arguments for *verify*!", "Expected <mention> <uuid/name>"));
+            return message.channel.send(errorEmbed("Incorrect number of arguments for *verify*!", "Expected [mention] [uuid/username]"));
 		} else if (typeof mentioned === "undefined") {
             return message.channel.send(errorEmbed("Incorrect argument for *verify*!", "The first argument should be the member you wish to verify!"));
 		}
