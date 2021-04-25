@@ -15,7 +15,6 @@ client.on("ready", async () => {
 	console.log("[INFO] Initializing...");
 
 	// DEBUG ONLY!!
-	console.log("[INFO] Resetting database...");
 	await db.reset();
 	// DEBUG ONLY!!
 
