@@ -680,8 +680,13 @@ client.on("message", async message => {
 	const command = args.shift().toLowerCase();
 
 	if (command in commands) {
-		message.channel.send("Command recognized");
-		await commands[command].run(client, message, args);
+		try {
+			await commands[command].run(client, message, args);
+		} catch (e) {
+			// Debug
+			message.channel.send("An internal error occoured, see the stacktrace below:");
+			message.channel.send("```" + e.e + "```");
+		}
 	} else {
 		message.channel.send("Command does not exist!");
 	}
