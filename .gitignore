@@ -1,19 +1,5 @@
-node_modules
-oldFiles
-config.yaml
-cookieData.json
-IDS.json
-json.sqlite
-leaderboard.json
-mafia.json
-mystFetch.js
-Procfile
-test.js
-.DS_Store
-indexUpload.js
-package-lock.json
-index.js
-bottesting.js
-index 2.js
+/json.sqlite
+/config.yaml
+/package-lock.json
 /.vscode
-bottesting.js
+/node_modules
