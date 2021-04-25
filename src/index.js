@@ -2,8 +2,7 @@
 const Discord = require("discord.js"),
 	Database = require("better-sqlite3"),
 	fs = require("fs"),
-	path = require("path"),
-	schedule = require("node-schedule");
+	path = require("path");
 
 const {
 	mojangUUIDFetch,
@@ -622,39 +621,18 @@ async function setMonthlyDB(data, uuid) {
 
 const commands = {};
 
-client.on("ready", async () => {
-	console.log("Bot: TNT Stats Bot is online!");
-	client.user.setActivity("TNT Games  | Use /TNThelp");
-
-	// const scheduleRule = new schedule.RecurrenceRule();
-	// scheduleRule.second = 0;
-	// scheduleRule.minute = 30;
-	// scheduleRule.hour = 9;
-	// scheduleRule.dayOfWeek = 0;
-	// scheduleRule.tz = "America/New_York";
-
-	// schedule.scheduleJob(scheduleRule, async function() {
-	// 	console.log("deconsting weekly");
-	// 	db.deconste("weekly");
-	// });
-
-	// const scheduleRule2 = new schedule.RecurrenceRule();
-	// scheduleRule2.second = 0;
-	// scheduleRule2.minute = 30;
-	// scheduleRule2.hour = 9;
-	// scheduleRule2.date = 1;
-	// scheduleRule2.tz = "America/New_York";
-
-	// schedule.scheduleJob(scheduleRule2, async function() {
-	// 	db.deconste("weekly");
-	// });
-
+client.on("ready", () => {
+	console.log("Ready...");
+	
 	fs.readdirSync(path.resolve(__dirname, "commands")).forEach(fileName => {
 		const obj = require("./commands/" + fileName);
 		// Slice to remove `.js`
 		commands[fileName.slice(0, -3)] = obj;
 	});
-	console.log("Commands loaded");
+	
+	console.log("Successfully loaded all commands...");
+	console.log(" -- Bot is now online! -- ");
+	client.user.setActivity("TNT Games | Use /TNThelp");
 });
 
 client.on("message", async message => {
