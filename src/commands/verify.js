@@ -1,10 +1,12 @@
+const config = require("../../config.json");
+
 module.exports = {
 	run: async (client, message, args) => {
-		if (message.author.id != config.masterID) return message.channel.send("This is a discord-bot-owner-only command");
+		if (message.author.id !== config.masterID) return message.channel.send("This is a discord-bot-owner-only command");
+        debugger;
 		if (args.length != 2) {
 			return message.channel.send("Incorrect amount of arguments");
-		}
-		if (!args[0].includes("@")) {
+		} else if (!args[0].includes("@")) {
 			return message.channel.send("First Arg must be a ping");
 		}
 

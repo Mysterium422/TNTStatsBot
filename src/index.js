@@ -682,10 +682,11 @@ client.on("message", async message => {
 	if (command in commands) {
 		try {
 			await commands[command].run(client, message, args);
-		} catch (e) {
+		} catch (up) {
 			// Debug
 			message.channel.send("An internal error occoured, see the stacktrace below:");
-			message.channel.send("```" + e.e + "```");
+			message.channel.send("```" + up.stack + "```");
+			throw up; // ha ha!
 		}
 	} else {
 		message.channel.send("Command does not exist!");
@@ -1570,4 +1571,4 @@ client.on("message", async message => {
 		}
 });
 
-client.login(config.TNTStatsBotToken);
+client.login(config.token);
