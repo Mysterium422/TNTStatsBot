@@ -712,7 +712,7 @@ client.on("ready", async () => {
 
 	fs.readdirSync(path.resolve(__dirname, "commands")).forEach(fileName => {
 		const obj = require("./commands/" + fileName);
-		commands[obj.name] = obj;
+		commands[fileName] = obj;
 	});
 	console.log("Commands loaded");
 });
