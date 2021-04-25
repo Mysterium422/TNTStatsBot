@@ -23,10 +23,7 @@ module.exports = {
             }
         }
 
-        const data = await hypixelFetch("player?uuid=" + uuid);
-        if (data === null) {
-            return message.channel.send(errorEmbed("Failed to reach Hypixel API", "Is Hypixel down?"));
-        }
+        message.channel.send(errorEmbed("Verifying is not currently supported", "There is no database"));
 	},
 	aliases: []
 };
