@@ -1,53 +1,32 @@
 const config = require("../../config.json");
+const {mojangUUIDFetch, hypixelFetch} = require("../mystFetch.js");
+const {errorEmbed} = require("../util.js");
 
 module.exports = {
 	run: async (client, message, args) => {
 		if (message.author.id !== config.masterID) return message.channel.send("This is a discord-bot-owner-only command");
-        
-        const mentioned = message.mentions.users.first();
 
-		if (args.length != 2) {
-			return message.channel.send("Incorrect amount of arguments");
+		const mentioned = message.mentions.users.first();
+		if (args.length !== 2) {
+            return message.channel.send(errorEmbed("Incorrect number of arguments for *verify*!", "Expected <mention> <uuid/name>"));
 		} else if (typeof mentioned === "undefined") {
-			return message.channel.send("First argument must mention the member to verify!");
-		} else if (args[1].length > 16) {
-			data = await hypixelFetch(`player?uuid=${args[1]}`);
-		} else {
-			const uuidInput = await mojangUUIDFetch(args[1]).catch(() => {
-				return {
-					id: "UUIDINVALID12345678910"
-				};
-			});
-
-			if (uuidInput.id.length > 16) {
-				data = await hypixelFetch(`player?uuid=${uuidInput.id}`);
-			} else {
-				data = await hypixelFetch(`player?name=${args[1]}`);
-			}
+            return message.channel.send(errorEmbed("Incorrect argument for *verify*!", "The first argument should be the member you wish to verify!"));
 		}
 
-		if (data == "API ERROR") {
-			return message.channel.send("API Connection Issues, Hypixel might be offline");
-		}
-		if (!data.success || data.success == false || data.player == null || data.player == undefined || !data.player || data.player.stats == undefined) return message.channel.send("Invalid Something");
-		if (data.player.stats.TNTGames == undefined) return sendErrorEmbed(message.channel, `Unknown Player`, `Player has no Data in Hypixel's TNT Database`);
+        let uuid = args[1];
+        if (args[1].length <= 16) {
+            const mojangResponse = await mojangUUIDFetch(args[1]);
+            if (mojangResponse === null) {
+                return message.channel.send(errorEmbed("Invalid username", `Failed to fetch the UUID of '${args[1]}' from the Mojang API`));
+            } else {
+                uuid = mojangResponse.id;
+            }
+        }
 
-		let received = "";
-		try {
-			received = await fs.readFileSync("../global/IDS.json");
-		} catch (e) {
-			console.warn("File is invalid!");
-			process.exit();
-		}
-		idData = JSON.parse(received);
-
-		idData[data.player.uuid] = args[0].replace("<", "").replace(">", "").replace("@", "").replace("!", "");
-		idData[args[0].replace("<", "").replace(">", "").replace("@", "").replace("!", "")] = data.player.uuid;
-
-		await setCacheDB(data.player, data.player.uuid, message.author.id);
-
-		fs.writeFileSync("../global/IDS.json", JSON.stringify(idData));
-		message.channel.send(`Registered ${data.player.displayname} to ${args[0]}`);
+        const data = await hypixelFetch("player?uuid=" + uuid);
+        if (data === null) {
+            return message.channel.send(errorEmbed("Failed to reach Hypixel API", "Is Hypixel down?"));
+        }
 	},
 	aliases: []
 };
