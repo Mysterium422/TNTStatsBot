@@ -7,14 +7,14 @@ const yaml = require("js-yaml");
 const schedule = require("node-schedule");
 
 // FETCH UNUSED BUT WORKS FOR FUTURE
-const {mojangUUIDFetch, hypixelFetch, plotzesFetch, fetch} = require("../global/mystFetch.js");
-const {randInt, replaceError, ChatCodes, ChatColor, ownerID, timeConverter} = require("../global/globalUtils.js");
+const {mojangUUIDFetch, hypixelFetch} = require("./mystFetch.js");
+const {randInt, replaceError, ChatCodes, ChatColor, ownerID, timeConverter} = require("./globalUtils.js");
 
 // USED FOR INFO COMMAND
-let unix_time_start = Date.now();
+const unix_time_start = Date.now();
 
 // SETUP CONFIG
-let yamlConfig = yaml.loadAll(fs.readFileSync("config.yaml", "utf8"));
+const yamlConfig = yaml.loadAll(fs.readFileSync("config.yaml", "utf8"));
 const config = yamlConfig[0];
 
 const pkg = JSON.parse(fs.readFileSync("package.json"));
@@ -28,7 +28,7 @@ const embedFooter = {
 	}
 };
 
-const helpMsg = `__Commands (Prefixes vary depending on your channel)__
+const helpMsg = `__Commands (Prefixes consty depending on your channel)__
 **/TNThelp** opens this page. Works anywhere this bot can read/send messages
 **/TNTconfigure** <game> <prefix> configure the bot to work in *this* channel using that game or prefix (admin perms needed).
 **/TNTremove** This bot will no longer answer to queries in this channel (admin perms needed). Works anywhere this bot can read/send messages.
@@ -63,7 +63,7 @@ const booleanPhrases = {
 
 // USEFUL COMMON FUNCTIONS
 function findRank(user) {
-	var rankData = {
+	let rankData = {
 		displayName: "",
 		color: ChatColor.gray
 	};
@@ -133,8 +133,8 @@ function sendErrorEmbed(channel, error, description) {
 }
 
 Array.prototype.unique = function() {
-	var a = this.concat();
-	let b = [];
+	const a = this.concat();
+	const b = [];
 
 	a.forEach((item, index) => {
 		if (a.indexOf(item) == index) b.push(b);
@@ -147,8 +147,8 @@ String.prototype.contains = function(substring) {
 };
 
 function min_sec(seconds) {
-	var mins = Math.floor(seconds / 60);
-	var secondsNew = seconds - mins * 60;
+	const mins = Math.floor(seconds / 60);
+	const secondsNew = seconds - mins * 60;
 	if (secondsNew < 10) {
 		return mins.toString() + ":0" + secondsNew.toString();
 	} else {
@@ -157,15 +157,15 @@ function min_sec(seconds) {
 }
 
 function displayOldNewNumbers(old, updated) {
-	var updatedRound = Math.round(updated * 1000) / 1000;
+	const updatedRound = Math.round(updated * 1000) / 1000;
 
 	if (old == updated) {
 		return updatedRound.toString();
 	} else if (old > updated) {
-		var diff = Math.round((old - updated) * 1000) / 1000;
+		const diff = Math.round((old - updated) * 1000) / 1000;
 		return updatedRound.toString() + " (-" + diff.toString() + ")";
 	} else {
-		var diff = Math.round((updated - old) * 1000) / 1000;
+		const diff = Math.round((updated - old) * 1000) / 1000;
 		return updatedRound.toString() + " (+" + diff.toString() + ")";
 	}
 }
@@ -183,7 +183,7 @@ function ratio(a, b) {
 async function setRunDB(data, uuid, authorID) {
 	if (!data.stats.TNTGames) return;
 
-	var runDBEntry = {
+	const runDBEntry = {
 		record: replaceError(data.stats.TNTGames.record_tntrun, 0),
 		w: replaceError(data.stats.TNTGames.wins_tntrun, 0),
 		l: replaceError(data.stats.TNTGames.deaths_tntrun, 0),
@@ -199,7 +199,7 @@ async function setRunDB(data, uuid, authorID) {
 async function setPVPDB(data, uuid, authorID) {
 	if (!data.stats.TNTGames) return;
 
-	var pvpDBEntry = {
+	const pvpDBEntry = {
 		record: replaceError(data.stats.TNTGames.record_pvprun, 0),
 		w: replaceError(data.stats.TNTGames.wins_pvprun, 0),
 		l: replaceError(data.stats.TNTGames.deaths_pvprun, 0),
@@ -215,7 +215,7 @@ async function setPVPDB(data, uuid, authorID) {
 async function setBowDB(data, uuid, authorID) {
 	if (!data.stats.TNTGames) return;
 
-	var bowDBEntry = {
+	const bowDBEntry = {
 		w: replaceError(data.stats.TNTGames.wins_bowspleef, 0),
 		l: replaceError(data.stats.TNTGames.deaths_bowspleef, 0),
 		shots: replaceError(data.stats.TNTGames.tags_bowspleef, 0),
@@ -230,7 +230,7 @@ async function setBowDB(data, uuid, authorID) {
 async function setTagDB(data, uuid, authorID) {
 	if (!data.stats.TNTGames) return;
 
-	var tagDBEntry = {
+	const tagDBEntry = {
 		w: replaceError(data.stats.TNTGames.wins_tntag, 0),
 		k: replaceError(data.stats.TNTGames.kills_tntag, 0),
 		kw: ratio(data.stats.TNTGames.kills_tntag, data.stats.TNTGames.wins_tntag),
@@ -245,7 +245,7 @@ async function setTagDB(data, uuid, authorID) {
 async function setWizDB(data, uuid, authorID) {
 	if (!data.stats.TNTGames) return;
 
-	var wizDBEntry = {
+	const wizDBEntry = {
 		w: replaceError(data.stats.TNTGames.wins_capture, 0),
 		k: replaceError(data.stats.TNTGames.kills_capture, 0),
 		a: replaceError(data.stats.TNTGames.assists_capture, 0),
@@ -264,7 +264,7 @@ async function setWizDB(data, uuid, authorID) {
 async function setWizKillsDB(data, uuid, authorID) {
 	if (!data.stats.TNTGames) return;
 
-	var wizKillDBEntry = {
+	const wizKillDBEntry = {
 		total_k: replaceError(data.stats.TNTGames.kills_capture, 0),
 		f_k: replaceError(data.stats.TNTGames.new_firewizard_kills, 0),
 		i_k: replaceError(data.stats.TNTGames.new_icewizard_kills, 0),
@@ -284,7 +284,7 @@ async function setWizKillsDB(data, uuid, authorID) {
 async function setDuelDB(data, uuid, authorID) {
 	if (!data.stats.Duels) return;
 
-	var duelDBEntry = {
+	const duelDBEntry = {
 		w: replaceError(data.stats.Duels.bowspleef_duel_wins, 0),
 		l: replaceError(data.stats.Duels.bowspleef_duel_rounds_played, 0) - replaceError(data.stats.Duels.bowspleef_duel_wins, 0),
 		shots: replaceError(data.stats.Duels.bowspleef_duel_bow_shots, 0),
@@ -297,7 +297,7 @@ async function setDuelDB(data, uuid, authorID) {
 }
 
 async function setAllDB(data, uuid, authorID) {
-	var allDBEntry = {
+	const allDBEntry = {
 		coins: replaceError(data.stats.TNTGames.coins, 0),
 		total_wins: replaceError(data.stats.TNTGames.wins_tntrun, 0) + replaceError(data.stats.TNTGames.wins_pvprun, 0) + replaceError(data.stats.TNTGames.wins_tntag, 0) + replaceError(data.stats.TNTGames.wins_bowspleef, 0) + replaceError(data.stats.TNTGames.wins_capture, 0),
 		streak: replaceError(data.stats.TNTGames.winstreak, 0),
@@ -330,7 +330,7 @@ async function setCacheDB(data, uuid, authorID) {
 }
 
 async function setWeeklyDB(data, uuid) {
-	var weeklyDBEntry = {};
+	const weeklyDBEntry = {};
 	if (data.stats.TNTGames) {
 		weeklyDBEntry.run = {
 			record: replaceError(data.stats.TNTGames.record_tntrun, 0),
@@ -485,7 +485,8 @@ async function setWeeklyDB(data, uuid) {
 
 	if (data.achievements) {
 		weeklyDBEntry.allTNT.time = replaceError(data.achievements.tntgames_tnt_triathlon, 0);
-		(weeklyDBEntry.run.blocks = replaceError(data.achievements.tntgames_block_runner, 0)), (weeklyDBEntry.tag.tags = replaceError(data.achievements.tntgames_clinic, 0));
+		weeklyDBEntry.run.blocks = replaceError(data.achievements.tntgames_block_runner, 0);
+        weeklyDBEntry.tag.tags = replaceError(data.achievements.tntgames_clinic, 0);
 	} else {
 		weeklyDBEntry.allTNT.time = 0;
 		weeklyDBEntry.run.blocks = 0;
@@ -505,7 +506,7 @@ async function setWeeklyDB(data, uuid) {
 }
 
 async function setMonthlyDB(data, uuid) {
-	var monthlyDBEntry = {};
+	const monthlyDBEntry = {};
 	if (data.stats.TNTGames) {
 		monthlyDBEntry.run = {
 			record: replaceError(data.stats.TNTGames.record_tntrun, 0),
@@ -660,7 +661,8 @@ async function setMonthlyDB(data, uuid) {
 
 	if (data.achievements) {
 		monthlyDBEntry.allTNT.time = replaceError(data.achievements.tntgames_tnt_triathlon, 0);
-		(monthlyDBEntry.run.blocks = replaceError(data.achievements.tntgames_block_runner, 0)), (monthlyDBEntry.tag.tags = replaceError(data.achievements.tntgames_clinic, 0));
+		monthlyDBEntry.run.blocks = replaceError(data.achievements.tntgames_block_runner, 0);
+        monthlyDBEntry.tag.tags = replaceError(data.achievements.tntgames_clinic, 0);
 	} else {
 		monthlyDBEntry.allTNT.time = 0;
 		monthlyDBEntry.run.blocks = 0;
@@ -691,8 +693,8 @@ client.on("ready", async () => {
 	scheduleRule.tz = "America/New_York";
 
 	schedule.scheduleJob(scheduleRule, async function() {
-		console.log("deleting weekly");
-		db.delete("weekly");
+		console.log("deconsting weekly");
+		db.deconste("weekly");
 	});
 
 	const scheduleRule2 = new schedule.RecurrenceRule();
@@ -703,7 +705,7 @@ client.on("ready", async () => {
 	scheduleRule2.tz = "America/New_York";
 
 	schedule.scheduleJob(scheduleRule2, async function() {
-		db.delete("weekly");
+		db.deconste("weekly");
 	});
 });
 
@@ -711,26 +713,26 @@ client.on("message", async m => {
 	if (m.author.bot) return;
 
 	if (m.content.toLowerCase() == "/ping") {
-		let discordToBot = Date.now() - m.createdTimestamp;
+		const discordToBot = Date.now() - m.createdTimestamp;
 
-		let now = Date.now();
+		const now = Date.now();
 		await db.get("chan_" + m.channel.id);
-		let botToDB = Date.now() - now;
+		const botToDB = Date.now() - now;
 
-		let now2 = Date.now();
-		let hypixelResponse = await hypixelFetch("key?");
-		let botToHypixel = Date.now() - now2;
+		const now2 = Date.now();
+		const hypixelResponse = await hypixelFetch("key?");
+		const botToHypixel = Date.now() - now2;
 		let botToHypixelString = "";
 		if (hypixelResponse == "API ERROR") {
 			botToHypixelString = "No Response - ";
 		}
 
-		let now3 = Date.now();
+		const now3 = Date.now();
 		messageSent = await m.channel.send(`**Ping**\n
 Discord to Bot: ${discordToBot}
 Bot to Hypixel (round trip): ${botToHypixelString}${botToHypixel}
 Bot to Database (round trip): ${botToDB}`);
-		let botToDiscord = Date.now() - now3;
+		const botToDiscord = Date.now() - now3;
 
 		messageSent.edit(`**Ping**
 Discord to Bot: ${discordToBot} ms
@@ -741,7 +743,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
 	}
 
 	if (m.content.startsWith("<@!735055542178938960>")) {
-		var channel = await db.get("chan_" + m.channel.id);
+		const channel = await db.get("chan_" + m.channel.id);
 		if (channel === null) {
 			if (m.member.hasPermission("ADMINISTRATOR")) {
 				return m.channel.send("Channel not configured (Use /TNTconfigure)");
@@ -788,11 +790,11 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
 	} else if (m.content.toLowerCase() == "/tntremove") {
 		if (!m.member.hasPermission("ADMINISTRATOR") && m.author.id != config.masterID) return;
 
-		await db.delete(`chan_${m.channel.id}`);
+		await db.deconste(`chan_${m.channel.id}`);
 		m.channel.send("I will no longer respond to messages in this channel");
 	} else if (m.content.toLowerCase().startsWith("/tnthelp")) {
-		let prefix = "/";
-		let msg = await m.channel.send(new Discord.MessageEmbed().setColor("#3bcc71").setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`).setTitle("Help Menu - Home").setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`).setTimestamp().setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green).setDescription(`:house:: Home\n:bar_chart:: Stat Commands\n:tools:: QoL Commands \n:information_source:: Bot Information Commands\n:track_next:: Latest Update Info`));
+		const prefix = "/";
+		const msg = await m.channel.send(new Discord.MessageEmbed().setColor("#3bcc71").setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`).setTitle("Help Menu - Home").setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`).setTimestamp().setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green).setDescription(`:house:: Home\n:bar_chart:: Stat Commands\n:tools:: QoL Commands \n:information_source:: Bot Information Commands\n:track_next:: Latest Update Info`));
 		msg.react("🏠").then(msg.react("📊").then(msg.react("🛠").then(msg.react("ℹ").then(msg.react("⏭")))));
 
 		const filter = (reaction, user) => user.id === m.author.id;
@@ -889,20 +891,20 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
 		});
 	}
 
-	var channel = await db.get("chan_" + m.channel.id);
+	let channel = await db.get("chan_" + m.channel.id);
 	if (channel === null) return;
 
-	var prefix = channel.prefix;
+	const prefix = channel.prefix;
 	if (!m.content.startsWith(prefix)) return;
-	var game = channel.game;
+	let game = channel.game;
 
-	var args = m.content.slice(prefix.length).split(" ");
+	const args = m.content.slice(prefix.length).split(" ");
 	const command = args.shift().toLowerCase();
 
 	console.log(m.author.username + ": " + m.content);
 
 	if (command == "help") {
-		let msg = await m.channel.send(new Discord.MessageEmbed().setColor("#3bcc71").setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`).setTitle("Help Menu - Home").setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`).setTimestamp().setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green).setDescription(`:house:: Home\n:bar_chart:: Stat Commands\n:tools:: QoL Commands \n:information_source:: Bot Information Commands\n:track_next:: Latest Update Info`));
+		const msg = await m.channel.send(new Discord.MessageEmbed().setColor("#3bcc71").setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`).setTitle("Help Menu - Home").setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`).setTimestamp().setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green).setDescription(`:house:: Home\n:bar_chart:: Stat Commands\n:tools:: QoL Commands \n:information_source:: Bot Information Commands\n:track_next:: Latest Update Info`));
 		msg.react("🏠").then(msg.react("📊").then(msg.react("🛠").then(msg.react("ℹ").then(msg.react("⏭")))));
 
 		const filter = (reaction, user) => user.id === m.author.id;
@@ -1015,7 +1017,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
 		if (args[1].length > 20) {
 			data = await hypixelFetch(`player?uuid=${args[1]}`);
 		} else {
-			let uuidInput = await mojangUUIDFetch(args[1]).catch(() => {
+			const uuidInput = await mojangUUIDFetch(args[1]).catch(() => {
 				return {
 					id: "UUIDINVALID12345678910"
 				};
@@ -1064,7 +1066,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
 		if (args[1].length > 20) {
 			data = await hypixelFetch(`player?uuid=${args[1]}`);
 		} else {
-			let uuidInput = await mojangUUIDFetch(args[1]).catch(() => {
+			const uuidInput = await mojangUUIDFetch(args[1]).catch(() => {
 				return {
 					id: "UUIDINVALID12345678910"
 				};
@@ -1100,11 +1102,11 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
 		m.channel.send(`Registered ${data.player.displayname} to ${args[0]}`);
 		return;
 	} else if (command.toLowerCase() == "info" || command.toLowerCase() == "information") {
-		let botUsers = [];
+		const botUsers = [];
 		client.guilds.cache.forEach(guild => {
 			guild.members.cache.forEach(member => botUsers.push(member.user.id));
 		});
-		let botUsersCount = botUsers.unique().length;
+		const botUsersCount = botUsers.unique().length;
 
 		const monthToName = {
 			0: "January",
@@ -1120,12 +1122,12 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
 			10: "November",
 			11: "December"
 		};
-		var date = new Date(unix_time_start);
+		const date = new Date(unix_time_start);
 		dateFormatted = `${monthToName[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
 
-		let allDb = await db.all().filter(a => a.ID.toLowerCase().startsWith("chan_")).length;
+		const allDb = await db.all().filter(a => a.ID.toLowerCase().startsWith("chan_")).length;
 
-		let result = `__Bot Information__
+		const result = `__Bot Information__
 **Version:** ${pkg.version}
 **Creator:** Mysterium
     IGN: Mysterium_
@@ -1144,7 +1146,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
 		if (args[0].length > 20) {
 			user = await hypixelFetch(`player?uuid=${args[0]}`);
 		} else {
-			let uuidInput = await mojangUUIDFetch(args[0]).catch(() => {
+			const uuidInput = await mojangUUIDFetch(args[0]).catch(() => {
 				return {
 					id: "UUIDINVALID12345678910"
 				};
@@ -1219,8 +1221,8 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
 			});
 		}
 
-		var settings = await db.get(m.author.id);
-		var reset = true;
+		const settings = await db.get(m.author.id);
+		let reset = true;
 
 		// Parse Args
 		if (args.length == 0) {
@@ -1229,7 +1231,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
 				reset = false;
 			}
 		} else if (args.length == 1) {
-			let games = ["all", "overall", "wiz", "wizard", "wizards", "tntrun", "run", "pvprun", "pvp", "tnttag", "tag", "bow", "spleef", "bowspleef", "duel", "duels", "tntduels"];
+			const games = ["all", "overall", "wiz", "wizard", "wizards", "tntrun", "run", "pvprun", "pvp", "tnttag", "tag", "bow", "spleef", "bowspleef", "duel", "duels", "tntduels"];
 			if (games.includes(args[0].toLowerCase())) {
 				game = args[0].toLowerCase();
 				username = idData[m.author.id];
@@ -1259,7 +1261,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
 		if (username.length > 20) {
 			user = await hypixelFetch(`player?uuid=${username}`);
 		} else {
-			var uuidInput = await mojangUUIDFetch(username).catch(() => {
+			const uuidInput = await mojangUUIDFetch(username).catch(() => {
 				return {
 					id: "UUIDINVALID12345678910"
 				};
@@ -1298,14 +1300,14 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
 
 		if (game == "run" || game == "tntrun") {
 			if (TNTGames.record_tntrun == undefined) {
-				var runRecordDifference = 0;
+				const runRecordDifference = 0;
 			} else {
-				var runRecordDifference = TNTGames.record_tntrun - data.run.record;
+				const runRecordDifference = TNTGames.record_tntrun - data.run.record;
 			}
 			if (runRecordDifference > 0) {
-				var runRecordDisplay = min_sec(replaceError(TNTGames.record_tntrun, 0)) + " (+" + min_sec(runRecordDifference) + ")";
+				const runRecordDisplay = min_sec(replaceError(TNTGames.record_tntrun, 0)) + " (+" + min_sec(runRecordDifference) + ")";
 			} else {
-				var runRecordDisplay = min_sec(replaceError(TNTGames.record_tntrun, 0));
+				const runRecordDisplay = min_sec(replaceError(TNTGames.record_tntrun, 0));
 			}
 
 			const embed = new Discord.MessageEmbed().setColor(`${rankData.color}`).setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`).setTitle(`${rankData.displayName} ${user.player.displayname}'s TNT Run Stats`).setThumbnail(`https://visage.surgeplay.com/head/128/${user.player.uuid}`).setURL(`https://plancke.io/hypixel/player/stats/${user.player.displayname}`).setTimestamp().setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green).addField(`**Record**`, runRecordDisplay, true).addField(`**Wins**`, displayOldNewNumbers(data.run.w, replaceError(TNTGames.wins_tntrun, 0)), true).addField(`**Deaths**`, displayOldNewNumbers(data.run.l, replaceError(TNTGames.deaths_tntrun, 0)), true).addField(`**Potions Thrown**`, displayOldNewNumbers(data.run.potions, replaceError(TNTGames.run_potions_splashed_on_players, 0)), true).addField(`**W/L**`, displayOldNewNumbers(Math.round(data.run.wl * 1000) / 1000, Math.round(ratio(TNTGames.wins_tntrun, TNTGames.deaths_tntrun) * 1000) / 1000), true).addField(`**Blocks Broken**`, displayOldNewNumbers(data.run.blocks, replaceError(user.player.achievements.tntgames_block_runner, 0)), true).setDescription(`()s show changes since your last ${prefix}stats call for this user`);
@@ -1316,14 +1318,14 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
 			return m.channel.send(embed);
 		} else if (game == "pvp" || game == "pvprun") {
 			if (TNTGames.record_pvprun == undefined) {
-				var pvpRecordDifference = 0;
+				const pvpRecordDifference = 0;
 			} else {
-				var pvpRecordDifference = TNTGames.record_pvprun - data.pvp.record;
+				const pvpRecordDifference = TNTGames.record_pvprun - data.pvp.record;
 			}
 			if (pvpRecordDifference > 0) {
-				var pvpRecordDisplay = min_sec(replaceError(TNTGames.record_pvprun, 0)) + " (+" + min_sec(pvpRecordDifference) + ")";
+				const pvpRecordDisplay = min_sec(replaceError(TNTGames.record_pvprun, 0)) + " (+" + min_sec(pvpRecordDifference) + ")";
 			} else {
-				var pvpRecordDisplay = min_sec(replaceError(TNTGames.record_pvprun, 0));
+				const pvpRecordDisplay = min_sec(replaceError(TNTGames.record_pvprun, 0));
 			}
 
 			const embed = new Discord.MessageEmbed().setColor(`${rankData.color}`).setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`).setTitle(`${rankData.displayName} ${user.player.displayname}'s PVP Run Stats`).setThumbnail(`https://visage.surgeplay.com/head/128/${user.player.uuid}`).setURL(`https://plancke.io/hypixel/player/stats/${user.player.displayname}`).setTimestamp().setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green).addField(`**Record**`, pvpRecordDisplay, true).addField(`**Wins**`, displayOldNewNumbers(data.pvp.w, replaceError(TNTGames.wins_pvprun, 0)), true).addField(`**Deaths**`, displayOldNewNumbers(data.pvp.l, replaceError(TNTGames.deaths_pvprun, 0)), true).addField(`**Kills**`, displayOldNewNumbers(data.pvp.k, replaceError(TNTGames.kills_pvprun, 0)), true).addField(`**W/L**`, displayOldNewNumbers(Math.round(data.pvp.wl * 1000) / 1000, Math.round(ratio(TNTGames.wins_pvprun, TNTGames.deaths_pvprun) * 1000) / 1000), true).addField(`**KDR**`, displayOldNewNumbers(Math.round(data.pvp.kd * 1000) / 1000, Math.round(ratio(TNTGames.kills_pvprun, TNTGames.deaths_pvprun) * 1000) / 1000), true).setDescription(`()s show changes since your last ${prefix}stats call for this user`);
@@ -1348,14 +1350,14 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
 
 			if (settings.verbose) {
 				if (TNTGames.air_time_capture == undefined) {
-					var airTimeDifference = 0;
+					const airTimeDifference = 0;
 				} else {
-					var airTimeDifference = TNTGames.air_time_capture - data.wizards.air;
+					const airTimeDifference = TNTGames.air_time_capture - data.wizards.air;
 				}
 				if (airTimeDifference > 0) {
-					var airTimeDisplay = min_sec(Math.floor(replaceError(TNTGames.air_time_capture, 0) / 1200)) + " (+" + min_sec(Math.floor(airTimeDifference / 1200)) + ")";
+					const airTimeDisplay = min_sec(Math.floor(replaceError(TNTGames.air_time_capture, 0) / 1200)) + " (+" + min_sec(Math.floor(airTimeDifference / 1200)) + ")";
 				} else {
-					var airTimeDisplay = min_sec(Math.floor(replaceError(TNTGames.air_time_capture, 0) / 1200));
+					const airTimeDisplay = min_sec(Math.floor(replaceError(TNTGames.air_time_capture, 0) / 1200));
 				}
 
 				embed.addField(`**Airtime**`, airTimeDisplay, true).addField(`**KADR**`, displayOldNewNumbers(Math.round(data.wizards.kad * 1000) / 1000, Math.round(ratio(replaceError(TNTGames.kills_capture, 0) + replaceError(TNTGames.assists_capture, 0), TNTGames.deaths_capture) * 1000) / 1000), true).addField(`**K/W**`, displayOldNewNumbers(Math.round(data.wizards.kw * 1000) / 1000, Math.round(ratio(TNTGames.kills_capture, TNTGames.wins_capture) * 1000) / 1000), true).addField(`**Fire**`, displayOldNewNumbers(data.wizardKills.f_k, replaceError(TNTGames.new_firewizard_kills, 0)), true).addField(`**Ice**`, displayOldNewNumbers(data.wizardKills.i_k, replaceError(TNTGames.new_icewizard_kills, 0)), true).addField(`**Wither**`, displayOldNewNumbers(data.wizardKills.w_k, replaceError(TNTGames.new_witherwizard_kills, 0)), true).addField(`**Kinetic**`, displayOldNewNumbers(data.wizardKills.k_k, replaceError(TNTGames.new_kineticwizard_kills, 0)), true).addField(`**Blood**`, displayOldNewNumbers(data.wizardKills.b_k, replaceError(TNTGames.new_bloodwizard_kills, 0)), true).addField(`**Toxic**`, displayOldNewNumbers(data.wizardKills.t_k, replaceError(TNTGames.new_toxicwizard_kills, 0)), true).addField(`**Hydro**`, displayOldNewNumbers(data.wizardKills.h_k, replaceError(TNTGames.new_hydrowizard_kills, 0)), true).addField(`**Ancient**`, displayOldNewNumbers(data.wizardKills.a_k, replaceError(TNTGames.new_ancientwizard_kills, 0)), true).addField(`**Storm**`, displayOldNewNumbers(data.wizardKills.s_k, replaceError(TNTGames.new_stormwizard_kills, 0)), true);
@@ -1369,37 +1371,37 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
 			return m.channel.send(embed);
 		} else if (game == "all" || game == "overall") {
 			if (TNTGames.record_tntrun == undefined) {
-				var runRecordDifference = 0;
+				const runRecordDifference = 0;
 			} else {
-				var runRecordDifference = TNTGames.record_tntrun - data.allTNT.record_tntrun;
+				const runRecordDifference = TNTGames.record_tntrun - data.allTNT.record_tntrun;
 			}
 			if (runRecordDifference > 0) {
-				var runRecordDisplay = min_sec(TNTGames.record_tntrun) + " (+" + min_sec(runRecordDifference) + ")";
+				const runRecordDisplay = min_sec(TNTGames.record_tntrun) + " (+" + min_sec(runRecordDifference) + ")";
 			} else {
-				var runRecordDisplay = min_sec(TNTGames.record_tntrun);
+				const runRecordDisplay = min_sec(TNTGames.record_tntrun);
 			}
 
 			if (TNTGames.record_pvprun == undefined) {
-				var pvpRecordDifference = 0;
+				const pvpRecordDifference = 0;
 			} else {
-				var pvpRecordDifference = TNTGames.record_pvprun - data.allTNT.record_pvprun;
+				const pvpRecordDifference = TNTGames.record_pvprun - data.allTNT.record_pvprun;
 			}
 			if (pvpRecordDifference > 0) {
-				var pvpRecordDisplay = min_sec(TNTGames.record_pvprun) + " (+" + min_sec(pvpRecordDifference) + ")";
+				const pvpRecordDisplay = min_sec(TNTGames.record_pvprun) + " (+" + min_sec(pvpRecordDifference) + ")";
 			} else {
-				var pvpRecordDisplay = min_sec(TNTGames.record_pvprun);
+				const pvpRecordDisplay = min_sec(TNTGames.record_pvprun);
 			}
 
 			if (user.player.achievements.tntgames_tnt_triathlon == undefined) {
-				var playTimeDifference = 0;
+				const playTimeDifference = 0;
 			} else {
-				var playTimeDifference = user.player.achievements.tntgames_tnt_triathlon - data.allTNT.time;
+				const playTimeDifference = user.player.achievements.tntgames_tnt_triathlon - data.allTNT.time;
 			}
 
 			if (playTimeDifference > 0) {
-				var playTimeDisplay = min_sec(replaceError(user.player.achievements.tntgames_tnt_triathlon, 0)) + " (+" + min_sec(playTimeDifference) + ")";
+				const playTimeDisplay = min_sec(replaceError(user.player.achievements.tntgames_tnt_triathlon, 0)) + " (+" + min_sec(playTimeDifference) + ")";
 			} else {
-				var playTimeDisplay = min_sec(user.player.achievements.tntgames_tnt_triathlon);
+				const playTimeDisplay = min_sec(user.player.achievements.tntgames_tnt_triathlon);
 			}
 
 			const embed = new Discord.MessageEmbed().setColor(`${rankData.color}`).setAuthor(`${m.author.tag}`, `https://cdn.discordapp.com/avatars/${m.author.id}/${m.author.avatar}?size=128`).setTitle(`${rankData.displayName} ${user.player.displayname}'s TNT Games Stats`).setThumbnail(`https://visage.surgeplay.com/head/128/${user.player.uuid}`).setURL(`https://plancke.io/hypixel/player/stats/${user.player.displayname}`).setTimestamp().setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green).addField(`**Coins**`, displayOldNewNumbers(data.allTNT.coins, replaceError(TNTGames.coins, 0)), true).addField(`**Winstreak**`, displayOldNewNumbers(data.allTNT.streak, replaceError(TNTGames.winstreak, 0)), true).addField(`**Playtime**`, playTimeDisplay, true).addField(`**TNT Wins**`, displayOldNewNumbers(data.allTNT.total_wins, replaceError(TNTGames.wins_tntrun, 0) + replaceError(TNTGames.wins_pvprun, 0) + replaceError(TNTGames.wins_tntag, 0) + replaceError(TNTGames.wins_bowspleef, 0) + replaceError(TNTGames.wins_capture, 0)), true).addField(`**Tag Wins**`, displayOldNewNumbers(data.allTNT.tag_wins, replaceError(TNTGames.wins_tntag, 0)), true).addField(`**TNT Run Record**`, runRecordDisplay, true).addField(`**TNT Run Wins**`, displayOldNewNumbers(data.allTNT.run_wins, replaceError(TNTGames.wins_tntrun, 0)), true).addField(`**Bowspleef Wins**`, displayOldNewNumbers(data.allTNT.bow_wins, replaceError(TNTGames.wins_bowspleef, 0)), true).addField(`**Wizards Wins**`, displayOldNewNumbers(data.allTNT.wizards_wins, replaceError(TNTGames.wins_capture, 0)), true).addField(`**Wizards Kills**`, displayOldNewNumbers(data.allTNT.wizards_kills, replaceError(TNTGames.kills_capture, 0)), true).addField(`**PVP Run Record**`, pvpRecordDisplay, true).addField(`**PVP Run Wins**`, displayOldNewNumbers(data.allTNT.pvp_wins, replaceError(TNTGames.wins_pvprun, 0)), true).setDescription(`()s show changes since your last ${prefix}stats call for this user`);
@@ -1436,8 +1438,8 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
 			});
 		}
 
-		var settings = await db.get(m.author.id);
-		var reset = true;
+		const settings = await db.get(m.author.id);
+		let reset = true;
 
 		// Parse Args
 		if (args.length == 0) {
@@ -1458,7 +1460,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
 		if (username.length > 20) {
 			user = await hypixelFetch(`player?uuid=${username}`);
 		} else {
-			let uuidInput = await mojangUUIDFetch(username).catch(() => {
+			const uuidInput = await mojangUUIDFetch(username).catch(() => {
 				return {
 					id: "UUIDINVALID12345678910"
 				};
@@ -1551,7 +1553,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
 		idData = JSON.parse(received);
 
 		if (m.author.id in idData) {
-			var user = await hypixelFetch(`player?uuid=${idData[m.author.id]}`);
+			const user = await hypixelFetch(`player?uuid=${idData[m.author.id]}`);
 		}
 		if (user == "API ERROR") {
 			return m.channel.send("API Connection Issues, Hypixel might be offline");
@@ -1582,7 +1584,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
 			console.log("Terminating Program - Code 005");
 			process.exit();
 		}
-		let idData = JSON.parse(received);
+		const idData = JSON.parse(received);
 
 		if (args[0].replace("<", "").replace(">", "").replace("@", "").replace("!", "") in idData) {
 			m.channel.send("https://namemc.com/profile/" + idData[args[0].replace("<", "").replace(">", "").replace("@", "").replace("!", "")]);
@@ -1668,8 +1670,8 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
 			});
 		}
 
-		var settings = await db.get(m.author.id);
-		var reset = true;
+		const settings = await db.get(m.author.id);
+		let reset = true;
 
 		// Parse Args
 		if (args.length == 0) {
@@ -1678,7 +1680,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
 				reset = false;
 			}
 		} else if (args.length == 1) {
-			let games = ["all", "overall", "wiz", "wizard", "wizards", "tntrun", "run", "pvprun", "pvp", "tnttag", "tag", "bow", "spleef", "bowspleef", "duel", "duels", "tntduels"];
+			const games = ["all", "overall", "wiz", "wizard", "wizards", "tntrun", "run", "pvprun", "pvp", "tnttag", "tag", "bow", "spleef", "bowspleef", "duel", "duels", "tntduels"];
 			if (games.includes(args[0].toLowerCase())) {
 				game = args[0].toLowerCase();
 				username = idData[m.author.id];
@@ -1708,7 +1710,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
 		if (username.length > 20) {
 			user = await hypixelFetch(`player?uuid=${username}`);
 		} else {
-			var uuidInput = await mojangUUIDFetch(username).catch(() => {
+			const uuidInput = await mojangUUIDFetch(username).catch(() => {
 				return {
 					id: "UUIDINVALID12345678910"
 				};
