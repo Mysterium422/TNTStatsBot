@@ -8,14 +8,7 @@ const Discord = require("discord.js"),
 	{mojangUUIDFetch, hypixelFetch} = require("./mystFetch.js");
 
 const client = new Discord.Client();
-
-// USED FOR INFO COMMAND
-const unix_time_start = Date.now();
-
-// SETUP CONFIG
 const config = require("../config.json");
-
-// HELPER OBJECTS
 
 // USEFUL COMMON FUNCTIONS
 function findRank(user) {
@@ -881,24 +874,6 @@ client.on("message", async message => {
 			guild.members.cache.forEach(member => botUsers.push(member.user.id));
 		});
 		const botUsersCount = new Set(botUsers).size;
-
-		const monthToName = {
-			0: "January",
-			1: "February",
-			2: "March",
-			3: "April",
-			4: "May",
-			5: "June",
-			6: "July",
-			7: "August",
-			8: "September",
-			9: "October",
-			10: "November",
-			11: "December"
-		};
-		const date = new Date(unix_time_start);
-		dateFormatted = `${monthToName[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
-
 		const allDb = await db.all().filter(a => a.ID.toLowerCase().startsWith("chan_")).length;
 
 		const result = `__Bot Information__
@@ -906,7 +881,6 @@ client.on("message", async message => {
 	**Creator:** Mysterium
 	IGN: Mysterium_
 	Discord: Mysterium#5229
-	**Last Updated:** ${dateFormatted}
 
 	**Total Guilds:** ${client.guilds.cache.size}
 	**Configured Channels:** ${allDb}
