@@ -101,20 +101,6 @@ function sendErrorEmbed(channel, error, description) {
 	return channel.send(errorEmbed);
 }
 
-Array.prototype.unique = function() {
-	const a = this.concat();
-	const b = [];
-
-	a.forEach((item, index) => {
-		if (a.indexOf(item) == index) b.push(b);
-	});
-	return b;
-};
-
-String.prototype.contains = function(substring) {
-	return this.indexOf(substring) !== -1;
-};
-
 function min_sec(seconds) {
 	const mins = Math.floor(seconds / 60);
 	const secondsNew = seconds - mins * 60;
@@ -962,7 +948,7 @@ client.on("message", async message => {
 			client.guilds.cache.forEach(guild => {
 				guild.members.cache.forEach(member => botUsers.push(member.user.id));
 			});
-			const botUsersCount = botUsers.unique().length;
+			const botUsersCount = new Set(botUsers).size;
 
 			const monthToName = {
 				0: "January",
@@ -1470,7 +1456,7 @@ client.on("message", async message => {
 			if (m.author.id != ownerID) return;
 
 			channelList = db.all().filter(a => {
-				return a.ID.contains("chan_");
+				return a.ID.includes("chan_");
 			});
 			for (let i = 0; i < channelList.length; i++) {
 				if (client.channels.cache.has(channelList[i].ID.slice(5))) {
@@ -1482,7 +1468,7 @@ client.on("message", async message => {
 			if (m.author.id != ownerID) return;
 
 			channelList = db.all().filter(a => {
-				return a.ID.contains("chan_");
+				return a.ID.includes("chan_");
 			});
 			for (let i = 0; i < channelList.length; i++) {
 				if (client.channels.cache.has(channelList[i].ID.slice(5))) {
