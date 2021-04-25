@@ -19,7 +19,7 @@ module.exports = {
             }
         }
 
-		const user = hypixelFetch("user?uuid=" + uuid);
+		const user = await hypixelFetch("user?uuid=" + uuid);
 
 		if (user === null) {
 			return message.channel.send(errorEmbed("Failed to reach Hypixel API", "Hypixel could be offline?"));
