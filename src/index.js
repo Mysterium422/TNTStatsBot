@@ -831,7 +831,7 @@ client.on("message", async message => {
 	// if (!m.content.startsWith(prefix)) return;
 	// let game = channel.game;
 
-	if (command.toLowerCase() == "verifyalt") {
+	       if (command.toLowerCase() === "verifyalt") {
 		if (message.author.id != config.masterID) return;
 		if (args.length != 2) {
 			return message.channel.send("Incorrect amount of arguments");
@@ -877,25 +877,7 @@ client.on("message", async message => {
 		fs.writeFileSync("../global/IDS.json", JSON.stringify(idData));
 		message.channel.send(`Registered ${data.player.displayname} to ${args[0]}`);
 		return;
-	} else if (command.toLowerCase() == "info" || command.toLowerCase() == "information") {
-		const botUsers = [];
-		client.guilds.cache.forEach(guild => {
-			guild.members.cache.forEach(member => botUsers.push(member.user.id));
-		});
-		const botUsersCount = new Set(botUsers).size;
-		const allDb = await db.all().filter(a => a.ID.toLowerCase().startsWith("chan_")).length;
-
-		const result = `__Bot Information__
-	**Version:** ${pkg.version}
-	**Creator:** Mysterium
-	IGN: Mysterium_
-	Discord: Mysterium#5229
-
-	**Total Guilds:** ${client.guilds.cache.size}
-	**Configured Channels:** ${allDb}
-	**Total Unique Users:** ${botUsersCount}`;
-		return message.channel.send(result);
-	} else if (command.toLowerCase() == "set") {
+	} else if (command.toLowerCase() === "set") {
 		if (args.length !== 1) {
 			return sendErrorEmbed(message.channel, `Usage Error`, `Usage: ${prefix}set [username]`);
 		}
@@ -959,7 +941,7 @@ client.on("message", async message => {
 		});
 		await setCacheDB(user.player, user.player.uuid, message.author.id);
 		return message.channel.send("Successfully set your ign to " + args[0]);
-	} else if (command.toLowerCase() == "stats") {
+	} else if (command.toLowerCase() === "stats") {
 		let received = "";
 		try {
 			received = await fs.readFileSync("../global/IDS.json");
@@ -1193,7 +1175,7 @@ client.on("message", async message => {
 			}
 			return message.channel.send(embed);
 		}
-	} else if (command.toLowerCase() == "kills") {
+	} else if (command.toLowerCase() === "kills") {
 		let received = "";
 		try {
 			received = await fs.readFileSync("../global/IDS.json");
@@ -1283,7 +1265,7 @@ client.on("message", async message => {
 			setWizKillsDB(user.player, user.player.uuid, message.author.id);
 		}
 		return message.channel.send(embed);
-	} else if (command.toLowerCase() == "settings") {
+	} else if (command.toLowerCase() === "settings") {
 		if (args.length != 2) {
 			return sendErrorEmbed(message.channel, `Usage Error`, `Usage: ${prefix}settings [setting] [true/false]`);
 		}
@@ -1313,7 +1295,7 @@ client.on("message", async message => {
 				return sendErrorEmbed(message.channel, `Usage Error`, `Usage: ${prefix}settings reset [true/false]`);
 			}
 		}
-	} else if (command.toLowerCase() == "reset") {
+	} else if (command.toLowerCase() === "reset") {
 		let received = "";
 		try {
 			received = await fs.readFileSync("../global/IDS.json");
@@ -1335,7 +1317,7 @@ client.on("message", async message => {
 
 		await setCacheDB(user.player, user.player.uuid, message.author.id);
 		return message.channel.send(`Reset counters for you!`);
-	} else if (command.toLowerCase() == "account") {
+	} else if (command.toLowerCase() === "account") {
 		if (args.length != 1) {
 			return message.channel.send("Incorrect amount of arguments");
 		}
@@ -1356,9 +1338,9 @@ client.on("message", async message => {
 			message.channel.send("No account registered to this ID");
 		}
 		return;
-	} else if (command == "mysterium") {
+	} else if (command.toLowerCase() === "mysterium") {
 		return message.channel.send("Hey! This bot was coded by Mysterium&Lebster!\nReport Bugs here: https://discord.gg/7Qb5xuJD4C\nHere's my website (WIP): <https://mysterium.me>");
-	} else if (command == "announcement") {
+	} else if (command.toLowerCase() === "announcement") {
 		if (message.author.id != config.masterID) return;
 
 		channelList = db.all().filter(a => {
@@ -1370,7 +1352,7 @@ client.on("message", async message => {
 				channel.send(message.content.slice("/announcement ".length)).catch();
 			}
 		}
-	} else if (command == "ownercommand") {
+	} else if (command.toLowerCase() === "ownercommand") {
 		if (message.author.id != config.masterID) return;
 
 		channelList = db.all().filter(a => {
@@ -1400,7 +1382,7 @@ client.on("message", async message => {
 					});
 			}
 		}
-	} else if (command == "weekly" || command == "monthly") {
+	} else if (command.toLowerCase() === "weekly" || command == "monthly") {
 		let received = "";
 		try {
 			received = await fs.readFileSync("../global/IDS.json");
