@@ -29,7 +29,5 @@ module.exports = {
 
 		return message.channel.send(embed);
 	},
-	aliases: [
-		"information"
-	]
+	aliases: ["information"]
 };

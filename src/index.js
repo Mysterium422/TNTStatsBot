@@ -31,6 +31,9 @@ client.on("ready", async () => {
 			const obj = require("./commands/" + fileName);
 			// Slice to remove `.js`
 			commands[fileName.slice(0, -3)] = obj;
+			obj.aliases.forEach(name => {
+				commands[name] = obj;
+			});
 		});
 		console.log("[SUCCESS] Loaded commands...");
 	} catch(e) {
