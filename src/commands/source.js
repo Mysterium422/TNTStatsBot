@@ -1,5 +1,7 @@
+const strings = require("../strings.js");
+
 module.exports = {
 	run: async (client, message, args) => {
-		return message.channel.send("Contribute here: https://github.com/LebsterFace/TNTStatsBot");
+		return message.channel.send(strings.source);
 	}
 };

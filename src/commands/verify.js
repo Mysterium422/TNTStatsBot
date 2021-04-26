@@ -23,9 +23,8 @@ module.exports = {
             }
         }
 
-        // message.channel.send(errorEmbed("Verifying is not currently supported", "There is no database"));
         await db.setData(uuid, message.author.id);
-        message.channel.send("Database: ```\n" + JSON.stringify(await db.all()) + "\n```");
+        return message.channel.send("Successfully set your IGN to `" + args[0] + "`");
 	},
 	aliases: []
 };
