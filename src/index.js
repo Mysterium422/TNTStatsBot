@@ -91,7 +91,7 @@ client.on("message", async message => {
 			bowspleef: "Bow spleef"
 		};
 
-		if (!message.member.hasPermission("ADMINISTRATOR") && message.author.id != config.masterID) return;
+		if (!message.member.hasPermission("ADMINISTRATOR") && message.author.id != config.owner_id) return;
 		console.log(`${message.author.username}: ${message.content}`);
 
 		const args = message.content.slice(14).split(" ");
@@ -114,7 +114,7 @@ client.on("message", async message => {
 		const embed = new Discord.MessageEmbed().setColor("#00BF00").setAuthor(`${message.author.tag}`, `https://cdn.discordapp.com/avatars/${message.author.id}/${message.author.avatar}?size=128`).setTitle(`Success! Channel Configured`).setTimestamp().setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green).addField(`__Default Game:__`, configurationTool[args[0]], true).addField(`__Bot Prefix:__`, args[1], true);
 		return message.channel.send(embed);
 	} else if (message.content.toLowerCase() == "/tntremove") {
-		if (!message.member.hasPermission("ADMINISTRATOR") && message.author.id != config.masterID) return;
+		if (!message.member.hasPermission("ADMINISTRATOR") && message.author.id != config.owner_id) return;
 
 		await db.deconste(`chan_${message.channel.id}`);
 		message.channel.send("I will no longer respond to messages in this channel");
@@ -224,7 +224,7 @@ client.on("message", async message => {
 	// let game = channel.game;
 
 	if (command.toLowerCase() === "verifyalt") {
-		if (message.author.id != config.masterID) return;
+		if (message.author.id != config.owner_id) return;
 		if (args.length != 2) {
 			return message.channel.send("Incorrect amount of arguments");
 		}
@@ -671,7 +671,7 @@ client.on("message", async message => {
 	} else if (command.toLowerCase() === "mysterium") {
 		return message.channel.send("Hey! This bot was coded by Mysterium&Lebster!\nReport Bugs here: https://discord.gg/7Qb5xuJD4C\nHere's my website (WIP): <https://mysterium.me>");
 	} else if (command.toLowerCase() === "announcement") {
-		if (message.author.id != config.masterID) return;
+		if (message.author.id != config.owner_id) return;
 
 		channelList = db.all().filter(a => {
 			return a.ID.includes("chan_");
@@ -683,7 +683,7 @@ client.on("message", async message => {
 			}
 		}
 	} else if (command.toLowerCase() === "ownercommand") {
-		if (message.author.id != config.masterID) return;
+		if (message.author.id != config.owner_id) return;
 
 		channelList = db.all().filter(a => {
 			return a.ID.includes("chan_");

@@ -4,7 +4,7 @@ const db = require("../db");
 
 module.exports = {
 	run: async (client, message, args) => {
-		if (message.author.id !== config.masterID) return message.channel.send("This is a discord-bot-owner-only command");
+		if (message.author.id !== config.owner_id) return message.channel.send("This is a discord-bot-owner-only command");
 
 		const mentioned = message.mentions.users.first();
 		if (args.length !== 2) {

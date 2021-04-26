@@ -32,7 +32,7 @@ const errorEmbed = (error = "Something went wrong...", description = "") => {
 
 // SETUP CONFIG
 const config = require("../config.json");
-const key = config.hypixelToken;
+const key = config.hypixel_key;
 const nodeFetch = require("node-fetch");
 
 // TODO: Caching with keyv (npm install keyv)
