@@ -1,45 +1,73 @@
-const Discord = require("discord.js");
 const db = require("../db");
 const strings = require("../strings.js");
+const config = require("../../config.json");
 const {errorEmbed, hypixelFetch, mojangUUIDFetch} = require("../util.js");
 
 module.exports = {
 	run: async (client, message, args, prefix) => {
-		if (args.length !== 1) {
-			return message.channel.send(errorEmbed("Incorrect number of arguments for set!", "Expected [uuid/playername]"));
+		const mentioned = message.mentions.users.first();
+		let uuid = null,
+			discord_id = null;
+
+		if (args.length === 1) {
+			uuid = args[0];
+			discord_id = message.author.id;
+		} else if (args.length === 2) {
+			if (mentioned) {
+				if (mentioned.id === message.author.id || message.author.id === config.owner_id) {
+					uuid = args[1];
+					discord_id = mentioned.id;
+				} else {
+					return message.channel.send(errorEmbed("Invalid permissions", "Only the bot's owner can verify other users"));
+				}
+			} else {
+				return message.channel.send(errorEmbed("Invalid usage", "Expected `[playername/uuid]` or `[mention] [playername/uuid]`"));
+			}
+		} else {
+			return message.channel.send(errorEmbed("Invalid usage", "Expected `[playername/uuid]` or `[mention] [playername/uuid]`"));
 		}
 
-		let uuid = args[0];
-        if (args[0].length <= 16) {
-            const mojangResponse = await mojangUUIDFetch(args[0]);
+		let playername = null;
+		const mojangResponse = await mojangUUIDFetch(uuid);
+        if (uuid.length <= 16) {
+			// It's actually a username
+			playername = uuid;
             if (mojangResponse === null) {
-                return message.channel.send(errorEmbed("Invalid playername", `Failed to fetch the UUID of '${args[0]}' from the Mojang API`));
+                return message.channel.send(errorEmbed("Invalid playername", `Failed to fetch the UUID of '${uuid}' from the Mojang API`));
             } else {
                 uuid = mojangResponse.id;
             }
-        }
-
-		const user = await hypixelFetch("player?uuid=" + uuid);
-
-		if (user === null) {
-			return message.channel.send(errorEmbed("Failed to reach Hypixel API", "Hypixel could be offline?"));
-		} else if (!user.success) {
-			return message.channel.send(errorEmbed("Something went wrong", user.cause));
-		} else if (user.player === null) {
-			return message.channel.send(errorEmbed("Invalid playername/uuid", "That player has never logged on to Hypixel!"));
-		} else if (!("TNTGames" in user.player.stats)) {
-			return message.channel.send(errorEmbed("Invalid playername/uuid", "That player has never played TNT Games!"));
-		} else if (
-			typeof user.player.socialMedia === "undefined" ||
-			typeof user.player.socialMedia.links === "undefined" ||
-			typeof user.player.socialMedia.links.DISCORD === "undefined"
-		) {
-			return message.channel.send(errorEmbed("Discord account not linked", strings.unlinked(prefix, args[0])));
-		} else if (user.player.socialMedia.links.DISCORD !== message.author.tag) {
-			return message.channel.send(errorEmbed("Discord account incorrect", `${args[0]} has their Hypixel profile linked to a different user. Did you link the correct discord account?`));
+        } else {
+            if (mojangResponse === null) {
+                return message.channel.send(errorEmbed("Invalid UUID", `Failed to fetch the playername of '${uuid}' from the Mojang API`));
+            } else {
+                playername = mojangResponse.name;
+            }
 		}
 
-		await db.setData(uuid, message.author.id);
-		return message.channel.send("Successfully set your IGN to `" + args[0] + "`");
-	}
+		if (message.author.id !== config.owner_id) {
+			const user = await hypixelFetch("player?uuid=" + uuid);
+			if (user === null) {
+				return message.channel.send(errorEmbed("Failed to reach Hypixel API", "Hypixel could be offline?"));
+			} else if (!user.success) {
+				return message.channel.send(errorEmbed("Something went wrong", user.cause));
+			} else if (user.player === null) {
+				return message.channel.send(errorEmbed("Invalid playername/uuid", `${playername} has never logged on to Hypixel!`));
+			} else if (!("TNTGames" in user.player.stats)) {
+				return message.channel.send(errorEmbed("Invalid playername/uuid", `${playername} has never played TNT Games!`));
+			} else if (
+				typeof user.player.socialMedia === "undefined" ||
+				typeof user.player.socialMedia.links === "undefined" ||
+				typeof user.player.socialMedia.links.DISCORD === "undefined"
+			) {
+				return message.channel.send(errorEmbed("Discord account not linked", strings.unlinked));
+			} else if (user.player.socialMedia.links.DISCORD !== message.author.tag) {
+				return message.channel.send(errorEmbed("Discord account incorrect", `${playername} has their Hypixel profile linked to a different discord user. Did you link the correct discord account?`));
+			}
+		}
+
+		await db.setData(uuid, discord_id);
+		return message.channel.send("Successfully set your IGN to `" + playername + "`");
+	},
+	aliases: ["verify", "verifyalt", "setalt"]
 };
