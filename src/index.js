@@ -70,7 +70,7 @@ client.on("message", async message => {
 		return message.channel.send(errorEmbed("Command under construction", "Per-channel setup is still under construction!"));
 	}
 	
-	const args = message.content.slice(prefix.length).split(" ");
+	const args = message.content.slice(prefix.length).split(/\s+/g);
 	const command = args.shift().toLowerCase();
 
 	if (command in commands) {
@@ -88,39 +88,7 @@ client.on("message", async message => {
 
 	if (1 + 1 === 2) return; // Debug
 
-	if (message.content.toLowerCase().startsWith("/tntconfigure")) {
-		const configurationTool = {
-			all: "All TNT Games",
-			wizards: "TNT Wizards",
-			run: "TNT Run",
-			pvp: "PVP Run",
-			tag: "TNT Tag",
-			bowspleef: "Bow spleef"
-		};
-
-		if (!message.member.hasPermission("ADMINISTRATOR") && message.author.id != config.owner_id) return;
-		console.log(`${message.author.username}: ${message.content}`);
-
-		const args = message.content.slice(14).split(" ");
-
-		if (!(args[0] in configurationTool)) {
-			return sendErrorEmbed(message.channel, `First Paramenter Invalid`, `Looking for: all, wizards, run, pvp, tag, or bowspleef`);
-		}
-		if (args.length == 1) {
-			return sendErrorEmbed(message.channel, `Second Parameter Invalid`, `No Parameter was found`);
-		}
-		if (args.length > 2) {
-			return sendErrorEmbed(message.channel, `Prefix Invalid`, `No Spaces in the prefix!`);
-		}
-
-		await db.set(`chan_${message.channel.id}`, {
-			game: args[0],
-			prefix: args[1]
-		});
-
-		const embed = new Discord.MessageEmbed().setColor("#00BF00").setAuthor(`${message.author.tag}`, `https://cdn.discordapp.com/avatars/${message.author.id}/${message.author.avatar}?size=128`).setTitle(`Success! Channel Configured`).setTimestamp().setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green).addField(`__Default Game:__`, configurationTool[args[0]], true).addField(`__Bot Prefix:__`, args[1], true);
-		return message.channel.send(embed);
-	} else if (message.content.toLowerCase() == "/tntremove") {
+	if (message.content.toLowerCase() == "/tntremove") {
 		if (!message.member.hasPermission("ADMINISTRATOR") && message.author.id != config.owner_id) return;
 
 		await db.deconste(`chan_${message.channel.id}`);
