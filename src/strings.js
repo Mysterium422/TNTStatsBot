@@ -75,5 +75,8 @@ invite:
 https://discord.com/oauth2/authorize?client_id=735055542178938960&scope=bot&permissions=2147994688`,
 
 source:
-"Contribute here: https://github.com/LebsterFace/TNTStatsBot"
+"Contribute here: https://github.com/LebsterFace/TNTStatsBot",
+
+invalid_game_type:
+"Expected one of: `all`, `wizards`, `run`, `pvp`, `tag`, `bowspleef`"
 };

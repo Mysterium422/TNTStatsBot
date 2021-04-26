@@ -1,8 +1,9 @@
 const db = require("../db");
+const strings = require("../strings.js");
 const {errorEmbed, successEmbed} = require("../util.js");
 
 module.exports = {
-	run: async (client, message, [game, prefix]) => {
+	run: async (client, message, [game, ...prefix]) => {
 		const configurationTool = {
 			all: "All TNT Games",
 			wizards: "TNT Wizards",
@@ -12,18 +13,14 @@ module.exports = {
 			bowspleef: "Bow spleef"
 		};
 
+		prefix = prefix.join(" ");
+
 		if (!message.member.hasPermission("ADMINISTRATOR")) {
 			return message.channel.send(errorEmbed("Invalid permissions", "Only a server administrator can configure the bot."));
-		}
-
-		if (!(args[0] in configurationTool)) {
-			return sendErrorEmbed(message.channel, `First Paramenter Invalid`, `Looking for: all, wizards, run, pvp, tag, or bowspleef`);
-		}
-		if (args.length == 1) {
-			return sendErrorEmbed(message.channel, `Second Parameter Invalid`, `No Parameter was found`);
-		}
-		if (args.length > 2) {
-			return sendErrorEmbed(message.channel, `Prefix Invalid`, `No Spaces in the prefix!`);
+		} else if (!(game in configurationTool)) {
+			return message.channel.send(errorEmbed("Invalid game type", strings.invalid_game_type));
+		} else if (prefix.length === 0) {
+			return message.channel.send(errorEmbed("Invalid prefix", "Expected at least one character"));
 		}
 
 		// await db.set(`chan_${message.channel.id}`, {
@@ -32,8 +29,8 @@ module.exports = {
 		// });
 
 		const embed = successEmbed(message.author, "", "Success! Channel Configured");
-		embed.addField("__Default Game:__", configurationTool[args[0]], true);
-		embed.addField("__Bot Prefix:__", args[1], true);
+		embed.addField("__Default Game:__", configurationTool[game], true);
+		embed.addField("__Bot Prefix:__", prefix, true);
 
 		return message.channel.send(embed);
 	},
