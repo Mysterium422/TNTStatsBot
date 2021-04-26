@@ -17,16 +17,16 @@ discordLinks:
 
 **My Server** - <https://discord.gg/7Qb5xuJD4C>`,
 
-help_home:
+help_home: prefix =>
 `:house:: Home
 :bar_chart:: Stat Commands
 :tools:: QoL Commands
 :information_source:: Bot Information Commands
 :track_next:: Latest Update Info
 
-**/tntconfigure [game] [prefix]** - Configure the bot to *this* channel. Game options include All, Wizards, Bowspleef, TNT Tag, TNT Run, PVP Run.
-**/tntremove** - Remove this channel from the bot's list of channels.
-**/tnthelp** - Opens this menu`,
+**${prefix}tntconfigure [game] [prefix]** - Configure the bot to *this* channel. Game options include All, Wizards, Bowspleef, TNT Tag, TNT Run, PVP Run.
+**${prefix}tntremove** - Remove this channel from the bot's list of channels.
+**${prefix}tnthelp** - Opens this menu`,
 
 help_stats: prefix =>
 `**${prefix}stats all [username]** - Shows overall TNT Games Stats

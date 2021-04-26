@@ -10,7 +10,7 @@ module.exports = {
 		embed.setTitle("Help Menu - Home");
 		embed.setThumbnail(`https://findicons.com/files/icons/1008/quiet/128/information.png`);
 		embed.setTimestamp().setFooter(randomChoice(embedFooter.text), embedFooter.image.green);
-		embed.setDescription(strings.help_home);
+		embed.setDescription(strings.help_home(prefix));
 
 		const msg = await message.channel.send(embed);
 		msg.react("🏠")
@@ -31,7 +31,7 @@ module.exports = {
 			embed.setFooter("Created by Mysterium", embedFooter.image.green);
 			
 			if (reaction.emoji.name === "🏠") {
-				msg.edit(embed.setTitle("Help Menu - Home").setDescription(strings.help_home));
+				msg.edit(embed.setTitle("Help Menu - Home").setDescription(strings.help_home(prefix)));
 			} else if (reaction.emoji.name === "📊") {
 				msg.edit(embed.setTitle("Help Menu - Stats Commands").setDescription(strings.help_stats(prefix)));
 			} else if (reaction.emoji.name === "ℹ") {
@@ -51,5 +51,5 @@ module.exports = {
 			}
 		});
 	},
-	aliases: []
+	aliases: ["tnthelp"]
 };
