@@ -56,7 +56,8 @@ client.on("message", async message => {
 	
 	// TODO: Per-channel prefix
 	const prefix = "!";
-	if (getMentioned(message).id === client.user.id) {
+	const mentioned = getMentioned(message);
+	if (mentioned !== null && mentioned.id === client.user.id) {
 		// const channel = await db.get("chan_" + message.channel.id);
 		// if (channel === null) {
 		// 	if (message.member.hasPermission("ADMINISTRATOR")) {
