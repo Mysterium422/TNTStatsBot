@@ -1,5 +1,5 @@
 const db = require("../db");
-const {errorEmbed, randomChoice, embedFooter} = require("../util.js");
+const {errorEmbed, successEmbed} = require("../util.js");
 
 module.exports = {
 	run: async (client, message, [game, prefix]) => {
@@ -31,15 +31,9 @@ module.exports = {
 		// 	prefix: args[1]
 		// });
 
-		// TODO: successEmbed(author) in utls
-		const embed = new Discord.MessageEmbed();
-		embed.setColor("#3bcc71");
-		embed.setAuthor(`${message.author.tag}`, `https://cdn.discordapp.com/avatars/${message.author.id}/${message.author.avatar}?size=128`);
-		embed.setTitle(`Success! Channel Configured`);
-		embed.setTimestamp();
-		embed.setFooter(randomChoice(embedFooter), embedFooter.image.green);
-		embed.addField(`__Default Game:__`, configurationTool[args[0]], true);
-		embed.addField(`__Bot Prefix:__`, args[1], true);
+		const embed = successEmbed(message.author, "", "Success! Channel Configured");
+		embed.addField("__Default Game:__", configurationTool[args[0]], true);
+		embed.addField("__Bot Prefix:__", args[1], true);
 
 		return message.channel.send(embed);
 	},
