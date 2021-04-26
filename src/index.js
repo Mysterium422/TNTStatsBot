@@ -4,7 +4,7 @@ const Discord = require("discord.js"),
 	db = require("./db"),
 	path = require("path");
 
-const {mojangUUIDFetch, hypixelFetch, randInt, replaceError, ChatCodes, ChatColor, formatTimestamp, booleanPhrases} = require("./util.js");
+const {mojangUUIDFetch, hypixelFetch, randInt, replaceError, booleanPhrases} = require("./util.js");
 
 const client = new Discord.Client();
 const config = require("../config.json");
@@ -129,55 +129,7 @@ client.on("message", async message => {
 	// if (!m.content.startsWith(prefix)) return;
 	// let game = channel.game;
 
-	if (command.toLowerCase() === "verifyalt") {
-		if (message.author.id != config.owner_id) return;
-		if (args.length != 2) {
-			return message.channel.send("Incorrect amount of arguments");
-		}
-		if (!args[0].includes("@")) {
-			return message.channel.send("First Arg must be a ping");
-		}
-
-		if (args[1].length > 20) {
-			data = await hypixelFetch(`player?uuid=${args[1]}`);
-		} else {
-			const uuidInput = await mojangUUIDFetch(args[1]).catch(() => {
-				return {
-					id: "UUIDINVALID12345678910"
-				};
-			});
-
-			if (uuidInput.id.length > 20) {
-				data = await hypixelFetch(`player?uuid=${uuidInput.id}`);
-			} else {
-				data = await hypixelFetch(`player?name=${args[1]}`);
-			}
-		}
-
-		if (data == "API ERROR") {
-			return message.channel.send("API Connection Issues, Hypixel might be offline");
-		}
-
-		if (!data.success || data.success == false || data.player == null || data.player == undefined || !data.player || data.player.stats == undefined) return message.channel.send("Invalid Something");
-		if (data.player.stats.TNTGames == undefined) return sendErrorEmbed(message.channel, `Unknown Player`, `Player has no Data in Hypixel's TNT Database`);
-
-		let received = "";
-		try {
-			received = await fs.readFileSync("../global/IDS.json");
-		} catch (e) {
-			console.warn("File is invalid!");
-			process.exit();
-		}
-		idData = JSON.parse(received);
-
-		idData[data.player.uuid] = args[0].replace("<", "").replace(">", "").replace("@", "").replace("!", "");
-
-		fs.writeFileSync("../global/IDS.json", JSON.stringify(idData));
-		message.channel.send(`Registered ${data.player.displayname} to ${args[0]}`);
-		return;
-	} else if (command.toLowerCase() === "set") {
-		
-	} else if (command.toLowerCase() === "stats") {
+	if (command.toLowerCase() === "stats") {
 		let received = "";
 		try {
 			received = await fs.readFileSync("../global/IDS.json");

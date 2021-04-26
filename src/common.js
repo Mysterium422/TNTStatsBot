@@ -1,3 +1,4 @@
+const {replaceError, ChatCodes, ChatColor} = require("./util.js");
 
 // USEFUL COMMON FUNCTIONS
 function findRank(user) {
