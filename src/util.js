@@ -40,7 +40,6 @@ const hypixelFetch = query => nodeFetch(`https://api.hypixel.net/${query}&key=${
 const mojangUUIDFetch = query => nodeFetch(`https://api.mojang.com/users/profiles/minecraft/${query}`).then(response => (response.status === 204 ? null : response.json()));
 
 const randInt = (max, min) => Math.floor(Math.random() * (max - min + 1) + min);
-
 const shuffle = array => {
 	for (let currentIndex = array.length; currentIndex !== 0; currentIndex--) {
 		const randomIndex = Math.floor(Math.random() * currentIndex);
@@ -113,9 +112,14 @@ const ChatCodes = {
 	f: "white"
 };
 
+const getMentioned = message => {
+	const result = message.mentions.users.first();
+	return typeof result === "undefined" ? null : result;
+};
+
 module.exports = {
 	embedFooter, randomChoice, noop, errorEmbed,
 	hypixelFetch, mojangUUIDFetch, ChatCodes,
 	ChatColor, booleanPhrases, ratio, formatTimestamp,
-	shuffle, randInt
+	shuffle, randInt, getMentioned
 };

@@ -4,7 +4,7 @@ const Discord = require("discord.js"),
 	db = require("./db"),
 	path = require("path");
 
-const {mojangUUIDFetch, hypixelFetch, randInt, replaceError, booleanPhrases} = require("./util.js");
+const {mojangUUIDFetch, hypixelFetch, randInt, replaceError, booleanPhrases, getMentioned, errorEmbed} = require("./util.js");
 
 const client = new Discord.Client();
 const config = require("../config.json");
@@ -47,14 +47,29 @@ client.on("ready", async () => {
 });
 
 client.on("message", async message => {
-	const prefix = "!";
-	if (message.author.bot || !message.content.startsWith(prefix)) return;
-
+	if (message.author.bot) return;
+	
 	if (!isReady) {
 		message.channel.send("I'm not ready, please try again in a few seconds...");
 		return;
 	}
-
+	
+	// TODO: Per-channel prefix
+	const prefix = "!";
+	if (getMentioned(message).id === client.user.id) {
+		// const channel = await db.get("chan_" + message.channel.id);
+		// if (channel === null) {
+		// 	if (message.member.hasPermission("ADMINISTRATOR")) {
+		// 		return message.channel.send("Channel not configured (Use /TNTconfigure)");
+		// 	} else {
+		// 		return message.channel.send("Channel not configured");
+		// 	}
+		// } else {
+		// 	return message.channel.send(`My prefix in this channel is: ${channel.prefix}\nMy default game in this channel is: ${channel.game}`);
+		// }
+		return message.channel.send(errorEmbed("Command under construction", "Per-channel setup is still under construction!"));
+	}
+	
 	const args = message.content.slice(prefix.length).split(" ");
 	const command = args.shift().toLowerCase();
 
@@ -73,18 +88,7 @@ client.on("message", async message => {
 
 	if (1 + 1 === 2) return; // Debug
 
-	if (message.content.startsWith("<@!735055542178938960>")) {
-		const channel = await db.get("chan_" + message.channel.id);
-		if (channel === null) {
-			if (message.member.hasPermission("ADMINISTRATOR")) {
-				return message.channel.send("Channel not configured (Use /TNTconfigure)");
-			} else {
-				return message.channel.send("Channel not configured");
-			}
-		} else {
-			return message.channel.send(`My prefix in this channel is: ${channel.prefix}\nMy default game in this channel is: ${channel.game}`);
-		}
-	} else if (message.content.toLowerCase().startsWith("/tntconfigure")) {
+	if (message.content.toLowerCase().startsWith("/tntconfigure")) {
 		const configurationTool = {
 			all: "All TNT Games",
 			wizards: "TNT Wizards",

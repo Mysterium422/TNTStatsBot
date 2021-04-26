@@ -1,11 +1,11 @@
 const db = require("../db");
 const strings = require("../strings.js");
 const config = require("../../config.json");
-const {errorEmbed, hypixelFetch, mojangUUIDFetch} = require("../util.js");
+const {errorEmbed, hypixelFetch, mojangUUIDFetch, getMentioned} = require("../util.js");
 
 module.exports = {
 	run: async (client, message, args, prefix) => {
-		const mentioned = message.mentions.users.first();
+		const mentioned = getMentioned(message);
 		let uuid = null,
 			discord_id = null;
 
@@ -13,7 +13,7 @@ module.exports = {
 			uuid = args[0];
 			discord_id = message.author.id;
 		} else if (args.length === 2) {
-			if (mentioned) {
+			if (mentioned !== null) {
 				if (mentioned.id === message.author.id || message.author.id === config.owner_id) {
 					uuid = args[1];
 					discord_id = mentioned.id;
