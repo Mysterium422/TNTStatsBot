@@ -121,7 +121,7 @@ const successEmbed = (author, description="", title="Success", thumbnail=null) =
 	const result = new Discord.MessageEmbed()
 		.setColor("#3bcc71")
 		.setAuthor(author.tag, `https://cdn.discordapp.com/avatars/${author.id}/${author.avatar}?size=128`)
-		.setFooter(randomChoice(embedFooter), embedFooter.image.green)
+		.setFooter(randomChoice(embedFooter.text), embedFooter.image.green)
 		.setTimestamp()
 		.setDescription(description)
 		.setTitle(title);
