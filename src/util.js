@@ -119,11 +119,12 @@ const successEmbed = (author, description="", title="Success", thumbnail=null) =
 	if (thumbnail !== null) result.setThumbnail(thumbnail);
 	return result;
 };
-	
+
+const getAvatar = user => `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}?size=128`;
 
 module.exports = {
 	embedFooter, randomChoice, noop, errorEmbed,
 	hypixelFetch, mojangUUIDFetch, ChatCodes,
 	ChatColor, booleanPhrases, ratio, formatTimestamp,
-	randInt, getMentioned, successEmbed, mojangNameFetch
+	randInt, getMentioned, successEmbed, mojangNameFetch, getAvatar
 };

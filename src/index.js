@@ -76,7 +76,7 @@ client.on("message", async message => {
 
 	if (command in commands) {
 		try {
-			await commands[command].run(client, message, args, prefix);
+			await commands[command].run(client, message, args, prefix, message.content.slice(prefix.length + command.length));
 			return;
 		} catch (up) {
 			// Debug
@@ -480,22 +480,8 @@ client.on("message", async message => {
 
 		await setCacheDB(user.player, user.player.uuid, message.author.id);
 		return message.channel.send(`Reset counters for you!`);
-	} else if (command.toLowerCase() === "account") {
-
 	} else if (command.toLowerCase() === "mysterium") {
 		return message.channel.send("Hey! This bot was coded by Mysterium&Lebster!\nReport Bugs here: https://discord.gg/7Qb5xuJD4C\nHere's my website (WIP): <https://mysterium.me>");
-	} else if (command.toLowerCase() === "announcement") {
-		if (message.author.id != config.owner_id) return;
-
-		channelList = db.all().filter(a => {
-			return a.ID.includes("chan_");
-		});
-		for (let i = 0; i < channelList.length; i++) {
-			if (client.channels.cache.has(channelList[i].ID.slice(5))) {
-				channel = await client.channels.cache.get(channelList[i].ID.slice(5));
-				channel.send(message.content.slice("/announcement ".length)).catch();
-			}
-		}
 	} else if (command.toLowerCase() === "ownercommand") {
 		if (message.author.id != config.owner_id) return;
 
