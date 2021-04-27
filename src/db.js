@@ -37,8 +37,10 @@ const createChannelTable = () =>
 
 const reset = async () => {
 	console.warn("[NOTICE] Resetting database...");
-	fs.unlinkSync(path.resolve(__dirname, "../database.sql"));
-	await createTable();
+	// Delete the database file if it exists
+	if (fs.existsSync(path.resolve(__dirname, "../database.sql"))) {
+		fs.unlinkSync(path.resolve(__dirname, "../database.sql"));
+	}
 };
 
 const all = database => knex(database);
@@ -60,12 +62,13 @@ const linkChannelPreifx = async (channel, prefix, game) => {
 
 	const updated = await update(TABLES.ConfiguredChannels, selector, newValues);
 	if (updated === 0) {
-		return await add(TABLES.VerifieConfiguredChannelsdUsers, {...selector, ...newValues});
+		return await add(TABLES.ConfiguredChannels, {...selector, ...newValues});
 	} else return updated;
 };
 
 module.exports = {
-	add, all, update, select, del, // General
+	add, all, update, select, del, reset, // General
 	TABLES, // enum
-	linkUUID, linkChannelPreifx // Helpers
+	linkUUID, linkChannelPreifx, // Helpers
+	createVerifiedTable, createChannelTable // Create tables
 };

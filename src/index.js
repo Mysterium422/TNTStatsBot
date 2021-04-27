@@ -1,6 +1,7 @@
 // FIND PACKAGES
 const Discord = require("discord.js"),
 	fs = require("fs"),
+	db = require("./db"),
 	path = require("path");
 
 const {mojangUUIDFetch, hypixelFetch, randInt, replaceError, booleanPhrases, getMentioned, errorEmbed} = require("./util.js");
@@ -14,14 +15,20 @@ client.on("ready", async () => {
 	console.log("[INFO] Initializing...");
 
 	// DEBUG ONLY!!
-	// await db.reset();
+	await db.reset();
 	// DEBUG ONLY!!
 
 	try {
-		// await db.createTable();
-		// console.log("[SUCCESS] Loaded database...");
+		// Kinda verbose but idrc
+		console.log("[INFO] Loading channel database...");
+		await db.createChannelTable();
+		console.log("[SUCCESS] Database loaded.");
+
+		console.log("[INFO] Loading users database...");
+		await db.createVerifiedTable();
+		console.log("[SUCCESS] Database loaded.");
 	} catch(e) {
-		console.error("[ERROR] Failed to load database! Aborting...");
+		console.error("[ERROR] Failed to load users database! Aborting...");
 		throw e;
 	}
 
