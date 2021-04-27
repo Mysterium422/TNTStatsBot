@@ -1673,7 +1673,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
         }
         if(user == "API ERROR") { return m.channel.send("API Connection Issues, Hypixel might be offline") }
 
-        if(!user || !user.sjuccess || user.success == false || user.player == null || user.player == undefined || !user.player || user.player.stats == undefined) return sendErrorEmbed(m.channel, `Unknown Player`, `Player has no data in Hypixel's Database`);
+        if(!user || !user.success || user.success == false || user.player == null || user.player == undefined || !user.player || user.player.stats == undefined) return sendErrorEmbed(m.channel, `Unknown Player`, `Player has no data in Hypixel's Database`);
         if(user.player.stats.TNTGames == undefined) return sendErrorEmbed(m.channel,`Unknown Player`,`Player has no Data in Hypixel's TNT Database`)
 
         await setCacheDB(user.player, user.player.uuid, m.author.id)
