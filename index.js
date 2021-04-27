@@ -700,7 +700,7 @@ client.on('ready', async () => {
     scheduleRule2.tz = 'America/New_York'
 
     schedule.scheduleJob(scheduleRule2, async function() {
-        db.delete('weekly')
+        db.delete('monthly')
     })
 });
 
