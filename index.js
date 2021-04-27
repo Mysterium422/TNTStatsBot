@@ -29,26 +29,6 @@ const embedFooter = {
         }
 }
 
-const helpMsg = `__Commands (Prefixes vary depending on your channel)__
-**/TNThelp** opens this page. Works anywhere this bot can read/send messages
-**/TNTconfigure** <game> <prefix> configure the bot to work in *this* channel using that game or prefix (admin perms needed).
-**/TNTremove** This bot will no longer answer to queries in this channel (admin perms needed). Works anywhere this bot can read/send messages.
-**/help** opens this page
-**/info** shows info about the bot
-**/invite** bot invite link
-**/source** links the bot source code
-**/discord** join link for the discord
-**/account** <mention> Looks for an MC account registered to this Discord account 
-**/stats** <game> <username> displays the TNT data. <game> will default to the channel game and <username> will default to your set username
-Possible 'Game' Parameters: all, wizards, bowspleef, tag, run, pvp
-**/kills** <username> gives a breakdown of wizards class by class kills
-**/set** <username> sets your username.
-**/settings** <setting> <true/false>
-Possible 'setting' Parameters:
-    verbose - Show more Wizards stats with /stats Default: false
-    reset - When false /stats will not update cache so ()s stay till you do /reset. Only works on your own registered ign. Default: true
-**/reset** Updates your personal stats in the cache. Only useful if reset setting is false`
-
 const booleanPhrases = {"false":false,
     "true":true,
     "f":false,
@@ -900,7 +880,15 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
                 .setTimestamp()
                 .setFooter("Created by Mysterium_", embedFooter.image.green)
                 // MAINBOTEDIT
-                .setDescription(`- Created Interactive Help Menu
+                .setDescription(`- Fixed Duel Losses
+- Fixed /reset
+- Added Shots/Game to Bowspleef, replacing Kills
+- Bug Fixes
+- Code cleanup
+- Reset cache :(
+
+**Update v4.0**
+- Created Interactive Help Menu
 - Added duels gamemode support
 - Fixed ()s with time bug
 - Formatted playtime
@@ -1047,7 +1035,15 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
                 .setTimestamp()
                 .setFooter("Created by Mysterium_", embedFooter.image.green)
                 // MAINBOTEDIT
-                .setDescription(`- Created Interactive Help Menu
+                .setDescription(`- Fixed Duel Losses
+- Fixed /reset
+- Added Shots/Game to Bowspleef, replacing Kills
+- Bug Fixes
+- Code cleanup
+- Reset cache :(
+
+**Update v4.0**
+- Created Interactive Help Menu
 - Added duels gamemode support
 - Fixed ()s with time bug
 - Formatted playtime
@@ -1740,13 +1736,15 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
             if (client.channels.cache.has(channelList[i].ID.slice(5))) {
                 channel = await client.channels.cache.get(channelList[i].ID.slice(5))
                 channel.send(new Discord.MessageEmbed()
-                    .setTitle("New Version: v4.0.0")
-                    .setDescription(`**- New Dynamic Help Menu** (do /help or /tnthelp to check it out) *Please give bot manage reactions perms for the best experience*
-**- Added TNT Duels stats!** /stats duels [username] to try that out (slightly unstable)
-**- Formatted Playtime** in all stats menu
-**- More command Aliases**
-**- Bug Squashing**
-- Groundwork for some new features`)
+                    .setTitle("New Version: v4.1.0")
+                    .setDescription(`- Fixed Duel Losses
+- Fixed /reset
+- Added Shots/Game to Bowspleef, replacing Kills
+- Bug Fixes
+- Code cleanup
+- Reset cache, weekly, and monthly :(
+
+To those who havent figured out the newest command (added in v4.0), you can do /weekly and /monthly to view your monthly/weekly stats. Check your stats before your weekly grind and then see your stats for that week! Will not work well rn due to the cache reset though...`)
                     .setTimestamp()
                     .setColor("#3bcc71")
                     .setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green)).catch(() => {return})
