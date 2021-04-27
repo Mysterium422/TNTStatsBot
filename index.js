@@ -1965,9 +1965,6 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
         }
         else if (game == "duel" || game == "duels") {
             if(user.player.stats.Duels == undefined) return sendErrorEmbed(m.channel,`Unknown Player`,`Player has no Data in Hypixel's Duel Database`)
-
-            console.log(Math.round(ratio(replaceError(user.player.stats.Duels.bowspleef_duel_wins, 0) - data.duels.w, replaceError(user.player.stats.Duels.bowspleef_duel_rounds_played, 0)-replaceError(user.player.stats.Duels.bowspleef_duel_wins, 0)-data.duels.l)*1000)/1000)
-            console.log(replaceError(user.player.stats.Duels.bowspleef_duel_rounds_played, 0)-replaceError(user.player.stats.Duels.bowspleef_duel_wins, 0)-data.duels.l)
             
             const embed = new Discord.MessageEmbed()
                 .setColor(`${rankData.color}`)
