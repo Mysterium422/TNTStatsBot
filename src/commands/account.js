@@ -15,7 +15,7 @@ module.exports = {
 			}
 		}
 		
-		const row = await db.select({discord: userID});
+		const row = await db.select(db.TABLES.VerifiedUsers, {discord: userID});
 		if (row.length === 0) {
 			return message.channel.send(errorEmbed("Invalid mention", "That user has not linked their account"));
 		}

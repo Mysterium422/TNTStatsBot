@@ -23,19 +23,12 @@ module.exports = {
 			return message.channel.send(errorEmbed("Invalid prefix", "Expected at least one character"));
 		}
 
-		// TODO: Channel setup
+		db.linkChannelPreifx(channel, prefix, game);
 
-		// await db.set(`chan_${message.channel.id}`, {
-		// 	game: args[0],
-		// 	prefix: args[1]
-		// });
-
-		// const embed = successEmbed(message.author, "", "Success! Channel Configured");
-		// embed.addField("__Default Game:__", configurationTool[game], true);
-		// embed.addField("__Bot Prefix:__", prefix, true);
-		// return message.channel.send(embed);
-
-		return message.channel.send(errorEmbed("Command under construction", "Per-channel setup is still a work in progress for the rewrite!"));
+		const embed = successEmbed(message.author, "", "Success! Channel Configured");
+		embed.addField("__Default Game:__", configurationTool[game], true);
+		embed.addField("__Bot Prefix:__", prefix, true);
+		return message.channel.send(embed);
 	},
 	aliases: ["configure", "config", "setup"]
 };

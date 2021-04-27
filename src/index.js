@@ -1,7 +1,6 @@
 // FIND PACKAGES
 const Discord = require("discord.js"),
 	fs = require("fs"),
-	db = require("./db"),
 	path = require("path");
 
 const {mojangUUIDFetch, hypixelFetch, randInt, replaceError, booleanPhrases, getMentioned, errorEmbed} = require("./util.js");
@@ -15,12 +14,12 @@ client.on("ready", async () => {
 	console.log("[INFO] Initializing...");
 
 	// DEBUG ONLY!!
-	await db.reset();
+	// await db.reset();
 	// DEBUG ONLY!!
 
 	try {
-		await db.createTable();
-		console.log("[SUCCESS] Loaded database...");
+		// await db.createTable();
+		// console.log("[SUCCESS] Loaded database...");
 	} catch(e) {
 		console.error("[ERROR] Failed to load database! Aborting...");
 		throw e;

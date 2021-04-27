@@ -1,15 +1,13 @@
 const {performance} = require("perf_hooks");
 const {hypixelFetch, errorEmbed, successEmbed} = require("../util.js");
+const db = require("../db");
 
 module.exports = {
 	run: async (client, message, args) => {
-		// TODO: Fix this
-		if (1 + 1 === 2) return message.channel.send(errorEmbed("Command Failed", "The ping command is under construction..."));
-
 		const discordToBot = Date.now() - message.createdTimestamp;
 
 		let START = performance.now();
-		// await db.get("chan_" + message.channel.id);
+		await db.all(db.TABLES.VerifiedUsers);
 		const botToDB = performance.now() - START;
 
 		START = performance.now();
