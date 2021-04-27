@@ -482,36 +482,6 @@ client.on("message", async message => {
 		return message.channel.send(`Reset counters for you!`);
 	} else if (command.toLowerCase() === "mysterium") {
 		return message.channel.send("Hey! This bot was coded by Mysterium&Lebster!\nReport Bugs here: https://discord.gg/7Qb5xuJD4C\nHere's my website (WIP): <https://mysterium.me>");
-	} else if (command.toLowerCase() === "ownercommand") {
-		if (message.author.id != config.owner_id) return;
-
-		channelList = db.all().filter(a => {
-			return a.ID.includes("chan_");
-		});
-		for (let i = 0; i < channelList.length; i++) {
-			if (client.channels.cache.has(channelList[i].ID.slice(5))) {
-				channel = await client.channels.cache.get(channelList[i].ID.slice(5));
-				channel
-					.send(
-						new Discord.MessageEmbed()
-							.setTitle("New Version: v4.0.0")
-							.setDescription(
-								`**- New Dynamic Help Menu** (do /help or /tnthelp to check it out) *Please give bot manage reactions perms for the best experience*
-	**- Added TNT Duels stats!** /stats duels [username] to try that out (slightly unstable)
-	**- Formatted Playtime** in all stats menu
-	**- More command Aliases**
-	**- Bug Squashing**
-	- Groundwork for some new features`
-							)
-							.setTimestamp()
-							.setColor("#3bcc71")
-							.setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green)
-					)
-					.catch(() => {
-						return;
-					});
-			}
-		}
 	} else if (command.toLowerCase() === "weekly" || command == "monthly") {
 		let received = "";
 		try {
