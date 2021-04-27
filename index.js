@@ -141,7 +141,9 @@ function ratio(a, b) {
 // DB HANDLERS
 async function setRunDB(data, uuid, authorID) {
 
-    if (!data.stats.TNTGames) return
+    if (!data.stats.TNTGames) {
+        data.stats.TNTGames = {}
+    }
 
     var runDBEntry = {
         record:replaceError(data.stats.TNTGames.record_tntrun, 0),
@@ -158,7 +160,9 @@ async function setRunDB(data, uuid, authorID) {
 
 async function setPVPDB(data, uuid, authorID) {
 
-    if (!data.stats.TNTGames) return
+    if (!data.stats.TNTGames) {
+        data.stats.TNTGames = {}
+    }
 
     var pvpDBEntry = {
         record:replaceError(data.stats.TNTGames.record_pvprun, 0),
@@ -175,13 +179,14 @@ async function setPVPDB(data, uuid, authorID) {
 
 async function setBowDB(data, uuid, authorID) {
 
-    if (!data.stats.TNTGames) return
+    if (!data.stats.TNTGames) {
+        data.stats.TNTGames = {}
+    }
 
     var bowDBEntry = {
         w:replaceError(data.stats.TNTGames.wins_bowspleef, 0),
         l:replaceError(data.stats.TNTGames.deaths_bowspleef, 0),
         shots:replaceError(data.stats.TNTGames.tags_bowspleef, 0),
-        k:replaceError(data.stats.TNTGames.kills_bowspleef, 0),
         wl:ratio(data.stats.TNTGames.wins_bowspleef, data.stats.TNTGames.deaths_bowspleef)
     }
 
@@ -191,7 +196,9 @@ async function setBowDB(data, uuid, authorID) {
 
 async function setTagDB(data, uuid, authorID) {
 
-    if (!data.stats.TNTGames) return
+    if (!data.stats.TNTGames) {
+        data.stats.TNTGames = {}
+    }
 
     var tagDBEntry = {
         w:replaceError(data.stats.TNTGames.wins_tntag, 0),
@@ -207,7 +214,9 @@ async function setTagDB(data, uuid, authorID) {
 
 async function setWizDB(data, uuid, authorID) {
 
-    if (!data.stats.TNTGames) return
+    if (!data.stats.TNTGames) {
+        data.stats.TNTGames = {}
+    }
 
     var wizDBEntry = {
         w:replaceError(data.stats.TNTGames.wins_capture, 0),
@@ -227,7 +236,9 @@ async function setWizDB(data, uuid, authorID) {
 
 async function setWizKillsDB(data, uuid, authorID) {
 
-    if (!data.stats.TNTGames) return
+    if (!data.stats.TNTGames) {
+        data.stats.TNTGames = {}
+    }
 
     var wizKillDBEntry = {
         total_k:replaceError(data.stats.TNTGames.kills_capture, 0),
@@ -248,13 +259,15 @@ async function setWizKillsDB(data, uuid, authorID) {
 
 async function setDuelDB(data, uuid, authorID) {
 
-    if (!data.stats.Duels) return
+    if (!data.stats.Duels) {
+        data.stats.Duels = {}
+    }
 
     var duelDBEntry = {
         w:replaceError(data.stats.Duels.bowspleef_duel_wins, 0),
-        l:replaceError(data.stats.Duels.bowspleef_duel_rounds_played, 0)-replaceError(data.stats.Duels.bowspleef_duel_wins, 0),
+        l:replaceError(data.stats.Duels.bowspleef_duel_deaths, 0),
         shots:replaceError(data.stats.Duels.bowspleef_duel_bow_shots, 0),
-        wl: ratio(data.stats.Duels.bowspleef_duel_wins, replaceError(data.stats.Duels.bowspleef_duel_rounds_played, 0)-replaceError(data.stats.Duels.bowspleef_duel_wins, 0)),
+        wl: ratio(data.stats.Duels.bowspleef_duel_wins, data.stats.Duels.bowspleef_duel_deaths),
         streak: replaceError(data.stats.Duels.best_tnt_games_winstreak, 0),
         currentStreak: replaceError(data.stats.Duels.current_tnt_games_winstreak, 0)
     }
@@ -272,7 +285,7 @@ async function setAllDB(data, uuid, authorID) {
         run_wins:replaceError(data.stats.TNTGames.wins_tntrun, 0),
         run_record:replaceError(data.stats.TNTGames.record_tntrun, 0),
         pvp_wins:replaceError(data.stats.TNTGames.wins_pvprun, 0),
-        pvp_record:replaceError(data.stats.TNTGames.record_pvprun, 0),
+        pvp_kills:replaceError(data.stats.TNTGames.kills_pvprun, 0),
         tag_wins:replaceError(data.stats.TNTGames.wins_tntag, 0),
         bow_wins:replaceError(data.stats.TNTGames.wins_bowspleef, 0),
         wizards_wins:replaceError(data.stats.TNTGames.wins_capture, 0),
@@ -298,177 +311,95 @@ async function setCacheDB(data, uuid, authorID) {
 
 async function setWeeklyDB(data, uuid) {
     var weeklyDBEntry = {}
-    if (data.stats.TNTGames) {
-        weeklyDBEntry.run = {
-            record:replaceError(data.stats.TNTGames.record_tntrun, 0),
-            w:replaceError(data.stats.TNTGames.wins_tntrun, 0),
-            l:replaceError(data.stats.TNTGames.deaths_tntrun, 0),
-            wl:ratio(data.stats.TNTGames.wins_tntrun, data.stats.TNTGames.deaths_tntrun),
-            potions:replaceError(data.stats.TNTGames.run_potions_splashed_on_players, 0)
-        }
-        weeklyDBEntry.pvp = {
-            record:replaceError(data.stats.TNTGames.record_pvprun, 0),
-            w:replaceError(data.stats.TNTGames.wins_pvprun, 0),
-            l:replaceError(data.stats.TNTGames.deaths_pvprun, 0),
-            k:replaceError(data.stats.TNTGames.kills_pvprun, 0),
-            wl:ratio(data.stats.TNTGames.wins_pvprun, data.stats.TNTGames.deaths_pvprun),
-            kd:ratio(data.stats.TNTGames.kills_pvprun, data.stats.TNTGames.deaths_pvprun)
-        }
-        weeklyDBEntry.bow = {
-            w:replaceError(data.stats.TNTGames.wins_bowspleef, 0),
-            l:replaceError(data.stats.TNTGames.deaths_bowspleef, 0),
-            shots:replaceError(data.stats.TNTGames.tags_bowspleef, 0),
-            k:replaceError(data.stats.TNTGames.kills_bowspleef, 0),
-            wl:ratio(data.stats.TNTGames.wins_bowspleef, data.stats.TNTGames.deaths_bowspleef)
-        }
-        weeklyDBEntry.tag = {
-            w:replaceError(data.stats.TNTGames.wins_tntag, 0),
-            k:replaceError(data.stats.TNTGames.kills_tntag, 0),
-            kw:ratio(data.stats.TNTGames.kills_tntag, data.stats.TNTGames.wins_tntag),
-        }
 
-        weeklyDBEntry.wizards = {
-            w:replaceError(data.stats.TNTGames.wins_capture, 0),
-            k:replaceError(data.stats.TNTGames.kills_capture, 0),
-            a:replaceError(data.stats.TNTGames.assists_capture, 0),
-            d:replaceError(data.stats.TNTGames.deaths_capture, 0),
-            p:replaceError(data.stats.TNTGames.points_capture, 0),
-            kd:ratio(data.stats.TNTGames.kills_capture, data.stats.TNTGames.deaths_capture),
-            kad:ratio(replaceError(data.stats.TNTGames.kills_capture, 0)+replaceError(data.stats.TNTGames.assists_capture, 0), data.stats.TNTGames.deaths_capture),
-            air:replaceError(data.stats.TNTGames.air_time_capture, 0),
-            kw:ratio(data.stats.TNTGames.kills_capture, data.stats.TNTGames.wins_capture)
-        }
-
-        weeklyDBEntry.wizardKills = {
-            total_k:replaceError(data.stats.TNTGames.kills_capture, 0),
-            f_k:replaceError(data.stats.TNTGames.new_firewizard_kills, 0),
-            i_k:replaceError(data.stats.TNTGames.new_icewizard_kills, 0),
-            w_k:replaceError(data.stats.TNTGames.new_witherwizard_kills, 0),
-            k_k:replaceError(data.stats.TNTGames.new_kineticwizard_kills, 0),
-            b_k:replaceError(data.stats.TNTGames.new_bloodwizard_kills, 0),
-            t_k:replaceError(data.stats.TNTGames.new_toxicwizard_kills, 0),
-            h_k:replaceError(data.stats.TNTGames.new_hydrowizard_kills, 0),
-            a_k:replaceError(data.stats.TNTGames.new_ancientwizard_kills, 0),
-            s_k:replaceError(data.stats.TNTGames.new_stormwizard_kills, 0),
-        }
-
-        weeklyDBEntry.allTNT = {
-                coins:replaceError(data.stats.TNTGames.coins, 0),
-                total_wins:replaceError(data.stats.TNTGames.wins_tntrun, 0)+replaceError(data.stats.TNTGames.wins_pvprun, 0)+replaceError(data.stats.TNTGames.wins_tntag, 0)+replaceError(data.stats.TNTGames.wins_bowspleef, 0) + replaceError(data.stats.TNTGames.wins_capture, 0),
-                streak:replaceError(data.stats.TNTGames.winstreak, 0),
-                run_wins:replaceError(data.stats.TNTGames.wins_tntrun, 0),
-                run_record:replaceError(data.stats.TNTGames.record_tntrun, 0),
-                pvp_wins:replaceError(data.stats.TNTGames.wins_pvprun, 0),
-                pvp_record:replaceError(data.stats.TNTGames.record_pvprun, 0),
-                tag_wins:replaceError(data.stats.TNTGames.wins_tntag, 0),
-                bow_wins:replaceError(data.stats.TNTGames.wins_bowspleef, 0),
-                wizards_wins:replaceError(data.stats.TNTGames.wins_capture, 0),
-                wizards_kills:replaceError(data.stats.TNTGames.kills_capture, 0)
-        }
+    if (!data.stats.TNTGames) {
+        data.stats.TNTGames = {}
     }
-    else {
-        weeklyDBEntry.run = {
-            record:0,
-            w:0,
-            l:0,
-            wl:0,
-            potions:0
-        }
-        weeklyDBEntry.pvp = {
-            record:0,
-            w:0,
-            l:0,
-            k:0,
-            wl:0,
-            kd:0
-        }
-        weeklyDBEntry.bow = {
-            w:0,
-            l:0,
-            shots:0,
-            k:0,
-            wl:0
-        }
-        weeklyDBEntry.tag = {
-            w:0,
-            k:0,
-            kw:0,
-        }
-        weeklyDBEntry.wizards = {
-            w:0,
-            k:0,
-            a:0,
-            d:0,
-            p:0,
-            kd:0,
-            kad:0,
-            air:0,
-            kw:0            
-        }
-        weeklyDBEntry.wizardKills = {
-            total_k:0,
-            f_k:0,
-            i_k:0,
-            w_k:0,
-            k_k:0,
-            b_k:0,
-            t_k:0,
-            h_k:0,
-            a_k:0,
-            s_k:0,
-        }
-        weeklyDBEntry.allTNT = {
-            coins:0,
-            total_wins:0,
-            streak:0,
-            run_wins:0,
-            run_record:0,
-            pvp_wins:0,
-            pvp_record:0,
-            tag_wins:0,
-            bow_wins:0,
-            wizards_wins:0,
-            wizards_kills:0
-        }
+    if (!data.stats.duels) {
+        data.stats.duels = {}
     }
-    if (data.stats.duels) {
-        weeklyDBEntry.duels = {
-            w:replaceError(data.stats.Duels.bowspleef_duel_wins, 0),
-            l:replaceError(data.stats.Duels.bowspleef_duel_rounds_played, 0)-replaceError(data.stats.Duels.bowspleef_duel_wins, 0),
-            shots:replaceError(data.stats.Duels.bowspleef_duel_bow_shots, 0),
-            wl: ratio(data.stats.Duels.bowspleef_duel_wins, replaceError(data.stats.Duels.bowspleef_duel_rounds_played, 0)-replaceError(data.stats.Duels.bowspleef_duel_wins, 0)),
-            streak: replaceError(data.stats.Duels.best_tnt_games_winstreak, 0),
-            currentStreak: replaceError(data.stats.Duels.current_tnt_games_winstreak, 0)
-        }
-    }
-    else {
-        weeklyDBEntry.duels = {
-            w:0,
-            l:0,
-            shots:0,
-            wl:0,
-            streak:0,
-            currentStreak:0
-        }
+    if (!data.achievements) {
+        data.achievements = {}
     }
 
-    if (data.achievements) {
-        weeklyDBEntry.allTNT.time = replaceError(data.achievements.tntgames_tnt_triathlon, 0)
-        weeklyDBEntry.run.blocks = replaceError(data.achievements.tntgames_block_runner, 0),
-        weeklyDBEntry.tag.tags = replaceError(data.achievements.tntgames_clinic, 0)
+    weeklyDBEntry.run = {
+        record:replaceError(data.stats.TNTGames.record_tntrun, 0),
+        w:replaceError(data.stats.TNTGames.wins_tntrun, 0),
+        l:replaceError(data.stats.TNTGames.deaths_tntrun, 0),
+        wl:ratio(data.stats.TNTGames.wins_tntrun, data.stats.TNTGames.deaths_tntrun),
+        potions:replaceError(data.stats.TNTGames.run_potions_splashed_on_players, 0)
     }
-    else {
-        weeklyDBEntry.allTNT.time = 0
-        weeklyDBEntry.run.blocks = 0
-        weeklyDBEntry.tag.tags = 0
+    weeklyDBEntry.pvp = {
+        record:replaceError(data.stats.TNTGames.record_pvprun, 0),
+        w:replaceError(data.stats.TNTGames.wins_pvprun, 0),
+        l:replaceError(data.stats.TNTGames.deaths_pvprun, 0),
+        k:replaceError(data.stats.TNTGames.kills_pvprun, 0),
+        wl:ratio(data.stats.TNTGames.wins_pvprun, data.stats.TNTGames.deaths_pvprun),
+        kd:ratio(data.stats.TNTGames.kills_pvprun, data.stats.TNTGames.deaths_pvprun)
+    }
+    weeklyDBEntry.bow = {
+        w:replaceError(data.stats.TNTGames.wins_bowspleef, 0),
+        l:replaceError(data.stats.TNTGames.deaths_bowspleef, 0),
+        shots:replaceError(data.stats.TNTGames.tags_bowspleef, 0),
+        wl:ratio(data.stats.TNTGames.wins_bowspleef, data.stats.TNTGames.deaths_bowspleef)
+    }
+    weeklyDBEntry.tag = {
+        w:replaceError(data.stats.TNTGames.wins_tntag, 0),
+        k:replaceError(data.stats.TNTGames.kills_tntag, 0),
+        kw:ratio(data.stats.TNTGames.kills_tntag, data.stats.TNTGames.wins_tntag),
     }
 
-    if (data.achievements && data.stats.TNTGames) {
-        weeklyDBEntry.tag.tk = ratio(data.achievements.tntgames_clinic, data.stats.TNTGames.kills_tntag)
+    weeklyDBEntry.wizards = {
+        w:replaceError(data.stats.TNTGames.wins_capture, 0),
+        k:replaceError(data.stats.TNTGames.kills_capture, 0),
+        a:replaceError(data.stats.TNTGames.assists_capture, 0),
+        d:replaceError(data.stats.TNTGames.deaths_capture, 0),
+        p:replaceError(data.stats.TNTGames.points_capture, 0),
+        kd:ratio(data.stats.TNTGames.kills_capture, data.stats.TNTGames.deaths_capture),
+        kad:ratio(replaceError(data.stats.TNTGames.kills_capture, 0)+replaceError(data.stats.TNTGames.assists_capture, 0), data.stats.TNTGames.deaths_capture),
+        air:replaceError(data.stats.TNTGames.air_time_capture, 0),
+        kw:ratio(data.stats.TNTGames.kills_capture, data.stats.TNTGames.wins_capture)
     }
-    else {
-        weeklyDBEntry.tag.tk = 0
+
+    weeklyDBEntry.wizardKills = {
+        total_k:replaceError(data.stats.TNTGames.kills_capture, 0),
+        f_k:replaceError(data.stats.TNTGames.new_firewizard_kills, 0),
+        i_k:replaceError(data.stats.TNTGames.new_icewizard_kills, 0),
+        w_k:replaceError(data.stats.TNTGames.new_witherwizard_kills, 0),
+        k_k:replaceError(data.stats.TNTGames.new_kineticwizard_kills, 0),
+        b_k:replaceError(data.stats.TNTGames.new_bloodwizard_kills, 0),
+        t_k:replaceError(data.stats.TNTGames.new_toxicwizard_kills, 0),
+        h_k:replaceError(data.stats.TNTGames.new_hydrowizard_kills, 0),
+        a_k:replaceError(data.stats.TNTGames.new_ancientwizard_kills, 0),
+        s_k:replaceError(data.stats.TNTGames.new_stormwizard_kills, 0),
     }
+
+    weeklyDBEntry.allTNT = {
+            coins:replaceError(data.stats.TNTGames.coins, 0),
+            total_wins:replaceError(data.stats.TNTGames.wins_tntrun, 0)+replaceError(data.stats.TNTGames.wins_pvprun, 0)+replaceError(data.stats.TNTGames.wins_tntag, 0)+replaceError(data.stats.TNTGames.wins_bowspleef, 0) + replaceError(data.stats.TNTGames.wins_capture, 0),
+            streak:replaceError(data.stats.TNTGames.winstreak, 0),
+            run_wins:replaceError(data.stats.TNTGames.wins_tntrun, 0),
+            run_record:replaceError(data.stats.TNTGames.record_tntrun, 0),
+            pvp_wins:replaceError(data.stats.TNTGames.wins_pvprun, 0),
+            pvp_record:replaceError(data.stats.TNTGames.record_pvprun, 0),
+            tag_wins:replaceError(data.stats.TNTGames.wins_tntag, 0),
+            bow_wins:replaceError(data.stats.TNTGames.wins_bowspleef, 0),
+            wizards_wins:replaceError(data.stats.TNTGames.wins_capture, 0),
+            wizards_kills:replaceError(data.stats.TNTGames.kills_capture, 0)
+    }
+    weeklyDBEntry.duels = {
+        w:replaceError(data.stats.Duels.bowspleef_duel_wins, 0),
+        l:replaceError(data.stats.Duels.bowspleef_duel_rounds_played, 0)-replaceError(data.stats.Duels.bowspleef_duel_wins, 0),
+        shots:replaceError(data.stats.Duels.bowspleef_duel_bow_shots, 0),
+        wl: ratio(data.stats.Duels.bowspleef_duel_wins, replaceError(data.stats.Duels.bowspleef_duel_rounds_played, 0)-replaceError(data.stats.Duels.bowspleef_duel_wins, 0)),
+        streak: replaceError(data.stats.Duels.best_tnt_games_winstreak, 0),
+        currentStreak: replaceError(data.stats.Duels.current_tnt_games_winstreak, 0)
+    }
+
+    weeklyDBEntry.allTNT.time = replaceError(data.achievements.tntgames_tnt_triathlon, 0)
+    weeklyDBEntry.run.blocks = replaceError(data.achievements.tntgames_block_runner, 0),
+    weeklyDBEntry.tag.tags = replaceError(data.achievements.tntgames_clinic, 0)
+    weeklyDBEntry.tag.tk = ratio(data.achievements.tntgames_clinic, data.stats.TNTGames.kills_tntag)
 
     weeklyDBEntry.time = Date.now()
 
@@ -478,177 +409,95 @@ async function setWeeklyDB(data, uuid) {
 
 async function setMonthlyDB(data, uuid) {
     var monthlyDBEntry = {}
-    if (data.stats.TNTGames) {
-        monthlyDBEntry.run = {
-            record:replaceError(data.stats.TNTGames.record_tntrun, 0),
-            w:replaceError(data.stats.TNTGames.wins_tntrun, 0),
-            l:replaceError(data.stats.TNTGames.deaths_tntrun, 0),
-            wl:ratio(data.stats.TNTGames.wins_tntrun, data.stats.TNTGames.deaths_tntrun),
-            potions:replaceError(data.stats.TNTGames.run_potions_splashed_on_players, 0)
-        }
-        monthlyDBEntry.pvp = {
-            record:replaceError(data.stats.TNTGames.record_pvprun, 0),
-            w:replaceError(data.stats.TNTGames.wins_pvprun, 0),
-            l:replaceError(data.stats.TNTGames.deaths_pvprun, 0),
-            k:replaceError(data.stats.TNTGames.kills_pvprun, 0),
-            wl:ratio(data.stats.TNTGames.wins_pvprun, data.stats.TNTGames.deaths_pvprun),
-            kd:ratio(data.stats.TNTGames.kills_pvprun, data.stats.TNTGames.deaths_pvprun)
-        }
-        monthlyDBEntry.bow = {
-            w:replaceError(data.stats.TNTGames.wins_bowspleef, 0),
-            l:replaceError(data.stats.TNTGames.deaths_bowspleef, 0),
-            shots:replaceError(data.stats.TNTGames.tags_bowspleef, 0),
-            k:replaceError(data.stats.TNTGames.kills_bowspleef, 0),
-            wl:ratio(data.stats.TNTGames.wins_bowspleef, data.stats.TNTGames.deaths_bowspleef)
-        }
-        monthlyDBEntry.tag = {
-            w:replaceError(data.stats.TNTGames.wins_tntag, 0),
-            k:replaceError(data.stats.TNTGames.kills_tntag, 0),
-            kw:ratio(data.stats.TNTGames.kills_tntag, data.stats.TNTGames.wins_tntag),
-        }
 
-        monthlyDBEntry.wizards = {
-            w:replaceError(data.stats.TNTGames.wins_capture, 0),
-            k:replaceError(data.stats.TNTGames.kills_capture, 0),
-            a:replaceError(data.stats.TNTGames.assists_capture, 0),
-            d:replaceError(data.stats.TNTGames.deaths_capture, 0),
-            p:replaceError(data.stats.TNTGames.points_capture, 0),
-            kd:ratio(data.stats.TNTGames.kills_capture, data.stats.TNTGames.deaths_capture),
-            kad:ratio(replaceError(data.stats.TNTGames.kills_capture, 0)+replaceError(data.stats.TNTGames.assists_capture, 0), data.stats.TNTGames.deaths_capture),
-            air:replaceError(data.stats.TNTGames.air_time_capture, 0),
-            kw:ratio(data.stats.TNTGames.kills_capture, data.stats.TNTGames.wins_capture)
-        }
-
-        monthlyDBEntry.wizardKills = {
-            total_k:replaceError(data.stats.TNTGames.kills_capture, 0),
-            f_k:replaceError(data.stats.TNTGames.new_firewizard_kills, 0),
-            i_k:replaceError(data.stats.TNTGames.new_icewizard_kills, 0),
-            w_k:replaceError(data.stats.TNTGames.new_witherwizard_kills, 0),
-            k_k:replaceError(data.stats.TNTGames.new_kineticwizard_kills, 0),
-            b_k:replaceError(data.stats.TNTGames.new_bloodwizard_kills, 0),
-            t_k:replaceError(data.stats.TNTGames.new_toxicwizard_kills, 0),
-            h_k:replaceError(data.stats.TNTGames.new_hydrowizard_kills, 0),
-            a_k:replaceError(data.stats.TNTGames.new_ancientwizard_kills, 0),
-            s_k:replaceError(data.stats.TNTGames.new_stormwizard_kills, 0),
-        }
-
-        monthlyDBEntry.allTNT = {
-                coins:replaceError(data.stats.TNTGames.coins, 0),
-                total_wins:replaceError(data.stats.TNTGames.wins_tntrun, 0)+replaceError(data.stats.TNTGames.wins_pvprun, 0)+replaceError(data.stats.TNTGames.wins_tntag, 0)+replaceError(data.stats.TNTGames.wins_bowspleef, 0) + replaceError(data.stats.TNTGames.wins_capture, 0),
-                streak:replaceError(data.stats.TNTGames.winstreak, 0),
-                run_wins:replaceError(data.stats.TNTGames.wins_tntrun, 0),
-                run_record:replaceError(data.stats.TNTGames.record_tntrun, 0),
-                pvp_wins:replaceError(data.stats.TNTGames.wins_pvprun, 0),
-                pvp_record:replaceError(data.stats.TNTGames.record_pvprun, 0),
-                tag_wins:replaceError(data.stats.TNTGames.wins_tntag, 0),
-                bow_wins:replaceError(data.stats.TNTGames.wins_bowspleef, 0),
-                wizards_wins:replaceError(data.stats.TNTGames.wins_capture, 0),
-                wizards_kills:replaceError(data.stats.TNTGames.kills_capture, 0)
-        }
+    if (!data.stats.TNTGames) {
+        data.stats.TNTGames = {}
     }
-    else {
-        monthlyDBEntry.run = {
-            record:0,
-            w:0,
-            l:0,
-            wl:0,
-            potions:0
-        }
-        monthlyDBEntry.pvp = {
-            record:0,
-            w:0,
-            l:0,
-            k:0,
-            wl:0,
-            kd:0
-        }
-        monthlyDBEntry.bow = {
-            w:0,
-            l:0,
-            shots:0,
-            k:0,
-            wl:0
-        }
-        monthlyDBEntry.tag = {
-            w:0,
-            k:0,
-            kw:0,
-        }
-        monthlyDBEntry.wizards = {
-            w:0,
-            k:0,
-            a:0,
-            d:0,
-            p:0,
-            kd:0,
-            kad:0,
-            air:0,
-            kw:0            
-        }
-        monthlyDBEntry.wizardKills = {
-            total_k:0,
-            f_k:0,
-            i_k:0,
-            w_k:0,
-            k_k:0,
-            b_k:0,
-            t_k:0,
-            h_k:0,
-            a_k:0,
-            s_k:0,
-        }
-        monthlyDBEntry.allTNT = {
-            coins:0,
-            total_wins:0,
-            streak:0,
-            run_wins:0,
-            run_record:0,
-            pvp_wins:0,
-            pvp_record:0,
-            tag_wins:0,
-            bow_wins:0,
-            wizards_wins:0,
-            wizards_kills:0
-        }
+    if (!data.stats.duels) {
+        data.stats.duels = {}
     }
-    if (data.stats.duels) {
-        monthlyDBEntry.duels = {
-            w:replaceError(data.stats.Duels.bowspleef_duel_wins, 0),
-            l:replaceError(data.stats.Duels.bowspleef_duel_rounds_played, 0)-replaceError(data.stats.Duels.bowspleef_duel_wins, 0),
-            shots:replaceError(data.stats.Duels.bowspleef_duel_bow_shots, 0),
-            wl: ratio(data.stats.Duels.bowspleef_duel_wins, replaceError(data.stats.Duels.bowspleef_duel_rounds_played, 0)-replaceError(data.stats.Duels.bowspleef_duel_wins, 0)),
-            streak: replaceError(data.stats.Duels.best_tnt_games_winstreak, 0),
-            currentStreak: replaceError(data.stats.Duels.current_tnt_games_winstreak, 0)
-        }
-    }
-    else {
-        monthlyDBEntry.duels = {
-            w:0,
-            l:0,
-            shots:0,
-            wl:0,
-            streak:0,
-            currentStreak:0
-        }
+    if (!data.achievements) {
+        data.achievements = {}
     }
 
-    if (data.achievements) {
-        monthlyDBEntry.allTNT.time = replaceError(data.achievements.tntgames_tnt_triathlon, 0)
-        monthlyDBEntry.run.blocks = replaceError(data.achievements.tntgames_block_runner, 0),
-        monthlyDBEntry.tag.tags = replaceError(data.achievements.tntgames_clinic, 0)
+    monthlyDBEntry.run = {
+        record:replaceError(data.stats.TNTGames.record_tntrun, 0),
+        w:replaceError(data.stats.TNTGames.wins_tntrun, 0),
+        l:replaceError(data.stats.TNTGames.deaths_tntrun, 0),
+        wl:ratio(data.stats.TNTGames.wins_tntrun, data.stats.TNTGames.deaths_tntrun),
+        potions:replaceError(data.stats.TNTGames.run_potions_splashed_on_players, 0)
     }
-    else {
-        monthlyDBEntry.allTNT.time = 0
-        monthlyDBEntry.run.blocks = 0
-        monthlyDBEntry.tag.tags = 0
+    monthlyDBEntry.pvp = {
+        record:replaceError(data.stats.TNTGames.record_pvprun, 0),
+        w:replaceError(data.stats.TNTGames.wins_pvprun, 0),
+        l:replaceError(data.stats.TNTGames.deaths_pvprun, 0),
+        k:replaceError(data.stats.TNTGames.kills_pvprun, 0),
+        wl:ratio(data.stats.TNTGames.wins_pvprun, data.stats.TNTGames.deaths_pvprun),
+        kd:ratio(data.stats.TNTGames.kills_pvprun, data.stats.TNTGames.deaths_pvprun)
+    }
+    monthlyDBEntry.bow = {
+        w:replaceError(data.stats.TNTGames.wins_bowspleef, 0),
+        l:replaceError(data.stats.TNTGames.deaths_bowspleef, 0),
+        shots:replaceError(data.stats.TNTGames.tags_bowspleef, 0),
+        wl:ratio(data.stats.TNTGames.wins_bowspleef, data.stats.TNTGames.deaths_bowspleef)
+    }
+    monthlyDBEntry.tag = {
+        w:replaceError(data.stats.TNTGames.wins_tntag, 0),
+        k:replaceError(data.stats.TNTGames.kills_tntag, 0),
+        kw:ratio(data.stats.TNTGames.kills_tntag, data.stats.TNTGames.wins_tntag),
     }
 
-    if (data.achievements && data.stats.TNTGames) {
-        monthlyDBEntry.tag.tk = ratio(data.achievements.tntgames_clinic, data.stats.TNTGames.kills_tntag)
+    monthlyDBEntry.wizards = {
+        w:replaceError(data.stats.TNTGames.wins_capture, 0),
+        k:replaceError(data.stats.TNTGames.kills_capture, 0),
+        a:replaceError(data.stats.TNTGames.assists_capture, 0),
+        d:replaceError(data.stats.TNTGames.deaths_capture, 0),
+        p:replaceError(data.stats.TNTGames.points_capture, 0),
+        kd:ratio(data.stats.TNTGames.kills_capture, data.stats.TNTGames.deaths_capture),
+        kad:ratio(replaceError(data.stats.TNTGames.kills_capture, 0)+replaceError(data.stats.TNTGames.assists_capture, 0), data.stats.TNTGames.deaths_capture),
+        air:replaceError(data.stats.TNTGames.air_time_capture, 0),
+        kw:ratio(data.stats.TNTGames.kills_capture, data.stats.TNTGames.wins_capture)
     }
-    else {
-        monthlyDBEntry.tag.tk = 0
+
+    monthlyDBEntry.wizardKills = {
+        total_k:replaceError(data.stats.TNTGames.kills_capture, 0),
+        f_k:replaceError(data.stats.TNTGames.new_firewizard_kills, 0),
+        i_k:replaceError(data.stats.TNTGames.new_icewizard_kills, 0),
+        w_k:replaceError(data.stats.TNTGames.new_witherwizard_kills, 0),
+        k_k:replaceError(data.stats.TNTGames.new_kineticwizard_kills, 0),
+        b_k:replaceError(data.stats.TNTGames.new_bloodwizard_kills, 0),
+        t_k:replaceError(data.stats.TNTGames.new_toxicwizard_kills, 0),
+        h_k:replaceError(data.stats.TNTGames.new_hydrowizard_kills, 0),
+        a_k:replaceError(data.stats.TNTGames.new_ancientwizard_kills, 0),
+        s_k:replaceError(data.stats.TNTGames.new_stormwizard_kills, 0),
     }
+
+    monthlyDBEntry.allTNT = {
+            coins:replaceError(data.stats.TNTGames.coins, 0),
+            total_wins:replaceError(data.stats.TNTGames.wins_tntrun, 0)+replaceError(data.stats.TNTGames.wins_pvprun, 0)+replaceError(data.stats.TNTGames.wins_tntag, 0)+replaceError(data.stats.TNTGames.wins_bowspleef, 0) + replaceError(data.stats.TNTGames.wins_capture, 0),
+            streak:replaceError(data.stats.TNTGames.winstreak, 0),
+            run_wins:replaceError(data.stats.TNTGames.wins_tntrun, 0),
+            run_record:replaceError(data.stats.TNTGames.record_tntrun, 0),
+            pvp_wins:replaceError(data.stats.TNTGames.wins_pvprun, 0),
+            pvp_record:replaceError(data.stats.TNTGames.record_pvprun, 0),
+            tag_wins:replaceError(data.stats.TNTGames.wins_tntag, 0),
+            bow_wins:replaceError(data.stats.TNTGames.wins_bowspleef, 0),
+            wizards_wins:replaceError(data.stats.TNTGames.wins_capture, 0),
+            wizards_kills:replaceError(data.stats.TNTGames.kills_capture, 0)
+    }
+    monthlyDBEntry.duels = {
+        w:replaceError(data.stats.Duels.bowspleef_duel_wins, 0),
+        l:replaceError(data.stats.Duels.bowspleef_duel_rounds_played, 0)-replaceError(data.stats.Duels.bowspleef_duel_wins, 0),
+        shots:replaceError(data.stats.Duels.bowspleef_duel_bow_shots, 0),
+        wl: ratio(data.stats.Duels.bowspleef_duel_wins, replaceError(data.stats.Duels.bowspleef_duel_rounds_played, 0)-replaceError(data.stats.Duels.bowspleef_duel_wins, 0)),
+        streak: replaceError(data.stats.Duels.best_tnt_games_winstreak, 0),
+        currentStreak: replaceError(data.stats.Duels.current_tnt_games_winstreak, 0)
+    }
+
+    monthlyDBEntry.allTNT.time = replaceError(data.achievements.tntgames_tnt_triathlon, 0)
+    monthlyDBEntry.run.blocks = replaceError(data.achievements.tntgames_block_runner, 0),
+    monthlyDBEntry.tag.tags = replaceError(data.achievements.tntgames_clinic, 0)
+    monthlyDBEntry.tag.tk = ratio(data.achievements.tntgames_clinic, data.stats.TNTGames.kills_tntag)
 
     monthlyDBEntry.time = Date.now()
 
@@ -1096,7 +945,6 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
 
         if(data == "API ERROR") { return m.channel.send("API Connection Issues, Hypixel might be offline") }
         if(!data.success || data.success == false || data.player == null || data.player == undefined || !data.player || data.player.stats == undefined) return m.channel.send("Invalid Something");
-        if(data.player.stats.TNTGames == undefined) return sendErrorEmbed(m.channel,`Unknown Player`,`Player has no Data in Hypixel's TNT Database`)
 
 
         let received = ""
@@ -1136,7 +984,6 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
         if(data == "API ERROR") { return m.channel.send("API Connection Issues, Hypixel might be offline") }
 
         if(!data.success || data.success == false || data.player == null || data.player == undefined || !data.player || data.player.stats == undefined) return m.channel.send("Invalid Something");
-        if(data.player.stats.TNTGames == undefined) return sendErrorEmbed(m.channel,`Unknown Player`,`Player has no Data in Hypixel's TNT Database`)
 
         let received = ""
         try {received = await fs.readFileSync('../global/IDS.json')} catch{ console.log("Failure! File Invalid"); console.log("Terminating Program - Code 005"); process.exit(); }
@@ -1185,7 +1032,7 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
             if (uuidInput.id.length > 20) {
                 user = await hypixelFetch(`player?uuid=${uuidInput.id}`)
             }
-            else {    
+            else {
                 user = await hypixelFetch(`player?name=${args[0]}`)
             }
         }
@@ -1195,10 +1042,6 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
         if (!user.success && user.cause == "Invalid API key") {return sendErrorEmbed(m.channel,"Im too busy!", "Please wait a few seconds and try again")}
 
         if(!user.success || user.success == false || user.player == null || user.player == undefined || !user.player || user.player.stats == undefined) return sendErrorEmbed(m.channel, `Unknown Player`, `Player has no data in Hypixel's Database`);
-        if(user.player.stats.TNTGames == undefined) return sendErrorEmbed(m.channel,`Unknown Player`,`Player has no Data in Hypixel's TNT Games Database`)
-        
-        
-
 
         //if (idData[m.author.id] == user.player.uuid) {
         //    return m.channel.send("This ign has already been set to this account!")
@@ -1303,9 +1146,8 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
         if (await db.get(`monthly.${user.player.uuid}`) == undefined) {
             await setMonthlyDB(user.player, user.player.uuid)
         }
-        if(user.player.stats.TNTGames == undefined) return sendErrorEmbed(m.channel,`Unknown Player`,`Player has no Data in Hypixel's TNT Database`)
     
-        const TNTGames = user.player.stats.TNTGames
+        const TNTGames = replaceError(user.player.stats.TNTGames, {})
 
         data = await db.get(`cache.${m.author.id}.${user.player.uuid}`)
         if (data == undefined) {
@@ -1386,9 +1228,9 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
                 .setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green)
                 .addField(`**Wins**`, displayOldNewNumbers(data.bow.w, replaceError(TNTGames.wins_bowspleef, 0)), true)
                 .addField(`**Deaths**`, displayOldNewNumbers(data.bow.l, replaceError(TNTGames.deaths_bowspleef, 0)), true)
-                .addField(`**Kills**`, displayOldNewNumbers(data.bow.k, replaceError(TNTGames.kills_bowspleef, 0)), true)
                 .addField(`**Shots**`, displayOldNewNumbers(data.bow.shots, replaceError(TNTGames.tags_bowspleef, 0)), true)
                 .addField(`**W/L**`, displayOldNewNumbers(Math.round(data.bow.wl*1000)/1000, Math.round(ratio(TNTGames.wins_bowspleef, TNTGames.deaths_bowspleef)*1000)/1000), true)
+                .addField(`**Shots/Game**`, displayOldNewNumbers(Math.round(ratio(data.bow.shots, data.bow.w + data.bow.l)*1000)/1000, Math.round(ratio(replaceError(TNTGames.tags_bowspleef, 0),replaceError(TNTGames.wins_bowspleef, 0) + replaceError(TNTGames.deaths_bowspleef, 0))*1000)/1000), true)
                 .setDescription(`()s show changes since your last ${prefix}stats call for this user`)
             if (reset) {
                 await setBowDB(user.player, user.player.uuid, m.author.id)
@@ -1472,13 +1314,6 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
                 var runRecordDisplay = min_sec(TNTGames.record_tntrun)
             }
 
-            if (TNTGames.record_pvprun == undefined) {var pvpRecordDifference = 0} else {var pvpRecordDifference = TNTGames.record_pvprun - data.allTNT.record_pvprun}
-            if (pvpRecordDifference > 0) {
-                var pvpRecordDisplay = min_sec(TNTGames.record_pvprun) + " (+" + min_sec(pvpRecordDifference) + ")"
-            } else {
-                var pvpRecordDisplay = min_sec(TNTGames.record_pvprun)
-            }
-
             if (user.player.achievements.tntgames_tnt_triathlon == undefined) {var playTimeDifference = 0} else {var playTimeDifference = user.player.achievements.tntgames_tnt_triathlon - data.allTNT.time}
             
             if (playTimeDifference > 0) {
@@ -1506,8 +1341,8 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
                 .addField(`**Bowspleef Wins**`, displayOldNewNumbers(data.allTNT.bow_wins, replaceError(TNTGames.wins_bowspleef, 0)), true)
                 .addField(`**Wizards Wins**`, displayOldNewNumbers(data.allTNT.wizards_wins, replaceError(TNTGames.wins_capture, 0)), true)
                 .addField(`**Wizards Kills**`, displayOldNewNumbers(data.allTNT.wizards_kills  , replaceError(TNTGames.kills_capture, 0)), true)
-                .addField(`**PVP Run Record**`, pvpRecordDisplay, true)
                 .addField(`**PVP Run Wins**`, displayOldNewNumbers(data.allTNT.pvp_wins, replaceError(TNTGames.wins_pvprun, 0)), true)
+                .addField(`**PVP Run Kills**`, displayOldNewNumbers(data.allTNT.pvp_kills, replaceError(TNTGames.kills_pvprun, 0)), true)
                 .setDescription(`()s show changes since your last ${prefix}stats call for this user`)
 
             if (reset) {
@@ -1527,9 +1362,9 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
                 .setTimestamp()
                 .setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green)
                 .addField(`**Wins**`, displayOldNewNumbers(replaceError(data.duels.w, 0), replaceError(user.player.stats.Duels.bowspleef_duel_wins, 0)), true)
-                .addField(`**Losses**`, displayOldNewNumbers(replaceError(data.duels.l, 0), replaceError(user.player.stats.Duels.bowspleef_duel_rounds_played, 0)-replaceError(user.player.stats.Duels.bowspleef_duel_wins, 0),), true)
+                .addField(`**Losses**`, displayOldNewNumbers(replaceError(data.duels.l, 0), replaceError(user.player.stats.Duels.bowspleef_duel_deaths, 0)), true)
                 .addField(`**Shots**`, displayOldNewNumbers(replaceError(data.duels.shots, 0), replaceError(user.player.stats.Duels.bowspleef_duel_bow_shots, 0)), true)
-                .addField(`**W/L**`, displayOldNewNumbers(replaceError(data.duels.wl, 0), ratio(user.player.stats.Duels.bowspleef_duel_wins, replaceError(user.player.stats.Duels.bowspleef_duel_rounds_played, 0)-replaceError(user.player.stats.Duels.bowspleef_duel_wins, 0))), true)
+                .addField(`**W/L**`, displayOldNewNumbers(replaceError(data.duels.wl, 0), ratio(user.player.stats.Duels.bowspleef_duel_wins, user.player.stats.Duels.bowspleef_duel_deaths)), true)
                 .addField(`**Best Streak**`, displayOldNewNumbers(replaceError(data.duels.streak, 0), replaceError(user.player.stats.Duels.best_tnt_games_winstreak, 0)), true)
                 .addField(`**Current Streak**`, displayOldNewNumbers(replaceError(data.duels.currentStreak, 0), replaceError(user.player.stats.Duels.current_tnt_games_winstreak, 0)), true)
                 .setDescription(`()s show changes since your last ${prefix}stats call for this user`)
@@ -1665,12 +1500,12 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
         idData = JSON.parse(received)
 
         if (m.author.id in idData) {
-            var user = await hypixelFetch(`player?uuid=${idData[m.author.id]}`)
+            user = await hypixelFetch(`player?uuid=${idData[m.author.id]}`)
         }
+
         if(user == "API ERROR") { return m.channel.send("API Connection Issues, Hypixel might be offline") }
 
         if(!user || !user.success || user.success == false || user.player == null || user.player == undefined || !user.player || user.player.stats == undefined) return sendErrorEmbed(m.channel, `Unknown Player`, `Player has no data in Hypixel's Database`);
-        if(user.player.stats.TNTGames == undefined) return sendErrorEmbed(m.channel,`Unknown Player`,`Player has no Data in Hypixel's TNT Database`)
 
         await setCacheDB(user.player, user.player.uuid, m.author.id)
         return m.channel.send(`Reset counters for you!`)
@@ -1925,7 +1760,7 @@ To those who havent figured out the newest command (added in v4.0), you can do /
                 .setDescription(`Showing changes since: ${timeConverter(Math.floor(data.time))}`)
             
             if (settings.verbose) {
-                embed.addField(`**Airtime**`, min_sec(Math.floor((replaceError(TNTGames.air_time_capture, 0) - data.wizards.air)/1200)),)
+                embed.addField(`**Airtime**`, min_sec(Math.floor((replaceError(TNTGames.air_time_capture, 0) - data.wizards.air)/1200)), true)
                     .addField(`**KADR**`, Math.round(ratio(replaceError(TNTGames.kills_capture, 0) + replaceError(TNTGames.assists_capture, 0) - data.wizards.k - data.wizards.a, replaceError(TNTGames.deaths_capture, 0) - data.wizards.d)*1000)/1000, true)
                     .addField(`**K/W**`, Math.round(ratio(replaceError(TNTGames.kills_capture, 0) - data.wizards.k, replaceError(TNTGames.wins_capture, 0) - data.wizards.w)*1000)/1000, true)
                     .addField(`**Fire**`, replaceError(TNTGames.new_firewizard_kills, 0) - data.wizardKills.f_k, true)
@@ -1956,8 +1791,8 @@ To those who havent figured out the newest command (added in v4.0), you can do /
                 .addField(`**TNT Run Wins**`, replaceError(TNTGames.wins_tntrun, 0) - data.allTNT.run_wins, true)
                 .addField(`**Bowspleef Wins**`, replaceError(TNTGames.wins_bowspleef, 0) - data.allTNT.bow_wins, true)
                 .addField(`**Wizards Wins**`, replaceError(TNTGames.wins_capture, 0) - data.allTNT.wizards_wins, true)
-                .addField(`**Wizards Kills**`, replaceError(TNTGames.kills_capture, 0) - data.allTNT.wizards_kills, true)
                 .addField(`**PVP Run Wins**`, replaceError(TNTGames.wins_pvprun, 0) - data.allTNT.pvp_wins, true)
+                .addField(`**Duel Wins**`, replaceError(user.player.stats.Duels.bowspleef_duel_wins, 0), true)
                 .setDescription(`Showing changes since: ${timeConverter(Math.floor(data.time))}`)
             return m.channel.send(embed)
         }
@@ -1973,9 +1808,9 @@ To those who havent figured out the newest command (added in v4.0), you can do /
                 .setTimestamp()
                 .setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green)
                 .addField(`**Wins**`, replaceError(user.player.stats.Duels.bowspleef_duel_wins, 0) - data.duels.w, true)
-                .addField(`**Losses**`, replaceError(user.player.stats.Duels.bowspleef_duel_rounds_played, 0)-replaceError(user.player.stats.Duels.bowspleef_duel_wins, 0) - data.duels.l, true)
+                .addField(`**Losses**`, replaceError(user.player.stats.Duels.bowspleef_duel_deaths, 0) - data.duels.l, true)
                 .addField(`**Shots**`, replaceError(user.player.stats.Duels.bowspleef_duel_bow_shots, 0) - data.duels.shots, true)
-                .addField(`**W/L**`, Math.round(ratio(replaceError(user.player.stats.Duels.bowspleef_duel_wins, 0) - data.duels.w, replaceError(user.player.stats.Duels.bowspleef_duel_rounds_played, 0)-replaceError(user.player.stats.Duels.bowspleef_duel_wins, 0)-data.duels.l)*1000)/1000, true)
+                .addField(`**W/L**`, Math.round(ratio(replaceError(user.player.stats.Duels.bowspleef_duel_wins, 0) - data.duels.w, replaceError(user.player.stats.Duels.bowspleef_duel_deaths, 0) - data.duels.l)*1000)/1000, true)
                 .setDescription(`Showing changes since: ${timeConverter(Math.floor(data.time))}`)
             return m.channel.send(embed)
         }
