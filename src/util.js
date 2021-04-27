@@ -33,11 +33,12 @@ const errorEmbed = (error = "Something went wrong...", description = "") => {
 // SETUP CONFIG
 const config = require("../config.json");
 const key = config.hypixel_key;
-const nodeFetch = require("node-fetch");
+const fetch = require("node-fetch");
 
 // TODO: Caching with keyv (npm install keyv)
-const hypixelFetch = query => nodeFetch(`https://api.hypixel.net/${query}&key=${key}`).then(response => response.json());
-const mojangUUIDFetch = query => nodeFetch(`https://api.mojang.com/users/profiles/minecraft/${query}`).then(response => (response.status === 204 ? null : response.json()));
+const hypixelFetch = query => fetch(`https://api.hypixel.net/${query}&key=${key}`).then(response => response.json());
+const mojangUUIDFetch = query => fetch(`https://api.mojang.com/users/profiles/minecraft/${query}`).then(response => (response.status === 204 ? null : response.json()));
+const mojangNameFetch = query => fetch(`https://api.mojang.com/user/profiles/${query}/names`).then(response => (response.status === 204 ? null : response.json()));
 
 const randInt = (max, min) => Math.floor(Math.random() * (max - min + 1) + min);
 
@@ -124,5 +125,5 @@ module.exports = {
 	embedFooter, randomChoice, noop, errorEmbed,
 	hypixelFetch, mojangUUIDFetch, ChatCodes,
 	ChatColor, booleanPhrases, ratio, formatTimestamp,
-	randInt, getMentioned, successEmbed
+	randInt, getMentioned, successEmbed, mojangNameFetch
 };

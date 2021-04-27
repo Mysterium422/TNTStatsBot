@@ -481,26 +481,7 @@ client.on("message", async message => {
 		await setCacheDB(user.player, user.player.uuid, message.author.id);
 		return message.channel.send(`Reset counters for you!`);
 	} else if (command.toLowerCase() === "account") {
-		if (args.length != 1) {
-			return message.channel.send("Incorrect amount of arguments");
-		}
-		if (!args[0].includes("@")) {
-			return message.channel.send("First Arg must be a ping");
-		}
-		try {
-			received = await fs.readFileSync("../global/IDS.json");
-		} catch (e) {
-			console.warn("File is invalid!");
-			process.exit();
-		}
-		const idData = JSON.parse(received);
 
-		if (args[0].replace("<", "").replace(">", "").replace("@", "").replace("!", "") in idData) {
-			message.channel.send("https://namemc.com/profile/" + idData[args[0].replace("<", "").replace(">", "").replace("@", "").replace("!", "")]);
-		} else {
-			message.channel.send("No account registered to this ID");
-		}
-		return;
 	} else if (command.toLowerCase() === "mysterium") {
 		return message.channel.send("Hey! This bot was coded by Mysterium&Lebster!\nReport Bugs here: https://discord.gg/7Qb5xuJD4C\nHere's my website (WIP): <https://mysterium.me>");
 	} else if (command.toLowerCase() === "announcement") {
