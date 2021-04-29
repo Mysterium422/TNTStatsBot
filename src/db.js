@@ -19,6 +19,7 @@ const createVerifiedTable = () =>
 			return knex.schema.createTable(TABLES.VerifiedUsers, table => {
 				table.string("uuid").primary();
 				table.string("discord").notNullable();
+				table.json("cache").defaultTo(null);
 			});
 		}
 	});
