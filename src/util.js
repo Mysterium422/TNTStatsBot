@@ -39,7 +39,7 @@ const fetch = require("node-fetch");
 const hypixelFetch = query => fetch(`https://api.hypixel.net/${query}&key=${key}`).then(response => response.json());
 const mojangUUIDFetch = query => fetch(`https://api.mojang.com/users/profiles/minecraft/${query}`).then(response => (response.status === 204 ? null : response.json()));
 const mojangNameFetch = query => fetch(`https://api.mojang.com/user/profiles/${query}/names`).then(response => (response.status === 204 ? null : response.json()));
-const randInt = (max, min) => Math.floor(Math.random() * (max - min + 1) + min);
+const defaultTo = (v, def=null) => typeof v === "undefined" ? def : v;
 
 const formatTimestamp = timestamp =>
 	new Date(timestamp).toLocaleString("default", {
@@ -155,69 +155,64 @@ const hypixelToStandard = D => {
 
 	const result = {
 		run: {
-			record: TNT.record_tntrun,
-			wins: TNT.wins_tntrun,
-			deaths: TNT.deaths_tntrun,
-			potions: TNT.run_potions_splashed_on_players,
-			WL: ratio(TNT.wins_tntrun, TNT.deaths_tntrun)
+			record:   defaultTo(TNT.record_tntrun, 0),
+			wins:     defaultTo(TNT.wins_tntrun, 0),
+			deaths:   defaultTo(TNT.deaths_tntrun, 0),
+			potions:  defaultTo(TNT.run_potions_splashed_on_players, 0),
+			WL:       defaultTo(ratio(TNT.wins_tntrun, TNT.deaths_tntrun), 0)
 		},
 		pvp: {
-			record: TNT.record_pvprun,
-			wins: TNT.wins_pvprun,
-			deaths: TNT.deaths_pvprun,
-			kills: TNT.kills_pvprun,
-			WL: ratio(TNT.wins_pvprun, TNT.deaths_pvprun),
-			KD: ratio(TNT.kills_pvprun, TNT.deaths_pvprun)
+			record:   defaultTo(TNT.record_pvprun, 0),
+			wins:     defaultTo(TNT.wins_pvprun, 0),
+			deaths:   defaultTo(TNT.deaths_pvprun, 0),
+			kills:    defaultTo(TNT.kills_pvprun, 0),
+			WL:       defaultTo(ratio(TNT.wins_pvprun, TNT.deaths_pvprun), 0),
+			KD:       defaultTo(ratio(TNT.kills_pvprun, TNT.deaths_pvprun), 0)
 		},
 		bow: {
-			wins: TNT.wins_bowspleef,
-			deaths: TNT.deaths_bowspleef,
-			shots: TNT.tags_bowspleef,
-			kills: TNT.kills_bowspleef,
-			WL: ratio(TNT.wins_bowspleef, TNT.deaths_bowspleef)
+			wins:     defaultTo(TNT.wins_bowspleef, 0),
+			deaths:   defaultTo(TNT.deaths_bowspleef, 0),
+			shots:    defaultTo(TNT.tags_bowspleef, 0),
+			kills:    defaultTo(TNT.kills_bowspleef, 0),
+			WL:       defaultTo(ratio(TNT.wins_bowspleef, TNT.deaths_bowspleef), 0)
 		},
 		tag: {
-			wins: TNT.wins_tntag,
-			kills: TNT.kills_tntag,
-			tags: D.achievements.tntgames_clinic,
-			tk: ratio(D.achievements.tntgames_clinic, TNT.kills_tntag),
-			KW: ratio(TNT.kills_tntag, TNT.wins_tntag)
+			wins:     defaultTo(TNT.wins_tntag, 0),
+			kills:    defaultTo(TNT.kills_tntag, 0),
+			tags:     defaultTo(D.achievements.tntgames_clinic, 0),
+			tk:       defaultTo(ratio(D.achievements.tntgames_clinic, TNT.kills_tntag), 0),
+			KW:       defaultTo(ratio(TNT.kills_tntag, TNT.wins_tntag), 0)
 		},
 		wizards: {
-			wins: TNT.wins_capture,
-			assists: TNT.assists_capture,
-			deaths: TNT.deaths_capture,
-			points: TNT.points_capture,
-			KD: ratio(TNT.kills_capture, TNT.deaths_capture),
-			KAD: ratio(TNT.kills_capture + TNT.assists_capture, TNT.deaths_capture),
-			airtime: TNT.air_time_capture,
-			KW: ratio(TNT.kills_capture, TNT.wins_capture),
+			wins:     defaultTo(TNT.wins_capture, 0),
+			assists:  defaultTo(TNT.assists_capture, 0),
+			deaths:   defaultTo(TNT.deaths_capture, 0),
+			points:   defaultTo(TNT.points_capture, 0),
+			KD:       defaultTo(ratio(TNT.kills_capture, TNT.deaths_capture), 0),
+			KAD:      defaultTo(ratio(TNT.kills_capture + TNT.assists_capture, TNT.deaths_capture), 0),
+			airtime:  defaultTo(TNT.air_time_capture, 0),
+			KW:       defaultTo(ratio(TNT.kills_capture, TNT.wins_capture), 0),
 			kills: {
-				total: TNT.kills_capture,
-				fire: TNT.new_firewizard_kills,
-				ice: TNT.new_icewizard_kills,
-				wither: TNT.new_witherwizard_kills,
-				kinetic: TNT.new_kineticwizard_kills,
-				blood: TNT.new_bloodwizard_kills,
-				toxic: TNT.new_toxicwizard_kills,
-				hydro: TNT.new_hydrowizard_kills,
-				ancient: TNT.new_ancientwizard_kills,
-				storm: TNT.new_stormwizard_kills
+				total:   defaultTo(TNT.kills_capture, 0),
+				fire:    defaultTo(TNT.new_firewizard_kills, 0),
+				ice:     defaultTo(TNT.new_icewizard_kills, 0),
+				wither:  defaultTo(TNT.new_witherwizard_kills, 0),
+				kinetic: defaultTo(TNT.new_kineticwizard_kills, 0),
+				blood:   defaultTo(TNT.new_bloodwizard_kills, 0),
+				toxic:   defaultTo(TNT.new_toxicwizard_kills, 0),
+				hydro:   defaultTo(TNT.new_hydrowizard_kills, 0),
+				ancient: defaultTo(TNT.new_ancientwizard_kills, 0),
+				storm:   defaultTo(TNT.new_stormwizard_kills, 0)
 			}
 		},
 		overall: {
-			coins: TNT.coins,
-			wins: TNT.wins,
-			streak: TNT.winstreak
+			coins:    defaultTo(TNT.coins, 0),
+			wins:     defaultTo(TNT.wins, 0),
+			streak:   defaultTo(TNT.winstreak, 0)
 		},
 		duels: {
-			wins: 0,
-			deaths: 0,
-			losses: 0,
-			shots: 0,
-			bestWS: 0,
-			currentWS: 0,
-			WL: 0
+			wins: 0, deaths: 0, losses: 0,
+			shots: 0, bestWS: 0, currentWS: 0, WL: 0
 		}
 	};
 
