@@ -235,6 +235,6 @@ module.exports = {
 	embedFooter, randomChoice, noop, errorEmbed,
 	hypixelFetch, mojangUUIDFetch, ChatCodes,
 	ChatColor, booleanPhrases, ratio, formatTimestamp,
-	randInt, getMentioned, successEmbed, mojangNameFetch, getAvatar,
+	getMentioned, successEmbed, mojangNameFetch, getAvatar,
 	getStats, hypixelToStandard
 };

@@ -4,7 +4,7 @@ const Discord = require("discord.js"),
 	db = require("./db"),
 	path = require("path");
 
-const {mojangUUIDFetch, hypixelFetch, randInt, replaceError, booleanPhrases, getMentioned, errorEmbed} = require("./util.js");
+const {mojangUUIDFetch, hypixelFetch, replaceError, booleanPhrases, getMentioned, errorEmbed} = require("./util.js");
 
 const client = new Discord.Client();
 const config = require("../config.json");
