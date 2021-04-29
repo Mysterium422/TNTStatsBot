@@ -39,9 +39,7 @@ const fetch = require("node-fetch");
 const hypixelFetch = query => fetch(`https://api.hypixel.net/${query}&key=${key}`).then(response => response.json());
 const mojangUUIDFetch = query => fetch(`https://api.mojang.com/users/profiles/minecraft/${query}`).then(response => (response.status === 204 ? null : response.json()));
 const mojangNameFetch = query => fetch(`https://api.mojang.com/user/profiles/${query}/names`).then(response => (response.status === 204 ? null : response.json()));
-
 const randInt = (max, min) => Math.floor(Math.random() * (max - min + 1) + min);
-
 
 const formatTimestamp = timestamp =>
 	new Date(timestamp).toLocaleString("default", {
@@ -121,10 +119,40 @@ const successEmbed = (author, description="", title="Success", thumbnail=null) =
 };
 
 const getAvatar = user => `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}?size=128`;
+const getStats = async uuid => {
+	const data = await hypixelFetch("player?uuid=" + uuid);
+	if (data === null) {
+		return {
+			success: false,
+			error: ["Failed to reach Hypixel API", "Hypixel could be offline?"]
+		};
+	} else if (!data.success) {
+		return {
+			success: false,
+			error: ["Something went wrong", data.cause]
+		};
+	} else if (data.player === null) {
+		return {
+			success: false,
+			error: ["Invalid playername/uuid", `${playername} has never logged on to Hypixel!`]
+		};
+	} else if (!("TNTGames" in data.player.stats)) {
+		return {
+			success: false,
+			error: ["Invalid playername/uuid", `${playername} has never played TNT Games!`]
+		};
+	}
+
+	return {
+		success: true,
+		user: data
+	};
+};
 
 module.exports = {
 	embedFooter, randomChoice, noop, errorEmbed,
 	hypixelFetch, mojangUUIDFetch, ChatCodes,
 	ChatColor, booleanPhrases, ratio, formatTimestamp,
-	randInt, getMentioned, successEmbed, mojangNameFetch, getAvatar
+	randInt, getMentioned, successEmbed, mojangNameFetch, getAvatar,
+	getStats
 };

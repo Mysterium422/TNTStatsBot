@@ -1,10 +1,8 @@
 const db = require("../db");
-const {errorEmbed, getMentioned, mojangUUIDFetch} = require("../util.js");
+const {errorEmbed, getMentioned, mojangUUIDFetch, hypixelFetch} = require("../util.js");
 
 module.exports = {
 	run: async (client, message, args) => {
-		// TODO: Cleanup
-
 		let uuid = null;
 		const handler = async discord => {
 			const rows = await db.select(db.TABLES.VerifiedUsers, {discord});
@@ -31,6 +29,11 @@ module.exports = {
 		if (uuid === null) {
 			return message.channel.send(errorEmbed("Invalid user", "That player has no account linked!"));
 		}
+
+		const data = await getStats(uuid);
+		// TODO: Error handling
+		 
+
 	},
 	aliases: []
 };

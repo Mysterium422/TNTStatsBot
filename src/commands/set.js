@@ -1,7 +1,7 @@
 const db = require("../db");
 const strings = require("../strings.js");
 const config = require("../../config.json");
-const {errorEmbed, hypixelFetch, mojangUUIDFetch, getMentioned} = require("../util.js");
+const {errorEmbed, hypixelFetch, mojangUUIDFetch, getMentioned, getStats} = require("../util.js");
 
 module.exports = {
 	run: async (client, message, args, prefix) => {
@@ -46,22 +46,17 @@ module.exports = {
 		}
 
 		if (message.author.id !== config.owner_id) {
-			const user = await hypixelFetch("player?uuid=" + uuid);
-			if (user === null) {
-				return message.channel.send(errorEmbed("Failed to reach Hypixel API", "Hypixel could be offline?"));
-			} else if (!user.success) {
-				return message.channel.send(errorEmbed("Something went wrong", user.cause));
-			} else if (user.player === null) {
-				return message.channel.send(errorEmbed("Invalid playername/uuid", `${playername} has never logged on to Hypixel!`));
-			} else if (!("TNTGames" in user.player.stats)) {
-				return message.channel.send(errorEmbed("Invalid playername/uuid", `${playername} has never played TNT Games!`));
+			const data = await getStats(uuid);
+			
+			if (!data.success) {
+				return message.channel.send(errorEmbed(...data.error));
 			} else if (
-				typeof user.player.socialMedia === "undefined" ||
-				typeof user.player.socialMedia.links === "undefined" ||
-				typeof user.player.socialMedia.links.DISCORD === "undefined"
+				typeof data.user.player.socialMedia === "undefined" ||
+				typeof data.user.player.socialMedia.links === "undefined" ||
+				typeof data.user.player.socialMedia.links.DISCORD === "undefined"
 			) {
 				return message.channel.send(errorEmbed("Discord account not linked", strings.unlinked));
-			} else if (user.player.socialMedia.links.DISCORD !== message.author.tag) {
+			} else if (data.user.player.socialMedia.links.DISCORD !== message.author.tag) {
 				return message.channel.send(errorEmbed("Discord account incorrect", `${playername} has their Hypixel profile linked to a different discord user. Did you link the correct discord account?`));
 			}
 		}
