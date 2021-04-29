@@ -180,6 +180,28 @@ const hypixelToStandard = D => {
 			tags: data.achievements.tntgames_clinic,
 			tk: ratio(data.achievements.tntgames_clinic, TNT.kills_tntag),
 			KW: ratio(TNT.kills_tntag, TNT.wins_tntag)
+		},
+		wizards: {
+			wins: TNT.wins_capture,
+			assists: TNT.assists_capture,
+			deaths: TNT.deaths_capture,
+			points: TNT.points_capture,
+			KD: ratio(TNT.kills_capture, TNT.deaths_capture),
+			KAD: ratio(TNT.kills_capture + TNT.assists_capture, TNT.deaths_capture),
+			airtime: TNT.air_time_capture,
+			KW: ratio(TNT.kills_capture, TNT.wins_capture),
+			kills: {
+				total: TNT.kills_capture,
+				fire: TNT.new_firewizard_kills,
+				ice: TNT.new_icewizard_kills,
+				wither: TNT.new_witherwizard_kills,
+				kinetic: TNT.new_kineticwizard_kills,
+				blood: TNT.new_bloodwizard_kills,
+				toxic: TNT.new_toxicwizard_kills,
+				hydro: TNT.new_hydrowizard_kills,
+				ancient: TNT.new_ancientwizard_kills,
+				storm: TNT.new_stormwizard_kills
+			}
 		}
 	};
 };
