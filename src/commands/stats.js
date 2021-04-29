@@ -29,10 +29,8 @@ module.exports = {
 		}
 
 		if (uuid === null) {
-			return message.channel.send(errorEmbed("User has no account linked"));
+			return message.channel.send(errorEmbed("Invalid user", "That player has no account linked!"));
 		}
-
-		debugger;
 	},
 	aliases: []
 };
