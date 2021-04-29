@@ -19,7 +19,7 @@ const createVerifiedTable = () =>
 			return knex.schema.createTable(TABLES.VerifiedUsers, table => {
 				table.string("uuid").primary();
 				table.string("discord").notNullable();
-				table.boolean("alt").notNullable().defaultTo(true);
+				table.boolean("alt").notNullable();
 				table.json("cache").defaultTo(null);
 			});
 		}
@@ -52,11 +52,22 @@ const select = (database, query) => knex(database).where(query);
 const del = (database, query) => knex(database).where(query).del();
 
 const setMain = async (uuid, discord) => {
-	const existing = await select(TABLES.VerifiedUsers, {discord});
-	debugger;
+	const existing = await select(TABLES.VerifiedUsers, {discord}),
+		  mains = existing.filter(row => !row.alt);
+
+	if (mains.length === 0 || existing.length === 0) {
+		return add(TABLES.VerifiedUsers, {uuid, discord, alt: false});
+	} else if (mains.length === 1) {
+		return update(TABLES.VerifiedUsers, mains[0], {uuid});
+	} else {
+		// TODO: Yikes! Multiple main accounts somehow
+		console.error("Multiple main accounts!");
+		process.exit(0);
+	}
 };
 
-const addAlt = (uuid, discord) => update(TABLES.VerifiedUsers, {uuid}, {discord, alt: true});
+const addAlt = (uuid, discord) =>
+	update(TABLES.VerifiedUsers, {uuid}, {discord, alt: true});
 
 const linkChannelPreifx = async (channel, prefix, game) => {
 	const selector = {guild: channel.guild.id, channel: channel.id},
@@ -64,7 +75,7 @@ const linkChannelPreifx = async (channel, prefix, game) => {
 
 	const updated = await update(TABLES.ConfiguredChannels, selector, newValues);
 	if (updated === 0) {
-		return await add(TABLES.ConfiguredChannels, {...selector, ...newValues});
+		return add(TABLES.ConfiguredChannels, {...selector, ...newValues});
 	} else return updated;
 };
 
