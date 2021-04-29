@@ -32,7 +32,7 @@ module.exports = {
 
 		const data = await getStats(uuid);
 		if (!data.success) return message.channel.send(errorEmbed(...data.error));
-		const stats = hypixelToStandard(data.user.player.stats.TNTGames);
+		const stats = hypixelToStandard(data.user.player);
 
 		debugger;
 	},

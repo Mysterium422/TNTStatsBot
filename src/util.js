@@ -149,30 +149,40 @@ const getStats = async uuid => {
 	};
 };
 
-const hypixelToStandard = stats => ({
-	run: {
-		record: stats.record_tntrun,
-		wins: stats.wins_tntrun,
-		deaths: stats.deaths_tntrun,
-		potions: stats.run_potions_splashed_on_players,
-		WL: ratio(stats.wins_tntrun, stats.deaths_tntrun)
-	},
-	pvp: {
-		record: stats.record_pvprun,
-		wins: stats.wins_pvprun,
-		deaths: stats.deaths_pvprun,
-		kills: stats.kills_pvprun,
-		WL: ratio(stats.wins_pvprun, stats.deaths_pvprun),
-		KD: ratio(stats.kills_pvprun, stats.deaths_pvprun)
-	},
-	bow: {
-		wins: stats.wins_bowspleef,
-		deaths: stats.deaths_bowspleef,
-		shots: stats.tags_bowspleef,
-		kills: stats.kills_bowspleef,
-		WL: ratio(stats.wins_bowspleef, stats.deaths_bowspleef)
-	}
-});
+const hypixelToStandard = D => {
+	const TNT = D.stats.TNTGames;
+	return {
+		run: {
+			record: TNT.record_tntrun,
+			wins: TNT.wins_tntrun,
+			deaths: TNT.deaths_tntrun,
+			potions: TNT.run_potions_splashed_on_players,
+			WL: ratio(TNT.wins_tntrun, TNT.deaths_tntrun)
+		},
+		pvp: {
+			record: TNT.record_pvprun,
+			wins: TNT.wins_pvprun,
+			deaths: TNT.deaths_pvprun,
+			kills: TNT.kills_pvprun,
+			WL: ratio(TNT.wins_pvprun, TNT.deaths_pvprun),
+			KD: ratio(TNT.kills_pvprun, TNT.deaths_pvprun)
+		},
+		bow: {
+			wins: TNT.wins_bowspleef,
+			deaths: TNT.deaths_bowspleef,
+			shots: TNT.tags_bowspleef,
+			kills: TNT.kills_bowspleef,
+			WL: ratio(TNT.wins_bowspleef, TNT.deaths_bowspleef)
+		},
+		tag: {
+			wins: TNT.wins_tntag,
+			kills: TNT.kills_tntag,
+			tags: data.achievements.tntgames_clinic,
+			tk: ratio(data.achievements.tntgames_clinic, TNT.kills_tntag),
+			KW: ratio(TNT.kills_tntag, TNT.wins_tntag)
+		}
+	};
+};
 
 module.exports = {
 	embedFooter, randomChoice, noop, errorEmbed,
