@@ -7,7 +7,7 @@ module.exports = {
 		const discordToBot = Date.now() - message.createdTimestamp;
 
 		let START = performance.now();
-		await db.all(db.TABLES.VerifiedUsers);
+		await db.select(db.TABLES.ConfiguredChannels, {guild: message.guild.id, channel: channel.id});
 		const botToDB = performance.now() - START;
 
 		START = performance.now();
