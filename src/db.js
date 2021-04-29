@@ -57,12 +57,6 @@ const linkUUID = async (uuid, discord) => {
 	} else return updated;
 };
 
-const getLinkedAccounts = async discord => {
-	const rows = await db.select(TABLES.VerifiedUsers, {discord});
-	if (rows.length === 0) return null;
-	return rows;
-};
-
 const linkChannelPreifx = async (channel, prefix, game) => {
 	const selector = {guild: channel.guild.id, channel: channel.id},
 		  newValues = {prefix, game};
@@ -77,6 +71,5 @@ module.exports = {
 	add, all, update, select, del, reset, // General
 	TABLES, // enum
 	linkUUID, linkChannelPreifx, // Helpers
-	createVerifiedTable, createChannelTable, // Create tables
-	getLinkedAccounts
+	createVerifiedTable, createChannelTable // Create tables
 };
