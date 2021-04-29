@@ -3,7 +3,7 @@ const strings = require("../strings.js");
 const {errorEmbed, successEmbed} = require("../util.js");
 
 module.exports = {
-	run: async (client, message, [game, ...prefix]) => {
+	run: (client, message, [game, ...prefix]) => {
 		const configurationTool = {
 			all: "All TNT Games",
 			wizards: "TNT Wizards",

@@ -156,6 +156,14 @@ const hypixelToStandard = stats => ({
 		deaths: stats.deaths_tntrun,
 		potions: stats.run_potions_splashed_on_players,
 		WL: ratio(stats.wins_tntrun, stats.deaths_tntrun)
+	},
+	pvp: {
+		record: stats.record_pvprun,
+		wins: stats.wins_pvprun,
+		deaths: stats.deaths_pvprun,
+		kills: stats.kills_pvprun,
+		WL: ratio(stats.wins_pvprun, stats.deaths_pvprun),
+		KD: ratio(stats.kills_pvprun, stats.deaths_pvprun)
 	}
 });
 
