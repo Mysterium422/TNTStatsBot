@@ -1,5 +1,5 @@
 const db = require("../db");
-const {errorEmbed, getMentioned, mojangUUIDFetch, getLinkedAccounts} = require("../util.js");
+const {errorEmbed, getMentioned, mojangUUIDFetch} = require("../util.js");
 
 module.exports = {
 	run: async (client, message, args) => {
@@ -7,7 +7,7 @@ module.exports = {
 
 		let uuid = null;
 		const handler = id => {
-			const accounts = getLinkedAccounts(id);
+			const accounts = db.getLinkedAccounts(id);
 			if (accounts === null) return message.channel.send(errorEmbed("User has no account linked"));
 
 			// TODO: Inform of multiple linked accounts?
