@@ -180,7 +180,7 @@ const hypixelToStandard = D => {
 			wins:     defaultTo(TNT.wins_tntag, 0),
 			kills:    defaultTo(TNT.kills_tntag, 0),
 			tags:     defaultTo(D.achievements.tntgames_clinic, 0),
-			tk:       defaultTo(ratio(D.achievements.tntgames_clinic, TNT.kills_tntag), 0),
+			TK:       defaultTo(ratio(D.achievements.tntgames_clinic, TNT.kills_tntag), 0),
 			KW:       defaultTo(ratio(TNT.kills_tntag, TNT.wins_tntag), 0)
 		},
 		wizards: {
