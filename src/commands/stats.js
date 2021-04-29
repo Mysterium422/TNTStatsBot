@@ -1,5 +1,5 @@
 const db = require("../db");
-const {errorEmbed, getMentioned, mojangUUIDFetch, hypixelFetch} = require("../util.js");
+const {errorEmbed, getMentioned, mojangUUIDFetch, getStats} = require("../util.js");
 
 module.exports = {
 	run: async (client, message, args) => {
@@ -31,9 +31,9 @@ module.exports = {
 		}
 
 		const data = await getStats(uuid);
-		// TODO: Error handling
-		 
+		if (!data.success) return message.channel.send(errorEmbed(...data.error));
 
+		debugger;
 	},
 	aliases: []
 };

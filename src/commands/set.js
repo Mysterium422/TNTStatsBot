@@ -1,7 +1,7 @@
 const db = require("../db");
 const strings = require("../strings.js");
 const config = require("../../config.json");
-const {errorEmbed, hypixelFetch, mojangUUIDFetch, getMentioned, getStats} = require("../util.js");
+const {errorEmbed, mojangUUIDFetch, getMentioned, getStats} = require("../util.js");
 
 module.exports = {
 	run: async (client, message, args, prefix) => {
