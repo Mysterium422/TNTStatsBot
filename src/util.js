@@ -152,8 +152,8 @@ const getStats = async uuid => {
 const hypixelToStandard = D => {
 	const TNT = D.stats.TNTGames,
 		  DUEL = D.stats.Duels;
-	
-	return {
+
+	const result = {
 		run: {
 			record: TNT.record_tntrun,
 			wins: TNT.wins_tntrun,
@@ -205,7 +205,24 @@ const hypixelToStandard = D => {
 				storm: TNT.new_stormwizard_kills
 			}
 		},
+		overall: {
+			coins: TNT.coins,
+			wins: TNT.wins,
+			streak: TNT.winstreak
+		},
 		duels: {
+			wins: 0,
+			deaths: 0,
+			losses: 0,
+			shots: 0,
+			bestWS: 0,
+			currentWS: 0,
+			WL: 0
+		}
+	};
+
+	if (typeof DUEL !== 'undefined') {
+		result.duels = {
 			wins: DUEL.bowspleef_duel_wins,
 			deaths: DUEL.bowspleef_duel_deaths,
 			losses: DUEL.bowspleef_duel_losses,
@@ -213,13 +230,10 @@ const hypixelToStandard = D => {
 			bestWS: DUEL.best_tnt_games_winstreak,
 			currentWS: DUEL.current_tnt_games_winstreak,
 			WL: ratio(DUEL.bowspleef_duel_wins, DUEL.bowspleef_duel_losses)
-		},
-		overall: {
-			coins: TNT.coins,
-			wins: TNT.wins_tntrun + TNT.wins_pvprun + TNT.wins_tntag + TNT.wins_bowspleef + TNT.wins_capture,
-			streak: TNT.winstreak
-		}
-	};
+		};
+	}
+	
+	return result;
 };
 
 module.exports = {
