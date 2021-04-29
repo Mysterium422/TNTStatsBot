@@ -179,8 +179,8 @@ const hypixelToStandard = D => {
 		tag: {
 			wins: TNT.wins_tntag,
 			kills: TNT.kills_tntag,
-			tags: data.achievements.tntgames_clinic,
-			tk: ratio(data.achievements.tntgames_clinic, TNT.kills_tntag),
+			tags: D.achievements.tntgames_clinic,
+			tk: ratio(D.achievements.tntgames_clinic, TNT.kills_tntag),
 			KW: ratio(TNT.kills_tntag, TNT.wins_tntag)
 		},
 		wizards: {
