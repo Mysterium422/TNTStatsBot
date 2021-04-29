@@ -149,10 +149,20 @@ const getStats = async uuid => {
 	};
 };
 
+const hypixelToStandard = stats => ({
+	run: {
+		record: stats.record_tntrun,
+		wins: stats.wins_tntrun,
+		deaths: stats.deaths_tntrun,
+		potions: stats.run_potions_splashed_on_players,
+		WL: ratio(stats.wins_tntrun, stats.deaths_tntrun)
+	}
+});
+
 module.exports = {
 	embedFooter, randomChoice, noop, errorEmbed,
 	hypixelFetch, mojangUUIDFetch, ChatCodes,
 	ChatColor, booleanPhrases, ratio, formatTimestamp,
 	randInt, getMentioned, successEmbed, mojangNameFetch, getAvatar,
-	getStats
+	getStats, hypixelToStandard
 };

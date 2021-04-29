@@ -52,6 +52,8 @@ const del = (database, query) => knex(database).where(query).del();
 
 const linkUUID = async (uuid, discord) => {
 	const updated = await update(TABLES.VerifiedUsers, {uuid}, {discord});
+	const current = await all(TABLES.VerifiedUsers);
+	debugger;
 	if (updated === 0) {
 		return await add(TABLES.VerifiedUsers, {uuid, discord});
 	} else return updated;

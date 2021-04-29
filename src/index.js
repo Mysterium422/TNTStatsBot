@@ -15,7 +15,7 @@ client.on("ready", async () => {
 	console.log("[INFO] Initializing...");
 
 	// DEBUG ONLY!!
-	await db.reset();
+	// await db.reset();
 	// DEBUG ONLY!!
 
 	try {
@@ -86,8 +86,7 @@ client.on("message", async message => {
 			return;
 		} catch (up) {
 			// Debug
-			message.channel.send("An internal error occoured, see the stacktrace below:");
-			message.channel.send("```" + up.stack + "```");
+			await message.channel.send("An internal error occoured, see the stacktrace below:\n```" + up.stack + "```");
 			throw up; // ha ha!
 		}
 	} else {
@@ -216,7 +215,19 @@ client.on("message", async message => {
 				const runRecordDisplay = min_sec(replaceError(TNTGames.record_tntrun, 0));
 			}
 
-			const embed = new Discord.MessageEmbed().setColor(`${rankData.color}`).setAuthor(`${message.author.tag}`, `https://cdn.discordapp.com/avatars/${message.author.id}/${message.author.avatar}?size=128`).setTitle(`${rankData.displayName} ${user.player.displayname}'s TNT Run Stats`).setThumbnail(`https://visage.surgeplay.com/head/128/${user.player.uuid}`).setURL(`https://plancke.io/hypixel/player/stats/${user.player.displayname}`).setTimestamp().setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green).addField(`**Record**`, runRecordDisplay, true).addField(`**Wins**`, displayOldNewNumbers(data.run.w, replaceError(TNTGames.wins_tntrun, 0)), true).addField(`**Deaths**`, displayOldNewNumbers(data.run.l, replaceError(TNTGames.deaths_tntrun, 0)), true).addField(`**Potions Thrown**`, displayOldNewNumbers(data.run.potions, replaceError(TNTGames.run_potions_splashed_on_players, 0)), true).addField(`**W/L**`, displayOldNewNumbers(Math.round(data.run.wl * 1000) / 1000, Math.round(ratio(TNTGames.wins_tntrun, TNTGames.deaths_tntrun) * 1000) / 1000), true).addField(`**Blocks Broken**`, displayOldNewNumbers(data.run.blocks, replaceError(user.player.achievements.tntgames_block_runner, 0)), true).setDescription(`()s show changes since your last ${prefix}stats call for this user`);
+			const embed = new Discord.MessageEmbed().setColor(`${rankData.color}`);
+			embed.setAuthor(`${message.author.tag}`, `https://cdn.discordapp.com/avatars/${message.author.id}/${message.author.avatar}?size=128`);
+			embed.setTitle(`${rankData.displayName} ${user.player.displayname}'s TNT Run Stats`);
+			embed.setThumbnail(`https://visage.surgeplay.com/head/128/${user.player.uuid}`);
+			embed.setURL(`https://plancke.io/hypixel/player/stats/${user.player.displayname}`);
+			embed.setTimestamp();
+			embed.setFooter(embedFooter.text[randInt(0, embedFooter.text.length - 1)], embedFooter.image.green);
+			embed.addField(`**Record**`, runRecordDisplay, true);
+			embed.addField(`**Wins**`, displayOldNewNumbers(data.run.w, replaceError(TNTGames.wins_tntrun, 0)), true);
+			embed.addField(`**Deaths**`, displayOldNewNumbers(data.run.l, replaceError(TNTGames.deaths_tntrun, 0)), true);
+			embed.addField(`**Potions Thrown**`, displayOldNewNumbers(data.run.potions, replaceError(TNTGames.run_potions_splashed_on_players, 0)), true);
+			embed.addField(`**W/L**`, displayOldNewNumbers(Math.round(data.run.wl * 1000) / 1000, Math.round(ratio(TNTGames.wins_tntrun, TNTGames.deaths_tntrun) * 1000) / 1000), true);
+			embed.addField(`**Blocks Broken**`, displayOldNewNumbers(data.run.blocks, replaceError(user.player.achievements.tntgames_block_runner, 0)), true).setDescription(`()s show changes since your last ${prefix}stats call for this user`);
 
 			if (reset) {
 				await setRunDB(user.player, user.player.uuid, message.author.id);

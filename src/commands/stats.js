@@ -1,5 +1,5 @@
 const db = require("../db");
-const {errorEmbed, getMentioned, mojangUUIDFetch, getStats} = require("../util.js");
+const {errorEmbed, getMentioned, mojangUUIDFetch, getStats, hypixelToStandard} = require("../util.js");
 
 module.exports = {
 	run: async (client, message, args) => {
@@ -32,6 +32,7 @@ module.exports = {
 
 		const data = await getStats(uuid);
 		if (!data.success) return message.channel.send(errorEmbed(...data.error));
+		const stats = hypixelToStandard(data.user.player.stats.TNTGames);
 
 		debugger;
 	},
