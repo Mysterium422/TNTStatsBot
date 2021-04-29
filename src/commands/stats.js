@@ -6,8 +6,8 @@ module.exports = {
 		// TODO: Cleanup
 
 		let uuid = null;
-		const handler = discord => {
-			const rows = db.select(db.TABLES.VerifiedUsers, {discord});
+		const handler = async discord => {
+			const rows = await db.select(db.TABLES.VerifiedUsers, {discord});
 			if (rows.length === 0) return null;
 			// TODO: Inform of multiple linked accounts?
 			return rows[0].uuid;
@@ -15,12 +15,12 @@ module.exports = {
 
 		if (args.length === 0) {
 			// Use the author's linked account
-			uuid = handler(message.author.id);
+			uuid = await handler(message.author.id);
 		} else if (args.length === 1) {
 			// Use the mentioned user's linked account
 			const mentioned = getMentioned(message);
 			if (mentioned !== null) {
-				uuid = handler(mentioned.id);
+				uuid = await handler(mentioned.id);
 			} else if (args[1].length > 16) {
 				uuid = args[1];
 			} else {
@@ -31,6 +31,8 @@ module.exports = {
 		if (uuid === null) {
 			return message.channel.send(errorEmbed("User has no account linked"));
 		}
+
+		debugger;
 	},
 	aliases: []
 };
