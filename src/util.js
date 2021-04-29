@@ -164,6 +164,13 @@ const hypixelToStandard = stats => ({
 		kills: stats.kills_pvprun,
 		WL: ratio(stats.wins_pvprun, stats.deaths_pvprun),
 		KD: ratio(stats.kills_pvprun, stats.deaths_pvprun)
+	},
+	bow: {
+		wins: stats.wins_bowspleef,
+		deaths: stats.deaths_bowspleef,
+		shots: stats.tags_bowspleef,
+		kills: stats.kills_bowspleef,
+		WL: ratio(stats.wins_bowspleef, stats.deaths_bowspleef)
 	}
 });
 
