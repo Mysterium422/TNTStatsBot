@@ -213,6 +213,11 @@ const hypixelToStandard = D => {
 			bestWS: DUEL.best_tnt_games_winstreak,
 			currentWS: DUEL.current_tnt_games_winstreak,
 			WL: ratio(DUEL.bowspleef_duel_wins, DUEL.bowspleef_duel_losses)
+		},
+		overall: {
+			coins: TNT.coins,
+			wins: TNT.wins_tntrun + TNT.wins_pvprun + TNT.wins_tntag + TNT.wins_bowspleef + TNT.wins_capture,
+			streak: TNT.winstreak
 		}
 	};
 };
