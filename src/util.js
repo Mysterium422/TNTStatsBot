@@ -154,6 +154,11 @@ const hypixelToStandard = D => {
 		  DUEL = D.stats.Duels;
 
 	const result = {
+		info: {
+			uuid:        D.uuid,
+			displayname: D.displayname,
+			rank:        D.packageRank
+		},
 		run: {
 			record:   defaultTo(TNT.record_tntrun, 0),
 			wins:     defaultTo(TNT.wins_tntrun, 0),
@@ -208,7 +213,8 @@ const hypixelToStandard = D => {
 		overall: {
 			coins:    defaultTo(TNT.coins, 0),
 			wins:     defaultTo(TNT.wins, 0),
-			streak:   defaultTo(TNT.winstreak, 0)
+			streak:   defaultTo(TNT.winstreak, 0),
+			playtime: defaultTo(D.achievements.tntgames_tnt_triathlon, 0)
 		},
 		duels: {
 			wins: 0, deaths: 0, losses: 0,
@@ -231,10 +237,20 @@ const hypixelToStandard = D => {
 	return result;
 };
 
+const formatMinutes = mins => {
+	let hours = 0;
+	while (mins >= 60) {
+		hours++;
+		mins -= 60;
+	}
+
+	return `${hours}h ${mins}m`;
+};
+
 module.exports = {
 	embedFooter, randomChoice, noop, errorEmbed,
 	hypixelFetch, mojangUUIDFetch, ChatCodes,
 	ChatColor, booleanPhrases, ratio, formatTimestamp,
 	getMentioned, successEmbed, mojangNameFetch, getAvatar,
-	getStats, hypixelToStandard
+	getStats, hypixelToStandard, formatMinutes
 };

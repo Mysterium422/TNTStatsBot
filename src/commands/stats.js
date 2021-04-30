@@ -1,5 +1,6 @@
 const db = require("../db");
-const {errorEmbed, getMentioned, mojangUUIDFetch, getStats, hypixelToStandard} = require("../util.js");
+const {errorEmbed, randomChoice, embedFooter, getMentioned, mojangUUIDFetch, getStats, hypixelToStandard, getAvatar, formatMinutes} = require("../util.js");
+const Discord = require("discord.js");
 
 module.exports = {
 	run: async (client, message, args) => {
@@ -11,30 +12,50 @@ module.exports = {
 			return rows[0].uuid;
 		};
 
+		const getStatsEmbed = (stats, game) => {
+			const embed = new Discord.MessageEmbed();
+			embed.setAuthor(message.author.tag, getAvatar(message.author));
+			embed.setFooter(randomChoice(embedFooter.text), embedFooter.image.green);
+			embed.setColor("#0099ff");
+			embed.setURL(`https://plancke.io/hypixel/player/stats/${stats.info.displayname}`);
+			embed.setThumbnail(`https://visage.surgeplay.com/head/128/${stats.info.uuid}`);
+			embed.setTimestamp();
+
+			embed.setTitle(`${stats.info.displayname} | ${game} Statistics`);
+			embed.addField("**Coins**", stats.overall.coins.toLocaleString(), true);
+			embed.addField("**Wins**", stats.overall.wins.toLocaleString(), true);
+			embed.addField("**Playtime**", formatMinutes(stats.overall.playtime), true);
+
+			embed.addField("**TNT Tag Wins**", stats.tag.wins.toLocaleString(), true);
+			embed.addField("**TNT Run Record**", stats.run.record.toLocaleString(), true);
+			embed.addField("**TNT Run Wins**", stats.run.wins.toLocaleString(), true);
+			embed.addField("**Bowspleef Wins**", stats.bow.wins.toLocaleString(), true);
+			embed.addField("**PvP Run Kills**", stats.pvp.kills.toLocaleString(), true);
+			embed.addField("**PvP Run Wins**", stats.pvp.wins.toLocaleString(), true);
+			embed.addField("**Wizards Wins**", stats.wizards.wins.toLocaleString(), true);
+			embed.addField("**Wizards Kills**", stats.wizards.kills.total.toLocaleString(), true);
+			embed.addField("**Wizards Points**", stats.wizards.points.toLocaleString(), true);
+
+			return embed;
+		};
+
 		if (args.length === 0) {
-			// Use the author's linked account
-			uuid = await handler(message.author.id);
-		} else if (args.length === 1) {
-			// Use the mentioned user's linked account
-			const mentioned = getMentioned(message);
-			if (mentioned !== null) {
-				uuid = await handler(mentioned.id);
-			} else if (args[1].length > 16) {
-				uuid = args[1];
-			} else {
-				uuid = mojangUUIDFetch(args[1]).id;
+			const uuid = await handler(message.author.id);
+			if (uuid === null) {
+				return message.channel.send(errorEmbed("Invalid account", "You do not have a linked Hypixel account!"));
 			}
-		}
 
-		if (uuid === null) {
-			return message.channel.send(errorEmbed("Invalid user", "That player has no account linked!"));
-		}
+			const data = await getStats(uuid);
+			if (!data.success) return message.channel.send(errorEmbed(...data.error));
 
-		const data = await getStats(uuid);
-		if (!data.success) return message.channel.send(errorEmbed(...data.error));
-		const stats = hypixelToStandard(data.user.player);
-		
-		debugger;
+			const channelConfig = await db.select(db.TABLES.ConfiguredChannels, {
+				guild: message.guild.id,
+				channel: message.channel.id
+			});
+
+			const embed = getStatsEmbed(hypixelToStandard(data.user.player), channelConfig[0].game);
+			return message.channel.send(embed);
+		}
 	},
 	aliases: []
 };
