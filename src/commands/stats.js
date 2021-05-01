@@ -59,6 +59,13 @@ module.exports = {
 					embed.addField("**W/L Ratio**", stats.pvp.WL.toLocaleString(), true);
 					embed.addField("**K/D Ratio**", stats.pvp.KD.toLocaleString(), true);
 					return embed;
+				case "bowspleef":
+					embed.addField("**Wins**", stats.bowspleef.wins.toLocaleString(), true);
+					embed.addField("**Deaths**", stats.bowspleef.deaths.toLocaleString(), true);
+					embed.addField("**Kills**", stats.bowspleef.kills.toLocaleString(), true);
+					embed.addField("**Shots**", stats.bowspleef.shots.toLocaleString(), true);
+					embed.addField("**W/L Ratio**", stats.bowspleef.WL.toLocaleString(), true);
+					return embed;
 			}
 			
 
