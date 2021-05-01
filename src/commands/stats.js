@@ -51,6 +51,14 @@ module.exports = {
 					embed.addField("**W/L Ratio**", stats.run.WL.toLocaleString(), true);
 					embed.addField("**Blocks Broken**", stats.run.blocks.toLocaleString(), true);
 					return embed;
+				case "pvp":
+					embed.addField("**Record**", formatSeconds(stats.run.record), true);
+					embed.addField("**Wins**", stats.pvp.wins.toLocaleString(), true);
+					embed.addField("**Deaths**", stats.pvp.deaths.toLocaleString(), true);
+					embed.addField("**Kills**", stats.pvp.kills.toLocaleString(), true);
+					embed.addField("**W/L Ratio**", stats.pvp.WL.toLocaleString(), true);
+					embed.addField("**K/D Ratio**", stats.pvp.KD.toLocaleString(), true);
+					return embed;
 			}
 			
 
