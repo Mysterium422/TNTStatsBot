@@ -333,13 +333,13 @@ const hypixelToStandard = D => {
 
 	if (typeof DUEL !== 'undefined') {
 		result.duels = {
-			wins: DUEL.bowspleef_duel_wins,
-			deaths: DUEL.bowspleef_duel_deaths,
-			losses: DUEL.bowspleef_duel_losses,
-			shots: DUEL.bowspleef_duel_bow_shots,
-			bestWS: DUEL.best_tnt_games_winstreak,
-			currentWS: DUEL.current_tnt_games_winstreak,
-			WL: ratio(DUEL.bowspleef_duel_wins, DUEL.bowspleef_duel_losses)
+			wins:      defaultTo(DUEL.bowspleef_duel_wins, 0),
+			deaths:    defaultTo(DUEL.bowspleef_duel_deaths, 0),
+			losses:    defaultTo(DUEL.bowspleef_duel_losses, 0),
+			shots:     defaultTo(DUEL.bowspleef_duel_bow_shots, 0),
+			bestWS:    defaultTo(DUEL.best_tnt_games_winstreak, 0),
+			currentWS: defaultTo(DUEL.current_tnt_games_winstreak, 0),
+			WL:        defaultTo(ratio(DUEL.bowspleef_duel_wins, DUEL.bowspleef_duel_losses), 0)
 		};
 	}
 	
