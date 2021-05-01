@@ -729,7 +729,10 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
                 .setTimestamp()
                 .setFooter("Created by Mysterium_", embedFooter.image.green)
                 // MAINBOTEDIT
-                .setDescription(`- Fixed Duel Losses
+                .setDescription(`- Fixed bot not giving results for some people
+
+**Update v4.1**                
+- Fixed Duel Losses
 - Fixed /reset
 - Added Shots/Game to Bowspleef, replacing Kills
 - Bug Fixes
@@ -884,7 +887,10 @@ Computation: ${Date.now() - m.createdTimestamp - discordToBot - botToHypixel - b
                 .setTimestamp()
                 .setFooter("Created by Mysterium_", embedFooter.image.green)
                 // MAINBOTEDIT
-                .setDescription(`- Fixed Duel Losses
+                .setDescription(`- Fixed bot not giving results for some people
+
+**Update v4.1**
+- Fixed Duel Losses
 - Fixed /reset
 - Added Shots/Game to Bowspleef, replacing Kills
 - Bug Fixes
