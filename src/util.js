@@ -153,6 +153,109 @@ const getStats = async uuid => {
 	};
 };
 
+/**
+ * @typedef DuelsStats 
+ * @property {number} wins Wins
+ * @property {number} deaths Deaths
+ * @property {number} losses Losses
+ * @property {number} shots Total shots fired
+ * @property {number} bestWS Best winstreak
+ * @property {number} currentWS Current winstreak
+ * @property {number} WL Win/Loss Ratio
+**/
+
+/**
+ * @typedef OverallStats 
+ * @property {number} coins Current coins
+ * @property {number} wins Total wins
+ * @property {number} streak Current winstreak
+ * @property {number} playtime Total playtime (minutes)
+**/
+
+/**
+ * @typedef WizardKills 
+ * @property {number} total Total Wizard kills
+ * @property {number} fire Fire Wizard kills
+ * @property {number} ice Ice Wizard kills
+ * @property {number} wither Wither Wizard kills
+ * @property {number} kinetic Kinetic Wizard kills
+ * @property {number} blood Blood Wizard kills
+ * @property {number} toxic Toxic Wizard kills
+ * @property {number} hydro Hyrdo Wizard kills
+ * @property {number} ancient Ancient Wizard kills
+ * @property {number} storm Storm Wizard kills
+**/
+
+/**
+ * @typedef WizardsStats 
+ * @property {number} wins Wins
+ * @property {number} assists Assists
+ * @property {number} deaths Deaths
+ * @property {number} points Total points
+ * @property {number} KD Kill/Death Ratio
+ * @property {number} KAD Kill+Assist/Death Ratio
+ * @property {number} airtime Total airtime (seconds)
+ * @property {number} KW Kill/Win Ratio
+ * @property {WizardKills} kills Kills
+**/
+
+/**
+ * @typedef TagStats 
+ * @property {number} wins Wins
+ * @property {number} kills Fatal tags
+ * @property {number} tags Total tags
+ * @property {number} TK Tags/Kills Ratio
+ * @property {number} KW Kill/Win Ratio
+**/
+
+/**
+ * @typedef BowspleefStats 
+ * @property {number} wins Wins
+ * @property {number} deaths Deaths
+ * @property {number} shots Shots fired
+ * @property {number} kills Kills
+ * @property {number} WL Win/Loss Ratio
+**/
+
+/**
+ * @typedef PVPStats 
+ * @property {number} record Longest time alive (seconds)
+ * @property {number} wins Wins
+ * @property {number} deaths Deaths
+ * @property {number} kills Kills
+ * @property {number} WL Win/Loss Ratio
+ * @property {number} KD Kill/Death Ratio
+**/
+
+/**
+ * @typedef RunStats 
+ * @property {number} record Longest time alive (seconds)
+ * @property {number} wins Wins
+ * @property {number} deaths Deaths
+ * @property {number} potions Potions thrown
+ * @property {number} WL Win/Loss Ratio
+**/
+
+/**
+ * @typedef PlayerInfo 
+ * @property {string} info.uuid UUID
+ * @property {string} info.displayname Display name
+ * @property {string} info.rank Rank on Hypixel
+**/
+
+/**
+ * Standard format for statistics
+ * @typedef {Object} HypixelStats 
+ * @property {PlayerInfo} info Information about the player
+ * @property {RunStats} run TNT Run Statistics
+ * @property {PVPStats} pvp PVP Run Statistics
+ * @property {BowspleefStats} bowspleef Bow Spleef Statistics
+ * @property {TagStats} tag TNT Tag Statistics
+ * @property {WizardsStats} wizards TNT Wizards Statistics
+ * @property {OverallStats} overall Overall TNT Games Statistics
+ * @property {DuelsStats} duels Bow Spleef Duels Statistics
+**/
+
 const hypixelToStandard = D => {
 	const TNT = D.stats.TNTGames,
 		  DUEL = D.stats.Duels;

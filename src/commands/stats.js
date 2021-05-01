@@ -12,6 +12,12 @@ module.exports = {
 			return rows[0].uuid;
 		};
 
+		/**
+		 * Get the stats embed
+		 * @param {import("../util").HypixelStats} stats The statistics
+		 * @param {string} game Game type
+		 * @returns Embed to send to user
+		 */
 		const getStatsEmbed = (stats, game) => {
 			const embed = new Discord.MessageEmbed();
 			embed.setAuthor(message.author.tag, getAvatar(message.author));
@@ -20,23 +26,26 @@ module.exports = {
 			embed.setURL(`https://plancke.io/hypixel/player/stats/${stats.info.displayname}`);
 			embed.setThumbnail(`https://visage.surgeplay.com/head/128/${stats.info.uuid}`);
 			embed.setTimestamp();
-
 			embed.setTitle(`${stats.info.displayname} | ${GAMES_READABLE[game]} Statistics`);
-			embed.addField("**Coins**", stats.overall.coins.toLocaleString(), true);
-			embed.addField("**Wins**", stats.overall.wins.toLocaleString(), true);
-			embed.addField("**Playtime**", formatMinutes(stats.overall.playtime), true);
 
-			embed.addField("**TNT Tag Wins**", stats.tag.wins.toLocaleString(), true);
-			embed.addField("**TNT Run Record**", stats.run.record.toLocaleString(), true);
-			embed.addField("**TNT Run Wins**", stats.run.wins.toLocaleString(), true);
-			embed.addField("**Bowspleef Wins**", stats.bowspleef.wins.toLocaleString(), true);
-			embed.addField("**PvP Run Kills**", stats.pvp.kills.toLocaleString(), true);
-			embed.addField("**PvP Run Wins**", stats.pvp.wins.toLocaleString(), true);
-			embed.addField("**Wizards Wins**", stats.wizards.wins.toLocaleString(), true);
-			embed.addField("**Wizards Kills**", stats.wizards.kills.total.toLocaleString(), true);
-			embed.addField("**Wizards Points**", stats.wizards.points.toLocaleString(), true);
+			switch (game) {
+				case "all":
+					embed.addField("**Coins**", stats.overall.coins.toLocaleString(), true);
+					embed.addField("**Wins**", stats.overall.wins.toLocaleString(), true);
+					embed.addField("**Playtime**", formatMinutes(stats.overall.playtime), true);
+					embed.addField("**TNT Tag Wins**", stats.tag.wins.toLocaleString(), true);
+					embed.addField("**TNT Run Record**", stats.run.record.toLocaleString(), true);
+					embed.addField("**TNT Run Wins**", stats.run.wins.toLocaleString(), true);
+					embed.addField("**Bowspleef Wins**", stats.bowspleef.wins.toLocaleString(), true);
+					embed.addField("**PvP Run Kills**", stats.pvp.kills.toLocaleString(), true);
+					embed.addField("**PvP Run Wins**", stats.pvp.wins.toLocaleString(), true);
+					embed.addField("**Wizards Wins**", stats.wizards.wins.toLocaleString(), true);
+					embed.addField("**Wizards Kills**", stats.wizards.kills.total.toLocaleString(), true);
+					embed.addField("**Wizards Points**", stats.wizards.points.toLocaleString(), true);
+					return embed;
+			}
+			
 
-			return embed;
 		};
 
 		if (args.length === 0) {
@@ -47,14 +56,8 @@ module.exports = {
 
 			const data = await getStats(uuid);
 			if (!data.success) return message.channel.send(errorEmbed(...data.error));
-
-			const channelConfig = await db.select(db.TABLES.ConfiguredChannels, {
-				guild: message.guild.id,
-				channel: message.channel.id
-			});
-
-			const embed = getStatsEmbed(hypixelToStandard(data.user.player), channelConfig[0].game);
-			return message.channel.send(embed);
+			const channelConfig = await db.getChannelInfo(message);			
+			return message.channel.send(getStatsEmbed(hypixelToStandard(data.user.player), channelConfig.game));
 		}
 	},
 	aliases: [],
