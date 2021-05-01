@@ -1,7 +1,7 @@
 const {successEmbed} = require("../util.js");
 
 module.exports = {
-	run: (client, message, args) => {
+	run: ({client, message}) => {
 		const botUsers = new Set();
 		client.guilds.cache.forEach(guild => {
 			guild.members.cache.forEach(member => {

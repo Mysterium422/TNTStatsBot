@@ -4,7 +4,7 @@ const config = require("../../config.json");
 const {errorEmbed, mojangUUIDFetch, getMentioned, getStats} = require("../util.js");
 
 module.exports = {
-	run: async (client, message, args, prefix) => {
+	run: async ({message, args}) => {
 		const mentioned = getMentioned(message);
 		let uuid = null,
 			discord_id = null;

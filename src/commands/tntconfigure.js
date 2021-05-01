@@ -3,7 +3,7 @@ const strings = require("../strings.js");
 const {errorEmbed, successEmbed, GAMES, GAMES_READABLE} = require("../util.js");
 
 module.exports = {
-	run: (client, message, [game, ...prefix]) => {
+	run: ({message, args: [game, ...prefix]}) => {
 		prefix = prefix.join(" ");
 		if (!message.member.hasPermission("ADMINISTRATOR")) {
 			return message.channel.send(errorEmbed("Invalid permissions", "Only a server administrator can configure the bot."));

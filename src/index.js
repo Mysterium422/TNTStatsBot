@@ -81,7 +81,13 @@ client.on("message", async message => {
 
 	if (command in commands) {
 		try {
-			await commands[command].run(client, message, args, channel.prefix, message.content.slice(channel.prefix.length + command.length));
+			await commands[command].run({
+				client, message,
+				args, command,
+				channelInfo: channel,
+				multiArgs: message.content.slice(channel.prefix.length + command.length)
+			});
+
 			return;
 		} catch (up) {
 			// Debug
@@ -95,18 +101,12 @@ client.on("message", async message => {
 
 	if (1 + 1 === 2) return; // Debug
 
-	if (message.content.toLowerCase() == "/tntremove") {
-		if (!message.member.hasPermission("ADMINISTRATOR") && message.author.id != config.owner_id) return;
+	// if (message.content.toLowerCase() == "/tntremove") {
+	// 	if (!message.member.hasPermission("ADMINISTRATOR") && message.author.id != config.owner_id) return;
 
-		await db.deconste(`chan_${message.channel.id}`);
-		message.channel.send("I will no longer respond to messages in this channel");
-	}
-
-	// let channel = await db.get("chan_" + m.channel.id);
-	// if (channel === null) return;
-	// const prefix = channel.prefix;
-	// if (!m.content.startsWith(prefix)) return;
-	// let game = channel.game;
+	// 	await db.deconste(`chan_${message.channel.id}`);
+	// 	return message.channel.send("I will no longer respond to messages in this channel");
+	// }
 
 	if (command.toLowerCase() === "stats") {
 		let received = "";

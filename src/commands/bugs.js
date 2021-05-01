@@ -1,6 +1,6 @@
+const strings = require("../strings.js");
+
 module.exports = {
-	run: (client, message, args) => {
-		return message.channel.send("Report any bugs here: https://discord.gg/7Qb5xuJD4C");
-	},
+	run: ({message}) => message.channel.send(strings.reportbugs),
 	aliases: ["bug", "reportbug", "report", "issue", "issues"]
 };

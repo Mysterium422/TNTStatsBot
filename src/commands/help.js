@@ -2,7 +2,7 @@ const strings = require("../strings.js");
 const {noop, successEmbed} = require("../util.js");
 
 module.exports = {
-	run: async (client, message, args, prefix) => {
+	run: async ({client, message, channelInfo: {prefix}}) => {
 		const embed = successEmbed(
 			message.author,
 			strings.help_home(prefix),

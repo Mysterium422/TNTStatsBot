@@ -78,5 +78,8 @@ source:
 "Contribute here: https://github.com/LebsterFace/TNTStatsBot",
 
 invalid_game_type:
-"Expected one of: `all`, `wizards`, `run`, `pvp`, `tag`, `bowspleef`"
+"Expected one of: `all`, `wizards`, `run`, `pvp`, `tag`, `bowspleef`",
+
+reportbugs:
+"Report any bugs here: https://discord.gg/7Qb5xuJD4C"
 };

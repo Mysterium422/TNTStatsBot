@@ -3,7 +3,7 @@ const {hypixelFetch, errorEmbed, successEmbed} = require("../util.js");
 const db = require("../db");
 
 module.exports = {
-	run: async (client, message, args) => {
+	run: async ({message}) => {
 		const discordToBot = Date.now() - message.createdTimestamp;
 
 		let START = performance.now();

@@ -2,7 +2,7 @@ const { getMentioned, errorEmbed, mojangNameFetch } = require("../util.js");
 const db = require("../db");
 
 module.exports = {
-	run: async (client, message, args) => {
+	run: async ({message, args}) => {
 		let userID = null;
 		if (args.length === 0) {
 			userID = message.author.id;

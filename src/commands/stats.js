@@ -3,7 +3,7 @@ const {errorEmbed, randomChoice, embedFooter, getMentioned, mojangUUIDFetch, get
 const Discord = require("discord.js");
 
 module.exports = {
-	run: async (client, message, args) => {
+	run: async ({message, args}) => {
 		let uuid = null;
 		const handler = async discord => {
 			const rows = await db.select(db.TABLES.VerifiedUsers, {discord});
