@@ -315,8 +315,8 @@ async function setWeeklyDB(data, uuid) {
     if (!data.stats.TNTGames) {
         data.stats.TNTGames = {}
     }
-    if (!data.stats.duels) {
-        data.stats.duels = {}
+    if (!data.stats.Duels) {
+        data.stats.Duels = {}
     }
     if (!data.achievements) {
         data.achievements = {}
@@ -413,8 +413,8 @@ async function setMonthlyDB(data, uuid) {
     if (!data.stats.TNTGames) {
         data.stats.TNTGames = {}
     }
-    if (!data.stats.duels) {
-        data.stats.duels = {}
+    if (!data.stats.Duels) {
+        data.stats.Duels = {}
     }
     if (!data.achievements) {
         data.achievements = {}
