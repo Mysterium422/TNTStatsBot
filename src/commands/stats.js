@@ -73,6 +73,15 @@ module.exports = {
 					embed.addField("**T/K Ratio**", stats.tag.TK.toLocaleString(), true);
 					embed.addField("**K/W Ratio**", stats.tag.KW.toLocaleString(), true);
 					return embed;
+				case "wizards":
+					embed.addField("**Wins**", stats.wizards.wins.toLocaleString(), true);
+					embed.addField("**Deaths**", stats.wizards.deaths.toLocaleString(), true);
+					embed.addField("**Kills**", stats.wizards.kills.total.toLocaleString(), true);
+					embed.addField("**Assists**", stats.wizards.assists.toLocaleString(), true);
+					embed.addField("**Points**", stats.wizards.points.toLocaleString(), true);
+					embed.addField("**K/D Ratio**", stats.wizards.KD.toLocaleString(), true);
+					// TODO: Airtime, KA/D Ratio, K/W Ratio, Kills with each class (verbose only)
+					return embed;
 			}
 			
 

@@ -174,7 +174,7 @@ const getStats = async uuid => {
 
 /**
  * @typedef WizardKills 
- * @property {number} total Total Wizard kills
+ * @property {number} total Total Wizards kills
  * @property {number} fire Fire Wizard kills
  * @property {number} ice Ice Wizard kills
  * @property {number} wither Wither Wizard kills
