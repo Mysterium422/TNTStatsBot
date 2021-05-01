@@ -54,35 +54,34 @@ client.on("ready", async () => {
 
 client.on("message", async message => {
 	if (message.author.bot) return;
-
 	if (!isReady) {
 		message.channel.send("I'm not ready, please try again in a few seconds...");
 		return;
 	}
 
-	// TODO: Per-channel prefix
-	const prefix = "!";
+	const channel = await db.getChannelInfo(message);
 	const mentioned = getMentioned(message);
-	if (mentioned !== null && mentioned.id === client.user.id) {
-		// const channel = await db.get("chan_" + message.channel.id);
-		// if (channel === null) {
-		// 	if (message.member.hasPermission("ADMINISTRATOR")) {
-		// 		return message.channel.send("Channel not configured (Use /TNTconfigure)");
-		// 	} else {
-		// 		return message.channel.send("Channel not configured");
-		// 	}
-		// } else {
-		// 	return message.channel.send(`My prefix in this channel is: ${channel.prefix}\nMy default game in this channel is: ${channel.game}`);
-		// }
-		return message.channel.send(errorEmbed("Command under construction", "Per-channel setup is still under construction!"));
+	if (channel === null) {
+		if (mentioned === null || mentioned.id !== client.user.id) {
+			// This message was none of our business!
+			return;
+		}
+
+		if (message.member.hasPermission("ADMINISTRATOR")) {
+			return message.channel.send(`Channel is not configured!\nUse '${client.user} config' to configure.`);
+		} else {
+			return message.channel.send("Channel is not configured! Please contact a server administrator.");
+		}
 	}
 
-	const args = message.content.slice(prefix.length).split(/\s+/g);
+	// TODO: return message.channel.send(`My prefix in this channel is: ${channel.prefix}\nMy default game in this channel is: ${channel.game}`);
+
+	const args = message.content.slice(channel.prefix.length).split(/\s+/g);
 	const command = args.shift().toLowerCase();
 
 	if (command in commands) {
 		try {
-			await commands[command].run(client, message, args, prefix, message.content.slice(prefix.length + command.length));
+			await commands[command].run(client, message, args, channel.prefix, message.content.slice(channel.prefix.length + command.length));
 			return;
 		} catch (up) {
 			// Debug
