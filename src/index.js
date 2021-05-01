@@ -62,10 +62,9 @@ client.on("message", async message => {
 	const channel = await db.getChannelInfo(message);
 	const mentioned = getMentioned(message);
 	if (channel === null) {
-		if (mentioned === null || mentioned.id !== client.user.id) {
-			// This message was none of our business!
-			return;
-		}
+		// This message was none of our business!
+		if (mentioned === null || mentioned.id !== client.user.id) return;
+		debugger;
 
 		if (message.member.hasPermission("ADMINISTRATOR")) {
 			return message.channel.send(`Channel is not configured!\nUse '${client.user} config' to configure.`);
@@ -76,6 +75,7 @@ client.on("message", async message => {
 
 	// TODO: return message.channel.send(`My prefix in this channel is: ${channel.prefix}\nMy default game in this channel is: ${channel.game}`);
 
+	if (!message.content.startsWith(channel.prefix)) return;
 	const args = message.content.slice(channel.prefix.length).split(/\s+/g);
 	const command = args.shift().toLowerCase();
 
