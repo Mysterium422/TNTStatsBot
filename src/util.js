@@ -234,6 +234,7 @@ const getStats = async uuid => {
  * @property {number} deaths Deaths
  * @property {number} potions Potions thrown
  * @property {number} WL Win/Loss Ratio
+ * @property {number} blocks Blocks broken
 **/
 
 /**
@@ -271,7 +272,8 @@ const hypixelToStandard = D => {
 			wins:     defaultTo(TNT.wins_tntrun, 0),
 			deaths:   defaultTo(TNT.deaths_tntrun, 0),
 			potions:  defaultTo(TNT.run_potions_splashed_on_players, 0),
-			WL:       defaultTo(ratio(TNT.wins_tntrun, TNT.deaths_tntrun), 0)
+			WL:       defaultTo(ratio(TNT.wins_tntrun, TNT.deaths_tntrun), 0),
+			blocks:   defaultTo(D.achievements.tntgames_block_runner, 0)
 		},
 		pvp: {
 			record:   defaultTo(TNT.record_pvprun, 0),
@@ -354,6 +356,16 @@ const formatMinutes = mins => {
 	return `${hours}h ${mins}m`;
 };
 
+const formatSeconds = secs => {
+	let mins = 0;
+	while (secs >= 60) {
+		mins++;
+		secs -= 60;
+	}
+
+	return `${mins}m ${secs}s`;
+};
+
 const GAMES_READABLE = {
 	all: "All TNT Games",
 	wizards: "TNT Wizards",
@@ -383,6 +395,7 @@ for (const key in games_generator) {
 
 const startsWithMention = message => /^<@!?(\d+)>/g.exec(message.content).index === 0;
 
+
 module.exports = {
 	embedFooter, randomChoice, noop, errorEmbed,
 	hypixelFetch, mojangUUIDFetch, ChatCodes,
@@ -390,5 +403,5 @@ module.exports = {
 	getMentioned, successEmbed, mojangNameFetch, getAvatar,
 	getStats, hypixelToStandard, formatMinutes,
 	GAMES, GAMES_READABLE, getWithoutMentions,
-	startsWithMention
+	startsWithMention, formatSeconds
 };

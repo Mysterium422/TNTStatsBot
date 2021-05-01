@@ -1,8 +1,8 @@
-# To Do:
- - Finish stats command
- - Kills command
- - [Recordings](#stats-recordings)
- - Weekly/Monthly Cache & Leaerboards
+# To Do:   
+- [ ] Finish stats command
+- [ ] Kills command
+- [ ] [Recordings](#stats-recordings)
+- [ ] Weekly/Monthly Cache & Leaerboards
 
 ## Stats Recordings
  - A stats recording can be started, and every recording has a target.

@@ -1,5 +1,5 @@
 const db = require("../db");
-const {errorEmbed, randomChoice, embedFooter, getMentioned, mojangUUIDFetch, getStats, hypixelToStandard, getAvatar, formatMinutes, GAMES_READABLE} = require("../util.js");
+const {errorEmbed, randomChoice, embedFooter, getMentioned, mojangUUIDFetch, getStats, hypixelToStandard, getAvatar, formatMinutes, GAMES_READABLE, formatSeconds} = require("../util.js");
 const Discord = require("discord.js");
 
 module.exports = {
@@ -42,6 +42,14 @@ module.exports = {
 					embed.addField("**Wizards Wins**", stats.wizards.wins.toLocaleString(), true);
 					embed.addField("**Wizards Kills**", stats.wizards.kills.total.toLocaleString(), true);
 					embed.addField("**Wizards Points**", stats.wizards.points.toLocaleString(), true);
+					return embed;
+				case "run":
+					embed.addField("**Record**", formatSeconds(stats.run.record), true);
+					embed.addField("**Wins**", stats.run.wins.toLocaleString(), true);
+					embed.addField("**Deaths**", stats.run.deaths.toLocaleString(), true);
+					embed.addField("**Potions Thrown**", stats.run.potions.toLocaleString(), true);
+					embed.addField("**W/L Ratio**", stats.run.WL.toLocaleString(), true);
+					embed.addField("**Blocks Broken**", stats.run.blocks.toLocaleString(), true);
 					return embed;
 			}
 			
