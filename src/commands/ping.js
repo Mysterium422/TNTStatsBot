@@ -23,5 +23,6 @@ module.exports = {
 
 		return message.channel.send(embed);
 	},
-	aliases: [ "latency" ]
+	aliases: ["latency"],
+	requiresConfiguredChannel: true
 };

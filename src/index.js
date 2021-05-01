@@ -4,7 +4,15 @@ const Discord = require("discord.js"),
 	db = require("./db"),
 	path = require("path");
 
-const {mojangUUIDFetch, hypixelFetch, replaceError, booleanPhrases, getMentioned, errorEmbed} = require("./util.js");
+const {
+	mojangUUIDFetch,
+	hypixelFetch,
+	replaceError,
+	booleanPhrases, 
+	getMentioned,
+	startsWithMention,
+	getWithoutMentions
+} = require("./util.js");
 
 const client = new Discord.Client();
 const config = require("../config.json");
@@ -54,38 +62,29 @@ client.on("ready", async () => {
 
 client.on("message", async message => {
 	if (message.author.bot) return;
-	if (!isReady) {
-		message.channel.send("I'm not ready, please try again in a few seconds...");
-		return;
-	}
+	if (!isReady) return message.channel.send("I'm not ready, please try again in a few seconds...");
 
-	const channel = await db.getChannelInfo(message);
-	const mentioned = getMentioned(message);
-	if (channel === null) {
-		// This message was none of our business!
-		if (mentioned === null || mentioned.id !== client.user.id) return;
-		debugger;
+	const channel = await db.getChannelInfo(message),
+		mentioned = getMentioned(message),
+		isBotMentioned = mentioned !== null && mentioned.id === client.user.id;
 
-		if (message.member.hasPermission("ADMINISTRATOR")) {
-			return message.channel.send(`Channel is not configured!\nUse '${client.user} config' to configure.`);
-		} else {
-			return message.channel.send("Channel is not configured! Please contact a server administrator.");
-		}
-	}
+	const isValid = (isBotMentioned && startsWithMention(message)) || (channel !== null && message.content.startsWith(channel.prefix));
+	if (!isValid) return;
 
-	// TODO: return message.channel.send(`My prefix in this channel is: ${channel.prefix}\nMy default game in this channel is: ${channel.game}`);
-
-	if (!message.content.startsWith(channel.prefix)) return;
-	const args = message.content.slice(channel.prefix.length).split(/\s+/g);
+	const messageContent = isBotMentioned ? getWithoutMentions(message) : message.content.slice(channel.prefix.length).trim();
+	const args = messageContent.split(/\s+/g);
 	const command = args.shift().toLowerCase();
 
 	if (command in commands) {
+		if (channel === null && commands[command].requiresConfiguredChannel) return;
 		try {
 			await commands[command].run({
-				client, message,
-				args, command,
+				client,
+				message,
+				args,
+				command,
 				channelInfo: channel,
-				multiArgs: message.content.slice(channel.prefix.length + command.length)
+				multiArgs: messageContent.slice(command.length)
 			});
 
 			return;

@@ -25,5 +25,6 @@ module.exports = {
 		embed.addField("__Bot Prefix:__", prefix, true);
 		return message.channel.send(embed);
 	},
-	aliases: ["configure", "config", "setup"]
+	aliases: ["configure", "config", "setup"],
+	requiresConfiguredChannel: false
 };

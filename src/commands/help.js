@@ -44,5 +44,6 @@ module.exports = {
 			}
 		});
 	},
-	aliases: ["tnthelp"]
+	aliases: ["tnthelp"],
+	requiresConfiguredChannel: true
 };

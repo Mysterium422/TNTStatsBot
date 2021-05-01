@@ -64,5 +64,6 @@ module.exports = {
 		await db.setMain(uuid, discord_id);
 		return message.channel.send("Successfully set your IGN to `" + playername + "`");
 	},
-	aliases: ["verify"]
+	aliases: ["verify"],
+	requiresConfiguredChannel: true
 };

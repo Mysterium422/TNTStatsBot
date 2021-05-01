@@ -24,5 +24,6 @@ module.exports = {
 			  currentName = response[response.length - 1].name;
 		return message.channel.send(encodeURI("https://namemc.com/profile/" + currentName));
 	},
-	aliases: []
+	aliases: [],
+	requiresConfiguredChannel: true
 };

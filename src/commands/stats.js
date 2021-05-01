@@ -57,5 +57,6 @@ module.exports = {
 			return message.channel.send(embed);
 		}
 	},
-	aliases: []
+	aliases: [],
+	requiresConfiguredChannel: true
 };

@@ -105,6 +105,10 @@ const getMentioned = message => {
 	return typeof result === "undefined" ? null : result;
 };
 
+const getWithoutMentions = message => {
+	return message.content.replace(/<@!?(\d+)>/g, "").trim();
+};
+
 const successEmbed = (author, description="", title="Success", thumbnail=null) => {
 	const result = new Discord.MessageEmbed()
 		.setColor("#3bcc71")
@@ -274,11 +278,14 @@ for (const key in games_generator) {
 	}
 }
 
+const startsWithMention = message => /^<@!?(\d+)>/g.exec(message.content).index === 0;
+
 module.exports = {
 	embedFooter, randomChoice, noop, errorEmbed,
 	hypixelFetch, mojangUUIDFetch, ChatCodes,
 	ChatColor, booleanPhrases, ratio, formatTimestamp,
 	getMentioned, successEmbed, mojangNameFetch, getAvatar,
 	getStats, hypixelToStandard, formatMinutes,
-	GAMES, GAMES_READABLE
+	GAMES, GAMES_READABLE, getWithoutMentions,
+	startsWithMention
 };

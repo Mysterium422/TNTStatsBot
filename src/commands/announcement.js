@@ -11,5 +11,6 @@ module.exports = {
 		const embed = successEmbed(message.author, multiArgs, "__Announcement__", getAvatar(client.user));
 		return message.channel.send(embed);
 	},
-	aliases: []
+	aliases: [],
+	requiresConfiguredChannel: false
 };
