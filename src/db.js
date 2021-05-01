@@ -79,6 +79,16 @@ const linkChannelPreifx = async (channel, prefix, game) => {
 	} else return updated;
 };
 
+const getChannelInfo = async message => {
+	const result = await select(TABLES.ConfiguredChannels, {
+		guild: message.guild.id,
+		channel: message.channel.id
+	});
+
+	if (result.length === 0) return null;
+	return result[0];
+};
+
 module.exports = {
 	add,
 	all,
@@ -90,5 +100,6 @@ module.exports = {
 	setMain, addAlt,
 	linkChannelPreifx,
 	createVerifiedTable,
-	createChannelTable
+	createChannelTable,
+	getChannelInfo
 };
