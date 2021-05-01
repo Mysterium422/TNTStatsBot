@@ -174,7 +174,7 @@ const hypixelToStandard = D => {
 			WL:       defaultTo(ratio(TNT.wins_pvprun, TNT.deaths_pvprun), 0),
 			KD:       defaultTo(ratio(TNT.kills_pvprun, TNT.deaths_pvprun), 0)
 		},
-		bow: {
+		bowspleef: {
 			wins:     defaultTo(TNT.wins_bowspleef, 0),
 			deaths:   defaultTo(TNT.deaths_bowspleef, 0),
 			shots:    defaultTo(TNT.tags_bowspleef, 0),
@@ -247,10 +247,38 @@ const formatMinutes = mins => {
 	return `${hours}h ${mins}m`;
 };
 
+const GAMES_READABLE = {
+	all: "All TNT Games",
+	wizards: "TNT Wizards",
+	run: "TNT Run",
+	pvp: "PVP Run",
+	tag: "TNT Tag",
+	bowspleef: "Bow Spleef",
+	duels: "Bow Spleef Duels"
+};
+
+const games_generator = {
+	all: ["overall", "all", "tnt"],
+	wizards: ["wizards", "wiz", "tntwiz", "wizard", "tntwizard", "tntwizards"],
+	run: ["run", "tntrun"],
+	pvp: ["pvp", "pvprun"],
+	tag: ["tag", "tnttag", "tagtnt"],
+	bowspleef: ["bowspleef", "bow", "spleef", "bspleef", "tntspleef"],
+	duels: ["duels", "bowduel", "spleefduel", "bowspleefduel", "tntduel", "tntduels", "duel"]
+};
+// I am very lazy, so let's generate the object in code!!
+const GAMES = {};
+for (const key in games_generator) {
+	for (const name of games_generator[key]) {
+		GAMES[name] = key;
+	}
+}
+
 module.exports = {
 	embedFooter, randomChoice, noop, errorEmbed,
 	hypixelFetch, mojangUUIDFetch, ChatCodes,
 	ChatColor, booleanPhrases, ratio, formatTimestamp,
 	getMentioned, successEmbed, mojangNameFetch, getAvatar,
-	getStats, hypixelToStandard, formatMinutes
+	getStats, hypixelToStandard, formatMinutes,
+	GAMES, GAMES_READABLE
 };

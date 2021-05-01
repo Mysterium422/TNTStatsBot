@@ -1,5 +1,5 @@
 const db = require("../db");
-const {errorEmbed, randomChoice, embedFooter, getMentioned, mojangUUIDFetch, getStats, hypixelToStandard, getAvatar, formatMinutes} = require("../util.js");
+const {errorEmbed, randomChoice, embedFooter, getMentioned, mojangUUIDFetch, getStats, hypixelToStandard, getAvatar, formatMinutes, GAMES_READABLE} = require("../util.js");
 const Discord = require("discord.js");
 
 module.exports = {
@@ -21,7 +21,7 @@ module.exports = {
 			embed.setThumbnail(`https://visage.surgeplay.com/head/128/${stats.info.uuid}`);
 			embed.setTimestamp();
 
-			embed.setTitle(`${stats.info.displayname} | ${game} Statistics`);
+			embed.setTitle(`${stats.info.displayname} | ${GAMES_READABLE[game]} Statistics`);
 			embed.addField("**Coins**", stats.overall.coins.toLocaleString(), true);
 			embed.addField("**Wins**", stats.overall.wins.toLocaleString(), true);
 			embed.addField("**Playtime**", formatMinutes(stats.overall.playtime), true);
@@ -29,7 +29,7 @@ module.exports = {
 			embed.addField("**TNT Tag Wins**", stats.tag.wins.toLocaleString(), true);
 			embed.addField("**TNT Run Record**", stats.run.record.toLocaleString(), true);
 			embed.addField("**TNT Run Wins**", stats.run.wins.toLocaleString(), true);
-			embed.addField("**Bowspleef Wins**", stats.bow.wins.toLocaleString(), true);
+			embed.addField("**Bowspleef Wins**", stats.bowspleef.wins.toLocaleString(), true);
 			embed.addField("**PvP Run Kills**", stats.pvp.kills.toLocaleString(), true);
 			embed.addField("**PvP Run Wins**", stats.pvp.wins.toLocaleString(), true);
 			embed.addField("**Wizards Wins**", stats.wizards.wins.toLocaleString(), true);
