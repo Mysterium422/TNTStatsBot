@@ -66,6 +66,13 @@ module.exports = {
 					embed.addField("**Shots**", stats.bowspleef.shots.toLocaleString(), true);
 					embed.addField("**W/L Ratio**", stats.bowspleef.WL.toLocaleString(), true);
 					return embed;
+				case "tag":
+					embed.addField("**Wins**", stats.tag.wins.toLocaleString(), true);
+					embed.addField("**Kills**", stats.tag.kills.toLocaleString(), true);
+					embed.addField("**Tags**", stats.tag.tags.toLocaleString(), true);
+					embed.addField("**T/K Ratio**", stats.tag.TK.toLocaleString(), true);
+					embed.addField("**K/W Ratio**", stats.tag.KW.toLocaleString(), true);
+					return embed;
 			}
 			
 
