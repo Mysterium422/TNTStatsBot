@@ -1,5 +1,5 @@
 # To Do:   
-- [ ] Finish stats command
+- [x] Finish stats command
 - [ ] Kills command
 - [ ] [Recordings](#stats-recordings)
 - [ ] Weekly/Monthly Cache & Leaerboards
@@ -18,9 +18,10 @@
 /finish <username (defaults to you)>
 ```
 
- - You can reset the current recording with the `reset` command. After doing that, the stats will recache and `()`s will display (but they will all be since you did the reset)
-
- - Doing a reset is basically like finishing & then recording again immediately
+ - You can reset the current recording with the `reset` command. After doing that, the stats will recache and `()`s will display (but they will all be since you did the reset). Doing a reset is basically like finishing & then recording again immediately.
+```
+/reset <username (defaults to you)>
+```
 
 ### Modifiable with a setting:
 If you check another user's stats, it will start a *temporary recording* (**as long as you were not explicitly recording said user already**)
