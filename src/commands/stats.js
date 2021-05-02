@@ -4,7 +4,6 @@ const Discord = require("discord.js");
 
 module.exports = {
 	run: async ({message, args}) => {
-		let uuid = null;
 		const handler = async discord => {
 			const rows = await db.select(db.TABLES.VerifiedUsers, {discord});
 			if (rows.length === 0) return null;
@@ -95,17 +94,64 @@ module.exports = {
 
 		};
 
-		if (args.length === 0) {
-			const uuid = await handler(message.author.id);
-			if (uuid === null) {
-				return message.channel.send(errorEmbed("Invalid account", "You do not have a linked Hypixel account!"));
-			}
-
-			const data = await getStats(uuid);
-			if (!data.success) return message.channel.send(errorEmbed(...data.error));
-			const channelConfig = await db.getChannelInfo(message);			
-			return message.channel.send(getStatsEmbed(hypixelToStandard(data.user.player), channelConfig.game));
+		let uuid = null,
+			game = null;
+	
+		if (args.length > 2) {
+			return message.channel.send(errorEmbed("Too many arguments", "Expected `[user]` or `[user], [game]`"));
 		}
+		
+		if (args.length === 0 || args.length === 1) {
+			const channelConfig = await db.getChannelInfo(message);
+			game = channelConfig.game;
+		} else if (args.length === 2) {
+			game = args[2];
+		}
+
+		if (args.length === 0) {
+			uuid = await handler(message.author.id);
+		} else if (args.length === 2 || args.length === 1) {
+			// If nobody was mentioned...
+			const mentioned = getMentioned(message);
+			if (mentioned === null) {
+				// If it's too short to be a UUID...
+				if (uuid.length <= 16) {
+					// Fetch the UUID from Mojang...
+					const mojangResponse = await mojangUUIDFetch(uuid);
+					if (mojangResponse === null) {
+						// If the playername is invalid, show an error
+						return message.channel.send(errorEmbed("Invalid playername", `Failed to fetch the UUID of '${uuid}' from the Mojang API`));
+					} else {
+						// Otherwise use the response from Mojang
+						uuid = mojangResponse.id;
+					}
+				} else {
+					// Otherwise, if it's long enough we can assume it's a UUID
+					uuid = args[0];
+				}
+			}
+			
+			// The argument was a mention:
+			else {
+				// Get the UUID from the database...
+				const row = await db.select(db.TABLES.VerifiedUsers, {discord: mentioned.id});
+				if (row.length === 0) {
+					return message.channel.send(errorEmbed("Invalid mention", "That user has not linked their account"));
+				}
+
+				uuid = row.uuid;
+			}
+		}
+
+		// -------------- [ Get the Statistics ] --------------
+
+		if (uuid === null) {
+			return message.channel.send(errorEmbed("Invalid account", "You do not have a linked Hypixel account!"));
+		}
+
+		const data = await getStats(uuid);
+		if (!data.success) return message.channel.send(errorEmbed(...data.error));
+		return message.channel.send(getStatsEmbed(stats, game));
 	},
 	aliases: [],
 	requiresConfiguredChannel: true
