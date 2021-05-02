@@ -1,5 +1,5 @@
 const db = require("../db");
-const {errorEmbed, randomChoice, embedFooter, getMentioned, mojangUUIDFetch, getStats, hypixelToStandard, getAvatar, formatMinutes, GAMES_READABLE, formatSeconds} = require("../util.js");
+const {errorEmbed, randomChoice, embedFooter, getMentioned, mojangUUIDFetch, getStats, hypixelToStandard, getAvatar, formatMinutes, GAMES_READABLE, formatSeconds, GAMES} = require("../util.js");
 const Discord = require("discord.js");
 const strings = require("../strings.js");
 
@@ -83,13 +83,16 @@ module.exports = {
 					embed.addField("**Current WS**", stats.duels.currentWS.toLocaleString(), true);
 					embed.addField("**Best WS**", stats.duels.bestWS.toLocaleString(), true);
 					return embed;
+				case null:
+					embed.setDescription("No game was provided.");
+					return embed;
 			}
 		};
 
 		const getUUIDFromDiscord = async discord => {
 			const row = await db.select(db.TABLES.VerifiedUsers, {discord});
 			if (row.length === 0) return null;
-			return row.uuid;
+			return row[0].uuid;
 		};
 
 		const parseUser = async (arg, mentioned = null) => {
@@ -118,18 +121,33 @@ module.exports = {
 		let uuid = null,
 			game = null;
 
-		if (args.length === 0 || (args.length === 1 && args[0] in GAMES_READABLE)) {
+		if (args.length === 1 && args[0] in GAMES) {
+			game = GAMES[args[0]];
+		} else if (args.length === 2) {
+			if (args[1] in GAMES) {
+				game = GAMES[args[1]];
+			} else {
+				return message.channel.send(errorEmbed("Invalid game type", strings.invalid_game_type));
+			}
+		} else {
+			const channelConfig = await db.getChannelInfo(message);
+			game = channelConfig.game;
+		}
+
+		if (args.length > 2) {
+			return message.channel.send(errorEmbed("Too many arguments!"));
+		}
+			
+		else if (args.length === 0 || (args.length === 1 && args[0] in GAMES)) {
 			uuid = await getUUIDFromDiscord(message.author.id);
 			if (uuid === null) return message.channel.send(errorEmbed("Discord account not linked", strings.unlinked));
 		}
 		
-		else if (args.length === 1 && !(args[0] in GAMES_READABLE)) {
+		else if (args.length === 2 || (args.length === 1 && !(args[0] in GAMES))) {
 			const user = await parseUser(args[0], getMentioned(message));
 			if (!user.success) return message.channel.send(errorEmbed(...user.error));
 			uuid = user.uuid;
 		}
-
-		// return message.channel.send(errorEmbed());
 
 		const data = await getStats(uuid);
 		if (!data.success) return message.channel.send(errorEmbed(...data.error));
