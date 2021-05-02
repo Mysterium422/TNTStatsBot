@@ -1,4 +1,5 @@
 module.exports = {
+// TODO: This is used wrongly in many places
 unlinked:
 `You need to link you Discord account to your profile on Hypixel!
 To do so, please follow this guide:
