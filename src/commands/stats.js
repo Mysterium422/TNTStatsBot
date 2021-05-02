@@ -92,7 +92,7 @@ module.exports = {
 			return row.uuid;
 		};
 
-		const parseUser = async (arg, mentioned=null) => {
+		const parseUser = async (arg, mentioned = null) => {
 			if (mentioned === null) {
 				// If it's too short to be a UUID...
 				if (arg.length <= 16) {
@@ -115,17 +115,21 @@ module.exports = {
 			}
 		};
 
+		let uuid = null,
+			game = null;
 
-		let uuid = null, game = null;
-		if (args.length === 0) {
+		if (args.length === 0 || (args.length === 1 && args[0] in GAMES_READABLE)) {
 			uuid = await getUUIDFromDiscord(message.author.id);
 			if (uuid === null) return message.channel.send(errorEmbed("Discord account not linked", strings.unlinked));
-		} else if (args.length === 1) {
-
+		}
+		
+		else if (args.length === 1 && !(args[0] in GAMES_READABLE)) {
+			const user = await parseUser(args[0], getMentioned(message));
+			if (!user.success) return message.channel.send(errorEmbed(...user.error));
+			uuid = user.uuid;
 		}
 
 		// return message.channel.send(errorEmbed());
-		
 
 		const data = await getStats(uuid);
 		if (!data.success) return message.channel.send(errorEmbed(...data.error));
