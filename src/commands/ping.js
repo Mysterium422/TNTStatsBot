@@ -11,7 +11,7 @@ module.exports = {
 		const botToDB = performance.now() - START;
 
 		START = performance.now();
-		const hypixelResponse = await hypixelFetch("?");
+		const hypixelResponse = await hypixelFetch("ping?"); // Fake endpoint
 		const botToHypixel = performance.now() - START;
 		const hypixelString = hypixelResponse === "API ERROR" ? "No Response" : Math.round(botToHypixel) + "ms";
 
