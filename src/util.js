@@ -326,7 +326,7 @@ const hypixelToStandard = D => {
 			playtime: defaultTo(D.achievements.tntgames_tnt_triathlon, 0)
 		},
 		duels: {
-			wins: 0, deaths: 0, losses: 0,
+			wins:  0, deaths: 0, losses: 0,
 			shots: 0, bestWS: 0, currentWS: 0, WL: 0
 		}
 	};
