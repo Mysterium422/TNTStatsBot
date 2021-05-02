@@ -1,7 +1,22 @@
-const db = require("../db");
-const {errorEmbed, randomChoice, embedFooter, getMentioned, mojangUUIDFetch, getStats, hypixelToStandard, getAvatar, formatMinutes, GAMES_READABLE, formatSeconds, GAMES} = require("../util.js");
-const Discord = require("discord.js");
-const strings = require("../strings.js");
+const {
+	errorEmbed,
+	randomChoice,
+	embedFooter,
+	getMentioned,
+	getUUIDFromDiscord,
+	parseUser,
+	getStats,
+	hypixelToStandard,
+	getAvatar,
+	formatMinutes,
+	GAMES_READABLE,
+	formatSeconds,
+	GAMES
+} = require("../util.js");
+
+const Discord = require("discord.js"),
+	  strings = require("../strings.js"),
+	  db = require("../db");
 
 module.exports = {
 	run: async ({message, args}) => {
@@ -89,35 +104,6 @@ module.exports = {
 			}
 		};
 
-		const getUUIDFromDiscord = async discord => {
-			const row = await db.select(db.TABLES.VerifiedUsers, {discord});
-			if (row.length === 0) return null;
-			return row[0].uuid;
-		};
-
-		const parseUser = async (arg, mentioned = null) => {
-			if (mentioned === null) {
-				// If it's too short to be a UUID...
-				if (arg.length <= 16) {
-					// Fetch the UUID from Mojang
-					const mojangResponse = await mojangUUIDFetch(arg);
-					if (mojangResponse === null) {
-						// If the playername is invalid, return an error
-						return {success: false, error: ["Invalid playername", `Failed to fetch the UUID of '${arg}' from the Mojang API`]};
-					} else {
-						// Otherwise use the response from Mojang
-						return {success: true, uuid: mojangResponse.id};
-					}
-				} else {
-					return {success: true, uuid: arg};
-				}
-			} else {
-				const uuid = await getUUIDFromDiscord(mentioned.id);
-				if (uuid === null) return {success: false, error: ["Invalid user", "That user has not linked their Hypixel account"]};
-				else return {success: true, uuid};
-			}
-		};
-
 		let uuid = null,
 			game = null;
 
@@ -136,14 +122,10 @@ module.exports = {
 
 		if (args.length > 2) {
 			return message.channel.send(errorEmbed("Too many arguments!"));
-		}
-			
-		else if (args.length === 0 || (args.length === 1 && args[0] in GAMES)) {
+		} else if (args.length === 0 || (args.length === 1 && args[0] in GAMES)) {
 			uuid = await getUUIDFromDiscord(message.author.id);
 			if (uuid === null) return message.channel.send(errorEmbed("Discord account not linked", strings.unlinked));
-		}
-		
-		else if (args.length === 2 || (args.length === 1 && !(args[0] in GAMES))) {
+		} else if (args.length === 2 || (args.length === 1 && !(args[0] in GAMES))) {
 			const user = await parseUser(args[0], getMentioned(message));
 			if (!user.success) return message.channel.send(errorEmbed(...user.error));
 			uuid = user.uuid;

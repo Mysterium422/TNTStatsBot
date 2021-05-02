@@ -1,4 +1,5 @@
-const Discord = require("discord.js");
+const Discord = require("discord.js"),
+	  db = require("./db");
 
 const embedFooter = {
 	text: [
@@ -394,7 +395,34 @@ for (const key in games_generator) {
 }
 
 const startsWithMention = message => /^<@!?(\d+)>/g.exec(message.content).index === 0;
+const getUUIDFromDiscord = async discord => {
+	const row = await db.select(db.TABLES.VerifiedUsers, {discord});
+	if (row.length === 0) return null;
+	return row[0].uuid;
+};
 
+const parseUser = async (arg, mentioned = null) => {
+	if (mentioned === null) {
+		// If it's too short to be a UUID...
+		if (arg.length <= 16) {
+			// Fetch the UUID from Mojang
+			const mojangResponse = await mojangUUIDFetch(arg);
+			if (mojangResponse === null) {
+				// If the playername is invalid, return an error
+				return {success: false, error: ["Invalid playername", `Failed to fetch the UUID of '${arg}' from the Mojang API`]};
+			} else {
+				// Otherwise use the response from Mojang
+				return {success: true, uuid: mojangResponse.id};
+			}
+		} else {
+			return {success: true, uuid: arg};
+		}
+	} else {
+		const uuid = await getUUIDFromDiscord(mentioned.id);
+		if (uuid === null) return {success: false, error: ["Invalid user", "That user has not linked their Hypixel account"]};
+		else return {success: true, uuid};
+	}
+};
 
 module.exports = {
 	embedFooter, randomChoice, noop, errorEmbed,
@@ -403,5 +431,6 @@ module.exports = {
 	getMentioned, successEmbed, mojangNameFetch, getAvatar,
 	getStats, hypixelToStandard, formatMinutes,
 	GAMES, GAMES_READABLE, getWithoutMentions,
-	startsWithMention, formatSeconds
+	startsWithMention, formatSeconds, getUUIDFromDiscord,
+	parseUser
 };
