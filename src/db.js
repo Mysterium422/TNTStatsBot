@@ -51,10 +51,12 @@ const select = (database, query) => knex(database).where(query);
 const del = (database, query) => knex(database).where(query).del();
 
 const linkUUID = async (uuid, discord) => {
-	const updated = await update(TABLES.VerifiedUsers, {uuid}, {discord});
-	if (updated === 0) {
-		return await add(TABLES.VerifiedUsers, {uuid, discord});
-	} else return updated;
+	const existing = await select(TABLES.VerifiedUsers, {discord});
+	if (existing.length === 0) {
+		return add(TABLES.VerifiedUsers, {uuid, discord});
+	} else {
+		return update(TABLES.VerifiedUsers, {discord}, {uuid});
+	}
 };
 
 const linkChannelPreifx = async (channel, prefix, game) => {
