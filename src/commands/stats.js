@@ -27,9 +27,11 @@ module.exports = {
 		 * @returns Embed to send to user
 		 */
 		const getStatsEmbed = (stats, game) => {
+			// TODO: Recording system
 			const embed = new Discord.MessageEmbed();
 			embed.setAuthor(message.author.tag, getAvatar(message.author));
 			embed.setFooter(randomChoice(embedFooter.text), embedFooter.image.green);
+			// TODO: Based on user's rank
 			embed.setColor("#0099ff");
 			embed.setURL(`https://plancke.io/hypixel/player/stats/${stats.info.displayname}`);
 			embed.setThumbnail(`https://visage.surgeplay.com/head/128/${stats.info.uuid}`);
