@@ -5,29 +5,29 @@ const knex = require("knex")({
 	client: "sqlite3",
 	connection: {
 		filename: path.resolve(__dirname, "../database.sql")
-	}
+	},
+	useNullAsDefault: true
 });
 
 const TABLES = {
 	VerifiedUsers: "verified_users",
-	ConfiguredChannels: "configured_channels"
+	ConfiguredChannels: "configured_channels",
+	UserCache: "user_cache"
 };
 
-const createVerifiedTable = () =>
+const createTables = () => {
 	knex.schema.hasTable(TABLES.VerifiedUsers).then(exists => {
 		if (!exists) {
 			return knex.schema.createTable(TABLES.VerifiedUsers, table => {
 				table.string("uuid").primary();
 				table.string("discord").notNullable();
-				table.json("cache").defaultTo(null);
 			});
 		}
 	});
 
-const createChannelTable = () =>
-	knex.schema.hasTable("configured_channels").then(exists => {
+	knex.schema.hasTable(TABLES.ConfiguredChannels).then(exists => {
 		if (!exists) {
-			return knex.schema.createTable("configured_channels", table => {
+			return knex.schema.createTable(TABLES.ConfiguredChannels, table => {
 				table.string("guild").notNullable();
 				table.string("channel").notNullable();
 				table.string("prefix").notNullable();
@@ -35,6 +35,17 @@ const createChannelTable = () =>
 			});
 		}
 	});
+
+	knex.schema.hasTable(TABLES.UserCache).then(exists => {
+		if (!exists) {
+			return knex.schema.createTable(TABLES.UserCache, table => {
+				table.string("discord").primary();
+				table.string("uuid").notNullable();
+				table.json("data").notNullable();
+			});
+		}
+	});
+};
 
 const reset = async () => {
 	console.warn("[NOTICE] Resetting database...");
@@ -79,17 +90,10 @@ const getChannelInfo = async message => {
 	return result[0];
 };
 
+
+
 module.exports = {
-	add,
-	all,
-	update,
-	select,
-	del,
-	reset,
-	TABLES,
-	linkUUID,
-	linkChannelPreifx,
-	createVerifiedTable,
-	createChannelTable,
-	getChannelInfo
+	add, all, update, select, del, reset,
+	TABLES, linkUUID, linkChannelPreifx,
+	getChannelInfo, createTables
 };

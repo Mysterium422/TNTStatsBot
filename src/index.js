@@ -7,8 +7,7 @@ const Discord = require("discord.js"),
 const {
 	mojangUUIDFetch,
 	hypixelFetch,
-	replaceError,
-	booleanPhrases, 
+	replaceError, 
 	getMentioned,
 	startsWithMention,
 	getWithoutMentions
@@ -22,25 +21,17 @@ const commands = {};
 client.on("ready", async () => {
 	console.log("[INFO] Initializing...");
 
-	// DEBUG ONLY!!
-	// await db.reset();
-	// DEBUG ONLY!!
-
 	try {
-		// Kinda verbose but idrc
-		console.log("[INFO] Loading channel database...");
-		await db.createChannelTable();
-		console.log("[SUCCESS] Database loaded.");
-
-		console.log("[INFO] Loading users database...");
-		await db.createVerifiedTable();
+		console.log("[INFO] Loading database...");
+		await db.createTables();
 		console.log("[SUCCESS] Database loaded.");
 	} catch (e) {
-		console.error("[ERROR] Failed to load users database! Aborting...");
+		console.error("[ERROR] Failed to load database! Aborting...");
 		throw e;
 	}
-
+	
 	try {
+		console.log("[INFO] Loading commands...");
 		fs.readdirSync(path.resolve(__dirname, "commands")).forEach(fileName => {
 			const obj = require("./commands/" + fileName);
 			// Slice to remove `.js`
@@ -49,7 +40,7 @@ client.on("ready", async () => {
 				commands[name] = obj;
 			});
 		});
-		console.log("[SUCCESS] Loaded commands...");
+		console.log("[SUCCESS] Commands loaded.");
 	} catch (e) {
 		console.error("[ERROR] Failed to load commands! Aborting...");
 		throw e;
@@ -79,11 +70,8 @@ client.on("message", async message => {
 		if (channel === null && commands[command].requiresConfiguredChannel) return;
 		try {
 			await commands[command].run({
-				client,
-				message,
-				args,
-				command,
-				channelInfo: channel,
+				client, message, args,
+				command, channelInfo: channel,
 				multiArgs: messageContent.slice(command.length)
 			});
 
@@ -95,10 +83,9 @@ client.on("message", async message => {
 		}
 	} else {
 		message.channel.send("Command does not exist!");
-		// return;
+		if (1 + 1 === 2) return; // Debug
 	}
 
-	if (1 + 1 === 2) return; // Debug
 
 	// if (message.content.toLowerCase() == "/tntremove") {
 	// 	if (!message.member.hasPermission("ADMINISTRATOR") && message.author.id != config.owner_id) return;
