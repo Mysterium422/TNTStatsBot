@@ -107,61 +107,7 @@ client.on("message", async message => {
 	// 	return message.channel.send("I will no longer respond to messages in this channel");
 	// }
 
-	if (command.toLowerCase() === "settings") {
-		if (args.length != 2) {
-			return sendErrorEmbed(message.channel, `Usage Error`, `Usage: ${prefix}settings [setting] [true/false]`);
-		}
-
-		if (args[0] == "verbose") {
-			if (args[1] in booleanPhrases) {
-				if ((await db.get(`${message.author.id}.verbose`)) == booleanPhrases[args[1]]) {
-					message.channel.send("This setting was already set!");
-				} else {
-					message.channel.send("Settings changed!");
-				}
-				await db.set(`${message.author.id}.verbose`, booleanPhrases[args[1]]);
-				return;
-			} else {
-				return sendErrorEmbed(message.channel, `Usage Error`, `Usage: ${prefix}settings verbose [true/false]`);
-			}
-		} else if (args[0] == "reset") {
-			if (args[1] in booleanPhrases) {
-				if ((await db.get(`${message.author.id}.reset`)) == booleanPhrases[args[1]]) {
-					message.channel.send("This setting was already set!");
-				} else {
-					message.channel.send("Settings changed!");
-				}
-				await db.set(`${message.author.id}.reset`, booleanPhrases[args[1]]);
-				return;
-			} else {
-				return sendErrorEmbed(message.channel, `Usage Error`, `Usage: ${prefix}settings reset [true/false]`);
-			}
-		}
-	} else if (command.toLowerCase() === "reset") {
-		let received = "";
-		try {
-			received = await fs.readFileSync("../global/IDS.json");
-		} catch (e) {
-			console.warn("File is invalid!");
-			process.exit();
-		}
-		idData = JSON.parse(received);
-
-		if (message.author.id in idData) {
-			const user = await hypixelFetch(`player?uuid=${idData[message.author.id]}`);
-		}
-		if (user == "API ERROR") {
-			return message.channel.send("API Connection Issues, Hypixel might be offline");
-		}
-
-		if (!user || !user.sjuccess || user.success == false || user.player == null || user.player == undefined || !user.player || user.player.stats == undefined) return sendErrorEmbed(message.channel, `Unknown Player`, `Player has no data in Hypixel's Database`);
-		if (user.player.stats.TNTGames == undefined) return sendErrorEmbed(message.channel, `Unknown Player`, `Player has no Data in Hypixel's TNT Database`);
-
-		await setCacheDB(user.player, user.player.uuid, message.author.id);
-		return message.channel.send(`Reset counters for you!`);
-	} else if (command.toLowerCase() === "mysterium") {
-		return message.channel.send("Hey! This bot was coded by Mysterium&Lebster!\nReport Bugs here: https://discord.gg/7Qb5xuJD4C\nHere's my website (WIP): <https://mysterium.me>");
-	} else if (command.toLowerCase() === "weekly" || command == "monthly") {
+	if (command.toLowerCase() === "weekly" || command == "monthly") {
 		let received = "";
 		try {
 			received = await fs.readFileSync("../global/IDS.json");

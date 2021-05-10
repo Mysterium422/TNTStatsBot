@@ -82,5 +82,15 @@ invalid_game_type:
 "Expected one of: `all`, `wizards`, `run`, `pvp`, `tag`, `bowspleef`",
 
 reportbugs:
-"Report any bugs here: https://discord.gg/7Qb5xuJD4C"
+"Report any bugs here: https://discord.gg/7Qb5xuJD4C",
+
+mysterium:
+`This bot was originally created by Mysterium_
+**Mysterium's Website (WIP)**: <https://mysterium.me>
+
+Later, Lebster joined the project and rewrote the entire bot!
+**Lebster's Website**: <https://lebster.xyz>
+
+Please report any bugs here: https://discord.gg/7Qb5xuJD4C
+`
 };

@@ -1,6 +1,6 @@
 # To Do:   
 - [x] Finish stats command
-- [ ] Kills command
+- [x] Kills command
 - [ ] [Recordings](#stats-recordings)
 - [ ] Weekly/Monthly Cache & Leaerboards
 
