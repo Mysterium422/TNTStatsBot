@@ -139,12 +139,12 @@ const getStats = async uuid => {
 	} else if (data.player === null) {
 		return {
 			success: false,
-			error: ["Invalid playername/uuid", `That player has never logged on to Hypixel!`]
+			error: ["Invalid playername/uuid", "That player has never logged on to Hypixel!"]
 		};
 	} else if (!("TNTGames" in data.player.stats)) {
 		return {
 			success: false,
-			error: ["Invalid playername/uuid", `That player has never played TNT Games!`]
+			error: ["Invalid playername/uuid", "That player has never played TNT Games!"]
 		};
 	}
 
@@ -240,9 +240,10 @@ const getStats = async uuid => {
 
 /**
  * @typedef PlayerInfo 
- * @property {string} info.uuid UUID
- * @property {string} info.displayname Display name
- * @property {string} info.rank Rank on Hypixel
+ * @property {string} uuid UUID
+ * @property {string} displayname Display name
+ * @property {string} rank Rank on Hypixel
+ * @property {number} timestamp Timestamp of stats
 **/
 
 /**
@@ -266,7 +267,8 @@ const hypixelToStandard = D => {
 		info: {
 			uuid:        D.uuid,
 			displayname: D.displayname,
-			rank:        D.packageRank
+			rank:        D.packageRank,
+			timestamp:   Date.now()
 		},
 		run: {
 			record:   defaultTo(TNT.record_tntrun, 0),
