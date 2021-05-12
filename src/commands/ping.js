@@ -4,7 +4,7 @@ const db = require("../db");
 
 module.exports = {
 	run: async ({message}) => {
-		const discordToBot = Date.now() - message.createdTimestamp;
+		const discordToBot = message.createdTimestamp - Date.now();
 
 		let START = performance.now();
 		await db.select(db.TABLES.ConfiguredChannels, {guild: message.guild.id, channel: message.channel.id});
@@ -17,7 +17,7 @@ module.exports = {
 
 		const embed = successEmbed(message.author, "", "Ping");
 
-		embed.addField("Discord to Bot", Math.round(discordToBot) + "ms");
+		embed.addField("Discord to Bot", Math.round(Math.abs(discordToBot)) + "ms");
 		embed.addField("Bot to Hypixel", hypixelString);
 		embed.addField("Bot to Database", Math.round(botToDB) + "ms");
 
