@@ -17,9 +17,9 @@ module.exports = {
 
 		const embed = successEmbed(message.author, "", "Ping");
 
-		embed.addField("Discord to Bot", Math.round(discordToBot) + "ms", true);
-		embed.addField("Bot to Hypixel", hypixelString, true);
-		embed.addField("Bot to Database", Math.round(botToDB) + "ms", true);
+		embed.addField("Discord to Bot", Math.round(discordToBot) + "ms");
+		embed.addField("Bot to Hypixel", hypixelString);
+		embed.addField("Bot to Database", Math.round(botToDB) + "ms");
 
 		return message.channel.send(embed);
 	},
