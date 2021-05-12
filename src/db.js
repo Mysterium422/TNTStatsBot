@@ -41,7 +41,7 @@ const createTables = () => {
 			return knex.schema.createTable(TABLES.UserCache, table => {
 				table.string("discord").primary();
 				table.string("uuid").notNullable();
-				table.json("data").notNullable();
+				table.jsonb("data").notNullable();
 			});
 		}
 	});

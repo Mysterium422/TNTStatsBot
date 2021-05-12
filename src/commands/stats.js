@@ -17,6 +17,7 @@ const {
 const Discord = require("discord.js"),
 	  strings = require("../strings.js"),
 	  db = require("../db");
+const { saveStats } = require("../cache.js");
 
 module.exports = {
 	run: async ({message, args}) => {
@@ -135,7 +136,10 @@ module.exports = {
 
 		const data = await getStats(uuid);
 		if (!data.success) return message.channel.send(errorEmbed(...data.error));
-		return message.channel.send(getStatsEmbed(hypixelToStandard(data.user.player), game));
+
+		const stats = hypixelToStandard(data.user.player);
+		await saveStats(message.author.id, uuid, stats);
+		return message.channel.send(getStatsEmbed(stats, game));
 	},
 	aliases: [],
 	requiresConfiguredChannel: true
