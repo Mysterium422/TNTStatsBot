@@ -6,4 +6,10 @@ const saveStats = async (discord, uuid, data) => {
     } else return updated;
 };
 
-module.exports = {saveStats};
+const getCache = async (discord, uuid) => {
+    const result = await db.select(db.TABLES.UserCache, {discord, uuid});
+    if (result.length === 0) return null;
+    else return JSON.parse(result[0].data);
+};
+
+module.exports = {saveStats, getCache};

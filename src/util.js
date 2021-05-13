@@ -350,23 +350,13 @@ const hypixelToStandard = D => {
 };
 
 const formatMinutes = mins => {
-	let hours = 0;
-	while (mins >= 60) {
-		hours++;
-		mins -= 60;
-	}
-
-	return `${hours}h ${mins}m`;
+	const hours = Math.trunc(mins / 60);
+	return `${hours > 0 ? (hours.toLocaleString() + "h") : ""} ${Math.floor(mins % 60).toLocaleString()}m`;
 };
 
 const formatSeconds = secs => {
-	let mins = 0;
-	while (secs >= 60) {
-		mins++;
-		secs -= 60;
-	}
-
-	return `${mins}m ${secs}s`;
+	const mins = Math.trunc(secs / 60);
+	return `${mins > 0 ? (mins.toLocaleString() + "m") : ""} ${Math.floor(secs % 60).toLocaleString()}s`;
 };
 
 const GAMES_READABLE = {
@@ -379,22 +369,36 @@ const GAMES_READABLE = {
 	duels: "Bow Spleef Duels"
 };
 
-const games_generator = {
-	all: ["overall", "all", "tnt"],
-	wizards: ["wizards", "wiz", "tntwiz", "wizard", "tntwizard", "tntwizards"],
-	run: ["run", "tntrun"],
-	pvp: ["pvp", "pvprun"],
-	tag: ["tag", "tnttag", "tagtnt"],
-	bowspleef: ["bowspleef", "bow", "spleef", "bspleef", "tntspleef"],
-	duels: ["duels", "bowduel", "spleefduel", "bowspleefduel", "tntduel", "tntduels", "duel"]
+const GAMES = {
+	all:           "all",
+	bow:           "bowspleef",
+	bowduel:       "duels",
+	bowspleef:     "bowspleef",
+	bowspleefduel: "duels",
+	bspleef:       "bowspleef",
+	duel:          "duels",
+	duels:         "duels",
+	overall:       "all",
+	pvp:           "pvp",
+	pvprun:        "pvp",
+	run:           "run",
+	spleef:        "bowspleef",
+	spleefduel:    "duels",
+	tag:           "tag",
+	tagtnt:        "tag",
+	tnt:           "all",
+	tntduel:       "duels",
+	tntduels:      "duels",
+	tntrun:        "run",
+	tntspleef:     "bowspleef",
+	tnttag:        "tag",
+	tntwiz:        "wizards",
+	tntwizard:     "wizards",
+	tntwizards:    "wizards",
+	wiz:           "wizards",
+	wizard:        "wizards",
+	wizards:       "wizards"
 };
-// I am very lazy, so let's generate the object in code!!
-const GAMES = {};
-for (const key in games_generator) {
-	for (const name of games_generator[key]) {
-		GAMES[name] = key;
-	}
-}
 
 const startsWithMention = message => /^<@!?(\d+)>/g.exec(message.content).index === 0;
 const getUUIDFromDiscord = async discord => {

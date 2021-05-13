@@ -15,25 +15,41 @@ const {
 } = require("../util.js");
 
 const Discord = require("discord.js"),
-	  strings = require("../strings.js"),
-	  db = require("../db");
-const { saveStats } = require("../cache.js");
+	strings = require("../strings.js"),
+	db = require("../db"),
+	{saveStats, getCache} = require("../cache.js");
 
 module.exports = {
 	run: async ({message, args}) => {
+		const toLString = n => n.toLocaleString();
+		const display = (pathStr, stats, previous, formatter = toLString) => {
+			const path = pathStr.split(".");
+			const statsValue = path.reduce((a, cv) => a[cv], stats);
+			let result = formatter(statsValue);
+
+			if (previous !== null) {
+				const previousValue = path.reduce((a, cv) => a[cv], previous);
+				if (statsValue < previousValue) {
+					result += " (" + formatter(statsValue - previousValue) + ")";
+				} else if (statsValue > previousValue) {
+					result += " (+" + formatter(statsValue - previousValue) + ")";
+				}
+			}
+
+			return result;
+		};
+
 		/**
 		 * Get the stats embed
 		 * @param {import("../util").HypixelStats} stats The statistics
 		 * @param {string} game Game type
 		 * @returns Embed to send to user
 		 */
-		const getStatsEmbed = (stats, game) => {
-			// TODO: Recording system
+		const getStatsEmbed = (stats, previous, game) => {
 			const embed = new Discord.MessageEmbed();
 			embed.setAuthor(message.author.tag, getAvatar(message.author));
 			embed.setFooter(randomChoice(embedFooter.text), embedFooter.image.green);
-			// TODO: Based on user's rank
-			embed.setColor("#0099ff");
+			embed.setColor("#0099ff"); // TODO: Based on user's rank
 			embed.setURL(`https://plancke.io/hypixel/player/stats/${stats.info.displayname}`);
 			embed.setThumbnail(`https://visage.surgeplay.com/head/128/${stats.info.uuid}`);
 			embed.setTimestamp();
@@ -41,65 +57,65 @@ module.exports = {
 
 			switch (game) {
 				case "all":
-					embed.addField("**Coins**", stats.overall.coins.toLocaleString(), true);
-					embed.addField("**Wins**", stats.overall.wins.toLocaleString(), true);
-					embed.addField("**Playtime**", formatMinutes(stats.overall.playtime), true);
-					embed.addField("**TNT Tag Wins**", stats.tag.wins.toLocaleString(), true);
-					embed.addField("**TNT Run Record**", stats.run.record.toLocaleString(), true);
-					embed.addField("**TNT Run Wins**", stats.run.wins.toLocaleString(), true);
-					embed.addField("**Bowspleef Wins**", stats.bowspleef.wins.toLocaleString(), true);
-					embed.addField("**PvP Run Kills**", stats.pvp.kills.toLocaleString(), true);
-					embed.addField("**PvP Run Wins**", stats.pvp.wins.toLocaleString(), true);
-					embed.addField("**Wizards Wins**", stats.wizards.wins.toLocaleString(), true);
-					embed.addField("**Wizards Kills**", stats.wizards.kills.total.toLocaleString(), true);
-					embed.addField("**Wizards Points**", stats.wizards.points.toLocaleString(), true);
+					embed.addField("**Coins**",          display("overall.coins",       stats, previous), true);
+					embed.addField("**Wins**",           display("overall.wins",        stats, previous), true);
+					embed.addField("**Playtime**",       display("overall.playtime",    stats, previous, formatMinutes), true);
+					embed.addField("**TNT Tag Wins**",   display("tag.wins",            stats, previous), true);
+					embed.addField("**TNT Run Record**", display("run.record",          stats, previous), true);
+					embed.addField("**TNT Run Wins**",   display("run.wins",            stats, previous), true);
+					embed.addField("**Bowspleef Wins**", display("bowspleef.wins",      stats, previous), true);
+					embed.addField("**PvP Run Kills**",  display("pvp.kills",           stats, previous), true);
+					embed.addField("**PvP Run Wins**",   display("pvp.wins",            stats, previous), true);
+					embed.addField("**Wizards Wins**",   display("wizards.wins",        stats, previous), true);
+					embed.addField("**Wizards Kills**",  display("wizards.kills.total", stats, previous), true);
+					embed.addField("**Wizards Points**", display("wizards.points",      stats, previous), true);
 					return embed;
 				case "run":
-					embed.addField("**Record**", formatSeconds(stats.run.record), true);
-					embed.addField("**Wins**", stats.run.wins.toLocaleString(), true);
-					embed.addField("**Deaths**", stats.run.deaths.toLocaleString(), true);
-					embed.addField("**Potions Thrown**", stats.run.potions.toLocaleString(), true);
-					embed.addField("**W/L Ratio**", stats.run.WL.toLocaleString(), true);
-					embed.addField("**Blocks Broken**", stats.run.blocks.toLocaleString(), true);
+					embed.addField("**Record**",         display("run.record",          stats, previous, formatSeconds), true);
+					embed.addField("**Wins**",           display("run.wins",            stats, previous), true);
+					embed.addField("**Deaths**",         display("run.deaths",          stats, previous), true);
+					embed.addField("**Potions Thrown**", display("run.potions",         stats, previous), true);
+					embed.addField("**W/L Ratio**",      display("run.WL",              stats, previous), true);
+					embed.addField("**Blocks Broken**",  display("run.blocks",          stats, previous), true);
 					return embed;
 				case "pvp":
-					embed.addField("**Record**", formatSeconds(stats.run.record), true);
-					embed.addField("**Wins**", stats.pvp.wins.toLocaleString(), true);
-					embed.addField("**Deaths**", stats.pvp.deaths.toLocaleString(), true);
-					embed.addField("**Kills**", stats.pvp.kills.toLocaleString(), true);
-					embed.addField("**W/L Ratio**", stats.pvp.WL.toLocaleString(), true);
-					embed.addField("**K/D Ratio**", stats.pvp.KD.toLocaleString(), true);
+					embed.addField("**Record**",         display("pvp.record",          stats, previous, formatSeconds), true);
+					embed.addField("**Wins**",           display("pvp.wins",            stats, previous), true);
+					embed.addField("**Deaths**",         display("pvp.deaths",          stats, previous), true);
+					embed.addField("**Kills**",          display("pvp.kills",           stats, previous), true);
+					embed.addField("**W/L Ratio**",      display("pvp.WL",              stats, previous), true);
+					embed.addField("**K/D Ratio**",      display("pvp.KD",              stats, previous), true);
 					return embed;
 				case "bowspleef":
-					embed.addField("**Wins**", stats.bowspleef.wins.toLocaleString(), true);
-					embed.addField("**Deaths**", stats.bowspleef.deaths.toLocaleString(), true);
-					embed.addField("**Kills**", stats.bowspleef.kills.toLocaleString(), true);
-					embed.addField("**Shots**", stats.bowspleef.shots.toLocaleString(), true);
-					embed.addField("**W/L Ratio**", stats.bowspleef.WL.toLocaleString(), true);
+					embed.addField("**Wins**",           display("bowspleef.wins",      stats, previous), true);
+					embed.addField("**Deaths**",         display("bowspleef.deaths",    stats, previous), true);
+					embed.addField("**Kills**",          display("bowspleef.kills",     stats, previous), true);
+					embed.addField("**Shots**",          display("bowspleef.shots",     stats, previous), true);
+					embed.addField("**W/L Ratio**",      display("bowspleef.WL",        stats, previous), true);
 					return embed;
 				case "tag":
-					embed.addField("**Wins**", stats.tag.wins.toLocaleString(), true);
-					embed.addField("**Kills**", stats.tag.kills.toLocaleString(), true);
-					embed.addField("**Tags**", stats.tag.tags.toLocaleString(), true);
-					embed.addField("**T/K Ratio**", stats.tag.TK.toLocaleString(), true);
-					embed.addField("**K/W Ratio**", stats.tag.KW.toLocaleString(), true);
+					embed.addField("**Wins**",           display("tag.wins",            stats, previous), true);
+					embed.addField("**Kills**",          display("tag.kills",           stats, previous), true);
+					embed.addField("**Tags**",           display("tag.tags",            stats, previous), true);
+					embed.addField("**T/K Ratio**",      display("tag.TK",              stats, previous), true);
+					embed.addField("**K/W Ratio**",      display("tag.KW",              stats, previous), true);
 					return embed;
 				case "wizards":
 					// TODO: Airtime, KA/D Ratio, K/W Ratio, Kills with each class (verbose only)
-					embed.addField("**Wins**", stats.wizards.wins.toLocaleString(), true);
-					embed.addField("**Deaths**", stats.wizards.deaths.toLocaleString(), true);
-					embed.addField("**Kills**", stats.wizards.kills.total.toLocaleString(), true);
-					embed.addField("**Assists**", stats.wizards.assists.toLocaleString(), true);
-					embed.addField("**Points**", stats.wizards.points.toLocaleString(), true);
-					embed.addField("**K/D Ratio**", stats.wizards.KD.toLocaleString(), true);
+					embed.addField("**Wins**",           display("wizards.wins",        stats, previous), true);
+					embed.addField("**Deaths**",         display("wizards.deaths",      stats, previous), true);
+					embed.addField("**Kills**", stats.   display("wizards.kills.total", stats, previous), true);
+					embed.addField("**Assists**",        display("wizards.assists",     stats, previous), true);
+					embed.addField("**Points**",         display("wizards.points",      stats, previous), true);
+					embed.addField("**K/D Ratio**",      display("wizards.KD",          stats, previous), true);
 					return embed;
 				case "duels":
-					embed.addField("**Wins**", stats.duels.wins.toLocaleString(), true);
-					embed.addField("**Losses**", stats.duels.losses.toLocaleString(), true);
-					embed.addField("**Shots**", stats.duels.shots.toLocaleString(), true);
-					embed.addField("**W/L Ratio**", stats.duels.WL.toLocaleString(), true);
-					embed.addField("**Current WS**", stats.duels.currentWS.toLocaleString(), true);
-					embed.addField("**Best WS**", stats.duels.bestWS.toLocaleString(), true);
+					embed.addField("**Wins**",           display("duels.wins",          stats, previous), true);
+					embed.addField("**Losses**",         display("duels.losses",        stats, previous), true);
+					embed.addField("**Shots**",          display("duels.shots",         stats, previous), true);
+					embed.addField("**W/L Ratio**",      display("duels.WL",            stats, previous), true);
+					embed.addField("**Current WS**",     display("duels.currentWS",     stats, previous), true);
+					embed.addField("**Best WS**",        display("duels.bestWS",        stats, previous), true);
 					return embed;
 				case null:
 					embed.setDescription("No game was provided.");
@@ -138,8 +154,10 @@ module.exports = {
 		if (!data.success) return message.channel.send(errorEmbed(...data.error));
 
 		const stats = hypixelToStandard(data.user.player);
+		const previous = await getCache(message.author.id, uuid);
 		await saveStats(message.author.id, uuid, stats);
-		return message.channel.send(getStatsEmbed(stats, game));
+
+		return message.channel.send(getStatsEmbed(stats, previous, game));
 	},
 	aliases: [],
 	requiresConfiguredChannel: true

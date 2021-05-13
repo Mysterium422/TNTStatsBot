@@ -39,7 +39,7 @@ const createTables = () => {
 	knex.schema.hasTable(TABLES.UserCache).then(exists => {
 		if (!exists) {
 			return knex.schema.createTable(TABLES.UserCache, table => {
-				table.string("discord").primary();
+				table.string("discord").notNullable();
 				table.string("uuid").notNullable();
 				table.jsonb("data").notNullable();
 			});
