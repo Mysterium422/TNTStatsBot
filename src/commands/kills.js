@@ -7,11 +7,13 @@ const {
 	hypixelToStandard,
 	getAvatar,
 	randomChoice,
-	embedFooter
+	embedFooter,
+	display
 } = require("../util.js");
 
 const Discord = require("discord.js"),
 	  strings = require("../strings.js");
+const { getCache } = require("../cache.js");
 
 module.exports = {
 	run: async ({message, args}) => {
@@ -20,7 +22,7 @@ module.exports = {
 			uuid = await getUUIDFromDiscord(message.author.id);
 			if (uuid === null) return message.channel.send(errorEmbed("Discord account not linked", strings.unlinked));
 		} else if (args.length === 1) {
-			const user = await parseUser(arg[0], getMentioned(message));
+			const user = await parseUser(args[0], getMentioned(message));
 			if (!user.success) return message.channel.send(...user.error);
 			uuid = user.uuid;
 		}
@@ -32,6 +34,8 @@ module.exports = {
 		 * @type {import("../util").HypixelStats}
 		*/
 		const stats = hypixelToStandard(data.user.player);
+		const previous = await getCache(message.author.id, uuid);
+
 		const embed = new Discord.MessageEmbed();
 		embed.setAuthor(message.author.tag, getAvatar(message.author));
 		embed.setFooter(randomChoice(embedFooter.text), embedFooter.image.green);
@@ -43,16 +47,16 @@ module.exports = {
 		embed.setTimestamp();
 		
 		// TODO: Recording system
-		embed.addField("**Fire**", stats.wizards.kills.fire.toLocaleString(), true);
-		embed.addField("**Ice**", stats.wizards.kills.ice.toLocaleString(), true);
-		embed.addField("**Wither**", stats.wizards.kills.wither.toLocaleString(), true);
-		embed.addField("**Kinetic**", stats.wizards.kills.kinetic.toLocaleString(), true);
-		embed.addField("**Blood**", stats.wizards.kills.blood.toLocaleString(), true);
-		embed.addField("**Toxic**", stats.wizards.kills.toxic.toLocaleString(), true);
-		embed.addField("**Hydro**", stats.wizards.kills.hydro.toLocaleString(), true);
-		embed.addField("**Ancient**", stats.wizards.kills.ancient.toLocaleString(), true);
-		embed.addField("**Storm**", stats.wizards.kills.storm.toLocaleString(), true);
-		embed.setDescription("**Total Kills**: " + stats.wizards.kills.total.toLocaleString());
+		embed.addField("**Fire**",    display("wizards.kills.fire",    stats, previous), true);
+		embed.addField("**Ice**",     display("wizards.kills.ice",     stats, previous), true);
+		embed.addField("**Wither**",  display("wizards.kills.wither",  stats, previous), true);
+		embed.addField("**Kinetic**", display("wizards.kills.kinetic", stats, previous), true);
+		embed.addField("**Blood**",   display("wizards.kills.blood",   stats, previous), true);
+		embed.addField("**Toxic**",   display("wizards.kills.toxic",   stats, previous), true);
+		embed.addField("**Hydro**",   display("wizards.kills.hydro",   stats, previous), true);
+		embed.addField("**Ancient**", display("wizards.kills.ancient", stats, previous), true);
+		embed.addField("**Storm**",   display("wizards.kills.storm",   stats, previous), true);
+		embed.setDescription("**Total Kills**: " + display("wizards.kills.total",   stats, previous));
 
 		return message.channel.send(embed);
 

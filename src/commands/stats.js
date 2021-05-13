@@ -11,7 +11,8 @@ const {
 	formatMinutes,
 	GAMES_READABLE,
 	formatSeconds,
-	GAMES
+	GAMES,
+	display,
 } = require("../util.js");
 
 const Discord = require("discord.js"),
@@ -21,24 +22,6 @@ const Discord = require("discord.js"),
 
 module.exports = {
 	run: async ({message, args}) => {
-		const toLString = n => n.toLocaleString();
-		const display = (pathStr, stats, previous, formatter = toLString) => {
-			const path = pathStr.split(".");
-			const statsValue = path.reduce((a, cv) => a[cv], stats);
-			let result = formatter(statsValue);
-
-			if (previous !== null) {
-				const previousValue = path.reduce((a, cv) => a[cv], previous);
-				if (statsValue < previousValue) {
-					result += " (" + formatter(statsValue - previousValue) + ")";
-				} else if (statsValue > previousValue) {
-					result += " (+" + formatter(statsValue - previousValue) + ")";
-				}
-			}
-
-			return result;
-		};
-
 		/**
 		 * Get the stats embed
 		 * @param {import("../util").HypixelStats} stats The statistics

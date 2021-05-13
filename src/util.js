@@ -267,7 +267,7 @@ const hypixelToStandard = D => {
 		info: {
 			uuid:        D.uuid,
 			displayname: D.displayname,
-			rank:        D.packageRank,
+			rank:        D.newPackageRank,
 			timestamp:   Date.now()
 		},
 		run: {
@@ -430,6 +430,26 @@ const parseUser = async (arg, mentioned = null) => {
 	}
 };
 
+
+const toLString = n => n.toLocaleString();
+
+const display = (pathStr, stats, previous, formatter = toLString) => {
+	const path = pathStr.split(".");
+	const statsValue = path.reduce((a, cv) => a[cv], stats);
+	let result = formatter(statsValue);
+
+	if (previous !== null) {
+		const previousValue = path.reduce((a, cv) => a[cv], previous);
+		if (statsValue < previousValue) {
+			result += " (" + formatter(statsValue - previousValue) + ")";
+		} else if (statsValue > previousValue) {
+			result += " (+" + formatter(statsValue - previousValue) + ")";
+		}
+	}
+
+	return result;
+};
+
 module.exports = {
 	embedFooter, randomChoice, noop, errorEmbed,
 	hypixelFetch, mojangUUIDFetch, ChatCodes,
@@ -438,5 +458,5 @@ module.exports = {
 	getStats, hypixelToStandard, formatMinutes,
 	GAMES, GAMES_READABLE, getWithoutMentions,
 	startsWithMention, formatSeconds, getUUIDFromDiscord,
-	parseUser
+	parseUser, toLString, display
 };
