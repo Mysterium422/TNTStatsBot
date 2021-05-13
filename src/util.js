@@ -1,5 +1,5 @@
 const Discord = require("discord.js"),
-	  db = require("./db");
+	db = require("./db");
 
 const embedFooter = {
 	text: [
@@ -11,7 +11,7 @@ const embedFooter = {
 		"Found a bug? Report it!",
 		"Join the discord!",
 		"All bow to sensei Kidzyy",
-		"I'm open source!",
+		"I'm open source!"
 	],
 	image: {
 		green: "https://cdn.discordapp.com/emojis/722990201307398204.png?v=1",
@@ -31,7 +31,6 @@ const errorEmbed = (error = "Something went wrong...", description = ":robot: be
 	return embed;
 };
 
-// SETUP CONFIG
 const config = require("../config.json");
 const key = config.hypixel_key;
 const fetch = require("node-fetch");
@@ -40,7 +39,7 @@ const fetch = require("node-fetch");
 const hypixelFetch = query => fetch(`https://api.hypixel.net/${query}&key=${key}`).then(response => response.json());
 const mojangUUIDFetch = query => fetch(`https://api.mojang.com/users/profiles/minecraft/${query}`).then(response => (response.status === 204 ? null : response.json()));
 const mojangNameFetch = query => fetch(`https://api.mojang.com/user/profiles/${query}/names`).then(response => (response.status === 204 ? null : response.json()));
-const defaultTo = (v, def=null) => typeof v === "undefined" ? def : v;
+const defaultTo = (v, def = null) => (typeof v === "undefined" ? def : v);
 
 const formatTimestamp = timestamp =>
 	new Date(timestamp).toLocaleString("default", {
@@ -63,42 +62,23 @@ const booleanPhrases = {
 	"0": false
 };
 
-const ChatColor = {
-	black: "#000000",
-	dark_blue: "#0000AA",
-	dark_green: "#00AA00",
-	dark_aqua: "#00AAAA",
-	dark_red: "#AA0000",
-	dark_purple: "#AA00AA",
-	gold: "#FFAA00",
-	gray: "#AAAAAA",
-	dark_gray: "#555555",
-	blue: "#5555FF",
-	green: "#55FF55",
-	aqua: "#55FFFF",
-	red: "#FF5555",
-	light_purple: "#FF55FF",
-	yellow: "#FFFF55",
-	white: "#FFFFFF"
-};
-
-const ChatCodes = {
-	"0": "black",
-	"1": "dark_blue",
-	"2": "dark_green",
-	"3": "dark_aqua",
-	"4": "dark_red",
-	"5": "dark_purple",
-	"6": "gold",
-	"7": "gray",
-	"8": "dark_gray",
-	"9": "blue",
-	a: "green",
-	b: "aqua",
-	c: "red",
-	d: "light_purple",
-	e: "yellow",
-	f: "white"
+const ChatColors = {
+	black:        "#000000",   "0": "#000000",
+	dark_blue:    "#0000AA",   "1": "#0000AA",
+	dark_green:   "#00AA00",   "2": "#00AA00",
+	dark_aqua:    "#00AAAA",   "3": "#00AAAA",
+	dark_red:     "#AA0000",   "4": "#AA0000",
+	dark_purple:  "#AA00AA",   "5": "#AA00AA",
+	gold:         "#FFAA00",   "6": "#FFAA00",
+	gray:         "#AAAAAA",   "7": "#AAAAAA",
+	dark_gray:    "#555555",   "8": "#555555",
+	blue:         "#5555FF",   "9": "#5555FF",
+	green:        "#55FF55",   "a": "#55FF55",
+	aqua:         "#55FFFF",   "b": "#55FFFF",
+	red:          "#FF5555",   "c": "#FF5555",
+	light_purple: "#FF55FF",   "d": "#FF55FF",
+	yellow:       "#FFFF55",   "e": "#FFFF55",
+	white:        "#FFFFFF",   "f": "#FFFFFF"
 };
 
 const getMentioned = message => {
@@ -110,21 +90,21 @@ const getWithoutMentions = message => {
 	return message.content.replace(/<@!?(\d+)>/g, "").trim();
 };
 
-const successEmbed = (author, description="", title="Success", thumbnail=null) => {
-	const result = new Discord.MessageEmbed()
-		.setColor("#3bcc71")
-		.setAuthor(author.tag, `https://cdn.discordapp.com/avatars/${author.id}/${author.avatar}?size=128`)
-		.setFooter(randomChoice(embedFooter.text), embedFooter.image.green)
-		.setTimestamp()
-		.setDescription(description)
-		.setTitle(title);
-	
+const avatarOf = user => `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}?size=128`;
+const successEmbed = (author, description = "", title = "Success", thumbnail = null) => {
+	const result = new Discord.MessageEmbed();
+	result.setColor("#3bcc71");
+	result.setAuthor(author.tag, avatarOf(author));
+	result.setFooter(randomChoice(embedFooter.text), embedFooter.image.green);
+	result.setTimestamp();
+	result.setDescription(description);
+	result.setTitle(title);
+
 	if (thumbnail !== null) result.setThumbnail(thumbnail);
 	return result;
 };
 
-const getAvatar = user => `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}?size=128`;
-const getStats = async uuid => {
+const fetchStats = async uuid => {
 	const data = await hypixelFetch("player?uuid=" + uuid);
 	if (data === null) {
 		return {
@@ -152,6 +132,36 @@ const getStats = async uuid => {
 		success: true,
 		user: data
 	};
+};
+
+const getRank = D => {
+	const ranks = {
+		ADMIN:     {string: "[ADMIN]",   color: ChatColors.red},
+		MODERATOR: {string: "[MOD]",     color: ChatColors.dark_green},
+		HELPER:    {string: "[HELPER]",  color: ChatColors.blue},
+		YOUTUBER:  {string: "[YOUTUBE]", color: ChatColors.red},
+		SUPERSTAR: {string: "[MVP++]",   color: ChatColors.gold},
+		MVP_PLUS:  {string: "[MVP+]",    color: ChatColors.aqua},
+		MVP:       {string: "[MVP]",     color: ChatColors.aqua},
+		VIP_PLUS:  {string: "[VIP+]",    color: ChatColors.green},
+		VIP:       {string: "[VIP]",     color: ChatColors.green},
+		DEFAULT:   {string: "",          color: ChatColors.gray}
+	};
+
+	const rank = D.rank === "NORMAL" ? null : D.rank;
+	const monthlyPackageRank = D.monthlyPackageRank === "NONE" ? null : D.monthlyPackageRank;
+	const packageRank = D.packageRank === "NONE" ? null : D.packageRank;
+	const newPackageRank = D.newPackageRank === "NONE" ? null : D.newPackageRank;
+	if (typeof D.prefix === "string") {
+		return {
+			string: D.prefix.replace(/§[A-F0-9]/gi, ""),
+			color: D.prefix.indexOf("§") !== -1 ? ChatColors[D.prefix[D.prefix.indexOf("§") + 1]] : ChatColors.gray
+		};
+	} else if (rank || monthlyPackageRank || newPackageRank || packageRank) {
+		return ranks[rank || monthlyPackageRank || newPackageRank || packageRank];
+	} else {
+		return ranks.DEFAULT;
+	}
 };
 
 /**
@@ -259,56 +269,61 @@ const getStats = async uuid => {
  * @property {DuelsStats} duels Bow Spleef Duels Statistics
 **/
 
+/**
+ * Convert Hypixel's API response to the standard format
+ * @param {Object} D Statistics
+ * @returns {HypixelStats} Standard format statistics
+ */
 const hypixelToStandard = D => {
 	const TNT = D.stats.TNTGames,
-		  DUEL = D.stats.Duels;
+		DUEL = D.stats.Duels;
 
 	const result = {
 		info: {
 			uuid:        D.uuid,
 			displayname: D.displayname,
-			rank:        D.newPackageRank,
+			rank:        getRank(D),
 			timestamp:   Date.now()
 		},
 		run: {
-			record:   defaultTo(TNT.record_tntrun, 0),
-			wins:     defaultTo(TNT.wins_tntrun, 0),
-			deaths:   defaultTo(TNT.deaths_tntrun, 0),
-			potions:  defaultTo(TNT.run_potions_splashed_on_players, 0),
-			WL:       defaultTo(ratio(TNT.wins_tntrun, TNT.deaths_tntrun), 0),
-			blocks:   defaultTo(D.achievements.tntgames_block_runner, 0)
+			record:  defaultTo(TNT.record_tntrun, 0),
+			wins:    defaultTo(TNT.wins_tntrun, 0),
+			deaths:  defaultTo(TNT.deaths_tntrun, 0),
+			potions: defaultTo(TNT.run_potions_splashed_on_players, 0),
+			WL:      defaultTo(ratio(TNT.wins_tntrun, TNT.deaths_tntrun), 0),
+			blocks:  defaultTo(D.achievements.tntgames_block_runner, 0)
 		},
 		pvp: {
-			record:   defaultTo(TNT.record_pvprun, 0),
-			wins:     defaultTo(TNT.wins_pvprun, 0),
-			deaths:   defaultTo(TNT.deaths_pvprun, 0),
-			kills:    defaultTo(TNT.kills_pvprun, 0),
-			WL:       defaultTo(ratio(TNT.wins_pvprun, TNT.deaths_pvprun), 0),
-			KD:       defaultTo(ratio(TNT.kills_pvprun, TNT.deaths_pvprun), 0)
+			record: defaultTo(TNT.record_pvprun, 0),
+			wins:   defaultTo(TNT.wins_pvprun, 0),
+			deaths: defaultTo(TNT.deaths_pvprun, 0),
+			kills:  defaultTo(TNT.kills_pvprun, 0),
+			WL:     defaultTo(ratio(TNT.wins_pvprun, TNT.deaths_pvprun), 0),
+			KD:     defaultTo(ratio(TNT.kills_pvprun, TNT.deaths_pvprun), 0)
 		},
 		bowspleef: {
-			wins:     defaultTo(TNT.wins_bowspleef, 0),
-			deaths:   defaultTo(TNT.deaths_bowspleef, 0),
-			shots:    defaultTo(TNT.tags_bowspleef, 0),
-			kills:    defaultTo(TNT.kills_bowspleef, 0),
-			WL:       defaultTo(ratio(TNT.wins_bowspleef, TNT.deaths_bowspleef), 0)
+			wins:   defaultTo(TNT.wins_bowspleef, 0),
+			deaths: defaultTo(TNT.deaths_bowspleef, 0),
+			shots:  defaultTo(TNT.tags_bowspleef, 0),
+			kills:  defaultTo(TNT.kills_bowspleef, 0),
+			WL:     defaultTo(ratio(TNT.wins_bowspleef, TNT.deaths_bowspleef), 0)
 		},
 		tag: {
-			wins:     defaultTo(TNT.wins_tntag, 0),
-			kills:    defaultTo(TNT.kills_tntag, 0),
-			tags:     defaultTo(D.achievements.tntgames_clinic, 0),
-			TK:       defaultTo(ratio(D.achievements.tntgames_clinic, TNT.kills_tntag), 0),
-			KW:       defaultTo(ratio(TNT.kills_tntag, TNT.wins_tntag), 0)
+			wins:  defaultTo(TNT.wins_tntag, 0),
+			kills: defaultTo(TNT.kills_tntag, 0),
+			tags:  defaultTo(D.achievements.tntgames_clinic, 0),
+			TK:    defaultTo(ratio(D.achievements.tntgames_clinic, TNT.kills_tntag), 0),
+			KW:    defaultTo(ratio(TNT.kills_tntag, TNT.wins_tntag), 0)
 		},
 		wizards: {
-			wins:     defaultTo(TNT.wins_capture, 0),
-			assists:  defaultTo(TNT.assists_capture, 0),
-			deaths:   defaultTo(TNT.deaths_capture, 0),
-			points:   defaultTo(TNT.points_capture, 0),
-			KD:       defaultTo(ratio(TNT.kills_capture, TNT.deaths_capture), 0),
-			KAD:      defaultTo(ratio(TNT.kills_capture + TNT.assists_capture, TNT.deaths_capture), 0),
-			airtime:  defaultTo(TNT.air_time_capture, 0),
-			KW:       defaultTo(ratio(TNT.kills_capture, TNT.wins_capture), 0),
+			wins:    defaultTo(TNT.wins_capture, 0),
+			assists: defaultTo(TNT.assists_capture, 0),
+			deaths:  defaultTo(TNT.deaths_capture, 0),
+			points:  defaultTo(TNT.points_capture, 0),
+			KD:      defaultTo(ratio(TNT.kills_capture, TNT.deaths_capture), 0),
+			KAD:     defaultTo(ratio(TNT.kills_capture + TNT.assists_capture, TNT.deaths_capture), 0),
+			airtime: defaultTo(TNT.air_time_capture, 0),
+			KW:      defaultTo(ratio(TNT.kills_capture, TNT.wins_capture), 0),
 			kills: {
 				total:   defaultTo(TNT.kills_capture, 0),
 				fire:    defaultTo(TNT.new_firewizard_kills, 0),
@@ -329,12 +344,11 @@ const hypixelToStandard = D => {
 			playtime: defaultTo(D.achievements.tntgames_tnt_triathlon, 0)
 		},
 		duels: {
-			wins:  0, deaths: 0, losses: 0,
-			shots: 0, bestWS: 0, currentWS: 0, WL: 0
+			wins: 0, deaths: 0, losses: 0, shots: 0, bestWS: 0, currentWS: 0, WL: 0
 		}
 	};
 
-	if (typeof DUEL !== 'undefined') {
+	if (typeof DUEL !== "undefined") {
 		result.duels = {
 			wins:      defaultTo(DUEL.bowspleef_duel_wins, 0),
 			deaths:    defaultTo(DUEL.bowspleef_duel_deaths, 0),
@@ -345,18 +359,18 @@ const hypixelToStandard = D => {
 			WL:        defaultTo(ratio(DUEL.bowspleef_duel_wins, DUEL.bowspleef_duel_losses), 0)
 		};
 	}
-	
+
 	return result;
 };
 
 const formatMinutes = mins => {
 	const hours = Math.trunc(mins / 60);
-	return `${hours > 0 ? (hours.toLocaleString() + "h") : ""} ${Math.floor(mins % 60).toLocaleString()}m`;
+	return `${hours > 0 ? hours.toLocaleString() + "h" : ""} ${Math.floor(mins % 60).toLocaleString()}m`;
 };
 
 const formatSeconds = secs => {
 	const mins = Math.trunc(secs / 60);
-	return `${mins > 0 ? (mins.toLocaleString() + "m") : ""} ${Math.floor(secs % 60).toLocaleString()}s`;
+	return `${mins > 0 ? mins.toLocaleString() + "m" : ""} ${Math.floor(secs % 60).toLocaleString()}s`;
 };
 
 const GAMES_READABLE = {
@@ -430,7 +444,6 @@ const parseUser = async (arg, mentioned = null) => {
 	}
 };
 
-
 const toLString = n => n.toLocaleString();
 
 const display = (pathStr, stats, previous, formatter = toLString) => {
@@ -451,12 +464,13 @@ const display = (pathStr, stats, previous, formatter = toLString) => {
 };
 
 module.exports = {
-	embedFooter, randomChoice, noop, errorEmbed,
-	hypixelFetch, mojangUUIDFetch, ChatCodes,
-	ChatColor, booleanPhrases, ratio, formatTimestamp,
-	getMentioned, successEmbed, mojangNameFetch, getAvatar,
-	getStats, hypixelToStandard, formatMinutes,
-	GAMES, GAMES_READABLE, getWithoutMentions,
-	startsWithMention, formatSeconds, getUUIDFromDiscord,
-	parseUser, toLString, display
+	embedFooter, ChatColors,
+	booleanPhrases,
+	GAMES, GAMES_READABLE,
+
+	randomChoice, noop, errorEmbed, hypixelFetch, mojangUUIDFetch,
+	ratio, formatTimestamp, getMentioned, successEmbed, fetchStats,
+	mojangNameFetch, avatarOf, hypixelToStandard, formatMinutes,
+	getWithoutMentions, startsWithMention, formatSeconds, display,
+	getUUIDFromDiscord, parseUser, toLString
 };

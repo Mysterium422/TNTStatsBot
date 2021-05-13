@@ -5,9 +5,9 @@ const {
 	getMentioned,
 	getUUIDFromDiscord,
 	parseUser,
-	getStats,
+	fetchStats,
 	hypixelToStandard,
-	getAvatar,
+	avatarOf,
 	formatMinutes,
 	GAMES_READABLE,
 	formatSeconds,
@@ -28,9 +28,9 @@ module.exports = {
 		 * @param {string} game Game type
 		 * @returns Embed to send to user
 		 */
-		const getStatsEmbed = (stats, previous, game) => {
+		const fetchStatsEmbed = (stats, previous, game) => {
 			const embed = new Discord.MessageEmbed();
-			embed.setAuthor(message.author.tag, getAvatar(message.author));
+			embed.setAuthor(message.author.tag, avatarOf(message.author));
 			embed.setFooter(randomChoice(embedFooter.text), embedFooter.image.green);
 			embed.setColor("#0099ff"); // TODO: Based on user's rank
 			embed.setURL(`https://plancke.io/hypixel/player/stats/${stats.info.displayname}`);
@@ -133,14 +133,14 @@ module.exports = {
 			uuid = user.uuid;
 		}
 
-		const data = await getStats(uuid);
+		const data = await fetchStats(uuid);
 		if (!data.success) return message.channel.send(errorEmbed(...data.error));
 
 		const stats = hypixelToStandard(data.user.player);
 		const previous = await getCache(message.author.id, uuid);
 		await saveStats(message.author.id, uuid, stats);
 
-		return message.channel.send(getStatsEmbed(stats, previous, game));
+		return message.channel.send(fetchStatsEmbed(stats, previous, game));
 	},
 	aliases: [],
 	requiresConfiguredChannel: true

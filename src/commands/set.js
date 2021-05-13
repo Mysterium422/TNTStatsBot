@@ -1,7 +1,7 @@
 const db = require("../db");
 const strings = require("../strings.js");
 const config = require("../../config.json");
-const {errorEmbed, mojangUUIDFetch, getStats, mojangNameFetch} = require("../util.js");
+const {errorEmbed, mojangUUIDFetch, fetchStats, mojangNameFetch} = require("../util.js");
 	
 module.exports = {
 	run: async ({message, args}) => {
@@ -20,7 +20,7 @@ module.exports = {
 		if (uuid.length <= 16) uuid = mojangResponse.id;
 	
 		if (message.author.id !== config.owner_id) {
-			const data = await getStats(uuid);
+			const data = await fetchStats(uuid);
 				
 			if (!data.success) {
 				return message.channel.send(errorEmbed(...data.error));

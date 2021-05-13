@@ -3,9 +3,9 @@ const {
 	getUUIDFromDiscord,
 	parseUser,
 	getMentioned,
-	getStats,
+	fetchStats,
 	hypixelToStandard,
-	getAvatar,
+	avatarOf,
 	randomChoice,
 	embedFooter,
 	display
@@ -27,7 +27,7 @@ module.exports = {
 			uuid = user.uuid;
 		}
 
-		const data = await getStats(uuid);
+		const data = await fetchStats(uuid);
 		if (!data.success) return message.channel.send(errorEmbed(...data.error));
 
 		/**
@@ -37,7 +37,7 @@ module.exports = {
 		const previous = await getCache(message.author.id, uuid);
 
 		const embed = new Discord.MessageEmbed();
-		embed.setAuthor(message.author.tag, getAvatar(message.author));
+		embed.setAuthor(message.author.tag, avatarOf(message.author));
 		embed.setFooter(randomChoice(embedFooter.text), embedFooter.image.green);
 		// TODO: Based on user's rank
 		embed.setColor("#0099ff");
