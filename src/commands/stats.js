@@ -20,7 +20,7 @@ module.exports = {
 		const previous = await getUserStats(message.author.id, uuid);
 		await cacheUserStats(message.author.id, uuid, stats);
 
-		return message.channel.send(createStatsEmbed(message.author, stats, previous, game));
+		return message.channel.send(createStatsEmbed({message, stats, previous, game}));
 	},
 	aliases: [],
 	requiresConfiguredChannel: true

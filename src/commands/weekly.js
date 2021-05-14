@@ -9,7 +9,7 @@ const {
 } = require("../util");
 
 module.exports = {
-	run: async ({message, args}) => {
+	run: async ({command, message, args}) => {
 		const parsed = await parseStatsArgs(message, args);
 		if (!parsed.success) return message.channel.send(errorEmbed(...parsed.error));
 		const {uuid, game} = parsed;
@@ -18,15 +18,18 @@ module.exports = {
 		if (!data.success) return message.channel.send(errorEmbed(...data.error));
 		
         const stats = hypixelToStandard(data.user.player);
+		const isWeekly = command !== "monthly";
         
-		let previous = await getTimedStats(uuid, true); // TODO: true represents weekly=true. make this dynamic
-		if (previous === null) await cacheTimedStats(uuid, true, stats);
+		// TODO: Check both weekly & monthly, set if not exist
+		// TODO: Do in !kills & !stats
+		let previous = await getTimedStats(uuid, isWeekly);
+		if (previous === null) await cacheTimedStats(uuid, isWeekly, stats);
 
-		const embed = createStatsEmbed(message.author, stats, previous, game);
-		embed.setDescription("**Showing changes since:** " + formatTimestamp(previous.info.timestamp));
+		const embed = createStatsEmbed({message, stats, previous, game, timeframe: isWeekly ? "*[**Weekly**]*" : "*[**Monthly**]*"});
+		embed.setDescription("**Showing changes since:** " + formatTimestamp(previous === null ? Date.now() : previous.info.timestamp));
 
         return message.channel.send(embed);
 	},
-	aliases: [],
+	aliases: ["monthly"],
 	requiresConfiguredChannel: true
 };

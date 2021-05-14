@@ -369,8 +369,8 @@ const formatSeconds = secs => {
 };
 
 const GAMES_READABLE = {
-	all: "All TNT Games",
-	wizards: "TNT Wizards",
+	all: "Overall",
+	wizards: "Wizards",
 	run: "TNT Run",
 	pvp: "PVP Run",
 	tag: "TNT Tag",
@@ -463,15 +463,15 @@ const display = (pathStr, stats, previous, formatter = toLString) => {
  * @param {string} game Game type
  * @returns Embed to send to user
  */
-const createStatsEmbed = (author, stats, previous, game) => {
+const createStatsEmbed = ({message, stats, previous, game, timeframe=""}) => {
 	const embed = new Discord.MessageEmbed();
-	embed.setAuthor(author.tag, avatarOf(author));
+	embed.setAuthor(message.author.tag, avatarOf(message.author));
 	embed.setFooter(randomChoice(embedFooter.text), embedFooter.image.green);
 	embed.setColor("#0099ff"); // TODO: Based on user's rank
 	embed.setURL(`https://plancke.io/hypixel/player/stats/${stats.info.displayname}`);
 	embed.setThumbnail(`https://visage.surgeplay.com/head/128/${stats.info.uuid}`);
 	embed.setTimestamp();
-	embed.setTitle(`${stats.info.displayname} | ${GAMES_READABLE[game]} Statistics`);
+	embed.setTitle(`${stats.info.displayname} | ${GAMES_READABLE[game]} Statistics ${timeframe}`);
 
 	switch (game) {
 		case "all":
