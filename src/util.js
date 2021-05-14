@@ -86,10 +86,6 @@ const getMentioned = message => {
 	return typeof result === "undefined" ? null : result;
 };
 
-const getWithoutMentions = message => {
-	return message.content.replace(/<@!?(\d+)>/g, "").trim();
-};
-
 const avatarOf = user => `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}?size=128`;
 const successEmbed = (author, description = "", title = "Success", thumbnail = null) => {
 	const result = new Discord.MessageEmbed();
@@ -414,7 +410,6 @@ const GAMES = {
 	wizards:       "wizards"
 };
 
-const startsWithMention = message => /^<@!?(\d+)>/g.exec(message.content).index === 0;
 const getUUIDFromDiscord = async discord => {
 	const row = await db.select(db.TABLES.VerifiedUsers, {discord});
 	if (row.length === 0) return null;
@@ -471,6 +466,5 @@ module.exports = {
 	randomChoice, noop, errorEmbed, hypixelFetch, mojangUUIDFetch,
 	ratio, formatTimestamp, getMentioned, successEmbed, fetchStats,
 	mojangNameFetch, avatarOf, hypixelToStandard, formatMinutes,
-	getWithoutMentions, startsWithMention, formatSeconds, display,
-	getUUIDFromDiscord, parseUser, toLString
+	formatSeconds, display, getUUIDFromDiscord, parseUser, toLString
 };

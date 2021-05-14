@@ -17,7 +17,9 @@ const client = new Discord.Client();
 const config = require("../config.json");
 
 let isReady = false;
+let mentionRegex = null;
 const commands = {};
+
 client.on("ready", async () => {
 	console.log("[INFO] Initializing...");
 
@@ -46,23 +48,23 @@ client.on("ready", async () => {
 		throw e;
 	}
 
-	console.log("[SUCCESS] Bot is now online and listening for commands!");
 	client.user.setActivity("TNT Games | Use /TNThelp");
+	mentionRegex = new RegExp(`^<@!?${client.user.id}>`);
 	isReady = true;
+	console.log("[SUCCESS] Bot is now online and listening for commands!");
 });
 
 client.on("message", async message => {
 	if (message.author.bot) return;
 	if (!isReady) return message.channel.send("I'm not ready, please try again in a few seconds...");
 
-	const channel = await db.getChannelInfo(message),
-		mentioned = getMentioned(message),
-		isBotMentioned = mentioned !== null && mentioned.id === client.user.id;
+	const channel = await db.getChannelInfo(message);
+	const isChannelValid = channel !== null && message.content.startsWith(channel.prefix);
+	const isMentionCommand = mentionRegex.test(message.content.trim());
 
-	const isValid = (isBotMentioned && startsWithMention(message)) || (channel !== null && message.content.startsWith(channel.prefix));
-	if (!isValid) return;
+	if (!isMentionCommand && !isChannelValid) return;
 
-	const messageContent = isBotMentioned ? getWithoutMentions(message) : message.content.slice(channel.prefix.length).trim();
+	const messageContent = isMentionCommand ? message.content.replace(mentionRegex, "").trim() : message.content.slice(channel.prefix.length).trim();
 	const args = messageContent.split(/\s+/g);
 	const command = args.shift().toLowerCase();
 
