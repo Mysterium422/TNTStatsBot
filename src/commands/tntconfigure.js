@@ -19,7 +19,7 @@ module.exports = {
 
 		game = GAMES[game]; // Convert to the internal representation
 
-		db.linkChannelPreifx(message.channel, prefix, game);
+		db.linkChannelPrefix(message.channel, prefix, game);
 		const embed = successEmbed(message.author, "", "Success! Channel Configured");
 		embed.addField("__Default Game:__", GAMES_READABLE[game], true);
 		embed.addField("__Bot Prefix:__", prefix, true);

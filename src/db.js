@@ -12,7 +12,8 @@ const knex = require("knex")({
 const TABLES = {
 	VerifiedUsers: "verified_users",
 	ConfiguredChannels: "configured_channels",
-	UserCache: "user_cache"
+	UserCache: "user_cache",
+	TimedCache: "timed_cache"
 };
 
 const createTables = () => {
@@ -45,6 +46,16 @@ const createTables = () => {
 			});
 		}
 	});
+
+	knex.schema.hasTable(TABLES.TimedCache).then(exists => {
+		if (!exists) {
+			return knex.schema.createTable(TABLES.TimedCache, table => {
+				table.string("uuid").notNullable();
+				table.boolean("isWeekly").notNullable();
+				table.jsonb("data").notNullable();
+			});
+		}
+	});
 };
 
 const reset = async () => {
@@ -70,7 +81,7 @@ const linkUUID = async (uuid, discord) => {
 	}
 };
 
-const linkChannelPreifx = async (channel, prefix, game) => {
+const linkChannelPrefix = async (channel, prefix, game) => {
 	const selector = {guild: channel.guild.id, channel: channel.id},
 		newValues = {prefix, game};
 
@@ -90,10 +101,8 @@ const getChannelInfo = async message => {
 	return result[0];
 };
 
-
-
 module.exports = {
 	add, all, update, select, del, reset,
-	TABLES, linkUUID, linkChannelPreifx,
+	TABLES, linkUUID, linkChannelPrefix,
 	getChannelInfo, createTables
 };

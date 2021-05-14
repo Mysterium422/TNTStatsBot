@@ -13,10 +13,11 @@ const {
 
 const Discord = require("discord.js"),
 	  strings = require("../strings.js");
-const { getCache } = require("../cache.js");
+const { getUserStats } = require("../cache.js");
 
 module.exports = {
 	run: async ({message, args}) => {
+		// TODO: Merge with stats command
 		let uuid = null;
 		if (args.length === 0) {
 			uuid = await getUUIDFromDiscord(message.author.id);
@@ -34,7 +35,7 @@ module.exports = {
 		 * @type {import("../util").HypixelStats}
 		*/
 		const stats = hypixelToStandard(data.user.player);
-		const previous = await getCache(message.author.id, uuid);
+		const previous = await getUserStats(message.author.id, uuid);
 
 		const embed = new Discord.MessageEmbed();
 		embed.setAuthor(message.author.tag, avatarOf(message.author));
