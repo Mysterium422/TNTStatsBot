@@ -1,4 +1,4 @@
-const { getMentioned, errorEmbed, mojangNameFetch } = require("../util.js");
+const {getMentioned, errorEmbed, mojangNameFetch} = require("../util.js");
 const db = require("../db");
 
 module.exports = {
@@ -14,14 +14,14 @@ module.exports = {
 				userID = mentioned.id;
 			}
 		}
-		
+
 		const row = await db.select(db.TABLES.VerifiedUsers, {discord: userID});
 		if (row.length === 0) {
 			return message.channel.send(errorEmbed("Invalid mention", "That user has not linked their account"));
 		}
-		
+
 		const response = await mojangNameFetch(row[0].uuid),
-			  currentName = response[response.length - 1].name;
+			currentName = response[response.length - 1].name;
 		return message.channel.send(encodeURI("https://namemc.com/profile/" + currentName));
 	},
 	aliases: [],

@@ -1,5 +1,5 @@
 const {performance} = require("perf_hooks");
-const {hypixelFetch, errorEmbed, successEmbed} = require("../util.js");
+const {hypixelFetch, successEmbed} = require("../util.js");
 const db = require("../db");
 
 module.exports = {
