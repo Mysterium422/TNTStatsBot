@@ -32,11 +32,10 @@ const errorEmbed = (error = "Something went wrong...", description = ":robot: be
 };
 
 const config = require("../config.json");
-const key = config.hypixel_key;
 const fetch = require("node-fetch");
 
 // TODO: Caching with keyv (npm install keyv)
-const hypixelFetch = query => fetch(`https://api.hypixel.net/${query}&key=${key}`).then(response => response.json());
+const hypixelFetch = query => fetch(`https://api.hypixel.net/${query}&key=${config.hypixel_key}`).then(response => response.json());
 const mojangUUIDFetch = query => fetch(`https://api.mojang.com/users/profiles/minecraft/${query}`).then(response => (response.status === 204 ? null : response.json()));
 const mojangNameFetch = query => fetch(`https://api.mojang.com/user/profiles/${query}/names`).then(response => (response.status === 204 ? null : response.json()));
 const defaultTo = (v, def = null) => (typeof v === "undefined" ? def : v);
