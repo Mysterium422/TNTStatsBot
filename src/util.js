@@ -1,5 +1,6 @@
 const Discord = require("discord.js"),
-	db = require("./db");
+	db = require("./db"),
+	strings = require("./strings");
 
 const embedFooter = {
 	text: [
@@ -46,7 +47,7 @@ const formatTimestamp = timestamp =>
 		timeStyle: "short"
 	});
 
-const ratio = (a = 0, b = 0) => (b === 0 ? a : a === 0 ? b : a / b);
+const ratio = (a = 0, b = 0) => (b === 0 ? a : a === 0 ? 0 : a / b);
 
 const booleanPhrases = {
 	false: false,
@@ -159,200 +160,112 @@ const getRank = D => {
 	}
 };
 
-/**
- * @typedef DuelsStats 
- * @property {number} wins Wins
- * @property {number} deaths Deaths
- * @property {number} losses Losses
- * @property {number} shots Total shots fired
- * @property {number} bestWS Best winstreak
- * @property {number} currentWS Current winstreak
- * @property {number} WL Win/Loss Ratio
-**/
-
-/**
- * @typedef OverallStats 
- * @property {number} coins Current coins
- * @property {number} wins Total wins
- * @property {number} streak Current winstreak
- * @property {number} playtime Total playtime (minutes)
-**/
-
-/**
- * @typedef WizardKills 
- * @property {number} total Total Wizards kills
- * @property {number} fire Fire Wizard kills
- * @property {number} ice Ice Wizard kills
- * @property {number} wither Wither Wizard kills
- * @property {number} kinetic Kinetic Wizard kills
- * @property {number} blood Blood Wizard kills
- * @property {number} toxic Toxic Wizard kills
- * @property {number} hydro Hyrdo Wizard kills
- * @property {number} ancient Ancient Wizard kills
- * @property {number} storm Storm Wizard kills
-**/
-
-/**
- * @typedef WizardsStats 
- * @property {number} wins Wins
- * @property {number} assists Assists
- * @property {number} deaths Deaths
- * @property {number} points Total points
- * @property {number} KD Kill/Death Ratio
- * @property {number} KAD Kill+Assist/Death Ratio
- * @property {number} airtime Total airtime (seconds)
- * @property {number} KW Kill/Win Ratio
- * @property {WizardKills} kills Kills
-**/
-
-/**
- * @typedef TagStats 
- * @property {number} wins Wins
- * @property {number} kills Fatal tags
- * @property {number} tags Total tags
- * @property {number} TK Tags/Kills Ratio
- * @property {number} KW Kill/Win Ratio
-**/
-
-/**
- * @typedef BowspleefStats 
- * @property {number} wins Wins
- * @property {number} deaths Deaths
- * @property {number} shots Shots fired
- * @property {number} kills Kills
- * @property {number} WL Win/Loss Ratio
-**/
-
-/**
- * @typedef PVPStats 
- * @property {number} record Longest time alive (seconds)
- * @property {number} wins Wins
- * @property {number} deaths Deaths
- * @property {number} kills Kills
- * @property {number} WL Win/Loss Ratio
- * @property {number} KD Kill/Death Ratio
-**/
-
-/**
- * @typedef RunStats 
- * @property {number} record Longest time alive (seconds)
- * @property {number} wins Wins
- * @property {number} deaths Deaths
- * @property {number} potions Potions thrown
- * @property {number} WL Win/Loss Ratio
- * @property {number} blocks Blocks broken
-**/
-
-/**
- * @typedef PlayerInfo 
- * @property {string} uuid UUID
- * @property {string} displayname Display name
- * @property {string} rank Rank on Hypixel
- * @property {number} timestamp Timestamp of stats
-**/
-
-/**
- * Standard format for statistics
- * @typedef {Object} HypixelStats 
- * @property {PlayerInfo} info Information about the player
- * @property {RunStats} run TNT Run Statistics
- * @property {PVPStats} pvp PVP Run Statistics
- * @property {BowspleefStats} bowspleef Bow Spleef Statistics
- * @property {TagStats} tag TNT Tag Statistics
- * @property {WizardsStats} wizards TNT Wizards Statistics
- * @property {OverallStats} overall Overall TNT Games Statistics
- * @property {DuelsStats} duels Bow Spleef Duels Statistics
-**/
-
-/**
- * Convert Hypixel's API response to the standard format
- * @param {Object} D Statistics
- * @returns {HypixelStats} Standard format statistics
- */
 const hypixelToStandard = D => {
 	const TNT = D.stats.TNTGames,
 		DUEL = D.stats.Duels;
 
 	const result = {
 		info: {
-			uuid:        D.uuid,
+			uuid: D.uuid,
 			displayname: D.displayname,
-			rank:        getRank(D),
-			timestamp:   Date.now()
+			rank: getRank(D),
+			timestamp: Date.now()
 		},
 		run: {
-			record:  defaultTo(TNT.record_tntrun, 0),
-			wins:    defaultTo(TNT.wins_tntrun, 0),
-			deaths:  defaultTo(TNT.deaths_tntrun, 0),
+			record: defaultTo(TNT.record_tntrun, 0),
+			wins: defaultTo(TNT.wins_tntrun, 0),
+			deaths: defaultTo(TNT.deaths_tntrun, 0),
 			potions: defaultTo(TNT.run_potions_splashed_on_players, 0),
-			WL:      defaultTo(ratio(TNT.wins_tntrun, TNT.deaths_tntrun), 0),
-			blocks:  defaultTo(D.achievements.tntgames_block_runner, 0)
+			blocks: defaultTo(D.achievements.tntgames_block_runner, 0)
 		},
 		pvp: {
 			record: defaultTo(TNT.record_pvprun, 0),
-			wins:   defaultTo(TNT.wins_pvprun, 0),
+			wins: defaultTo(TNT.wins_pvprun, 0),
 			deaths: defaultTo(TNT.deaths_pvprun, 0),
-			kills:  defaultTo(TNT.kills_pvprun, 0),
-			WL:     defaultTo(ratio(TNT.wins_pvprun, TNT.deaths_pvprun), 0),
-			KD:     defaultTo(ratio(TNT.kills_pvprun, TNT.deaths_pvprun), 0)
+			kills: defaultTo(TNT.kills_pvprun, 0)
 		},
 		bowspleef: {
-			wins:   defaultTo(TNT.wins_bowspleef, 0),
+			wins: defaultTo(TNT.wins_bowspleef, 0),
 			deaths: defaultTo(TNT.deaths_bowspleef, 0),
-			shots:  defaultTo(TNT.tags_bowspleef, 0),
-			kills:  defaultTo(TNT.kills_bowspleef, 0),
-			WL:     defaultTo(ratio(TNT.wins_bowspleef, TNT.deaths_bowspleef), 0)
+			shots: defaultTo(TNT.tags_bowspleef, 0),
+			kills: defaultTo(TNT.kills_bowspleef, 0)
 		},
 		tag: {
-			wins:  defaultTo(TNT.wins_tntag, 0),
+			wins: defaultTo(TNT.wins_tntag, 0),
 			kills: defaultTo(TNT.kills_tntag, 0),
-			tags:  defaultTo(D.achievements.tntgames_clinic, 0),
-			TK:    defaultTo(ratio(D.achievements.tntgames_clinic, TNT.kills_tntag), 0),
-			KW:    defaultTo(ratio(TNT.kills_tntag, TNT.wins_tntag), 0)
+			tags: defaultTo(D.achievements.tntgames_clinic, 0)
 		},
 		wizards: {
-			wins:    defaultTo(TNT.wins_capture, 0),
+			wins: defaultTo(TNT.wins_capture, 0),
 			assists: defaultTo(TNT.assists_capture, 0),
-			deaths:  defaultTo(TNT.deaths_capture, 0),
-			points:  defaultTo(TNT.points_capture, 0),
-			KD:      defaultTo(ratio(TNT.kills_capture, TNT.deaths_capture), 0),
-			KAD:     defaultTo(ratio(TNT.kills_capture + TNT.assists_capture, TNT.deaths_capture), 0),
-			airtime: defaultTo(TNT.air_time_capture, 0),
-			KW:      defaultTo(ratio(TNT.kills_capture, TNT.wins_capture), 0),
-			kills: {
-				total:   defaultTo(TNT.kills_capture, 0),
-				fire:    defaultTo(TNT.new_firewizard_kills, 0),
-				ice:     defaultTo(TNT.new_icewizard_kills, 0),
-				wither:  defaultTo(TNT.new_witherwizard_kills, 0),
-				kinetic: defaultTo(TNT.new_kineticwizard_kills, 0),
-				blood:   defaultTo(TNT.new_bloodwizard_kills, 0),
-				toxic:   defaultTo(TNT.new_toxicwizard_kills, 0),
-				hydro:   defaultTo(TNT.new_hydrowizard_kills, 0),
-				ancient: defaultTo(TNT.new_ancientwizard_kills, 0),
-				storm:   defaultTo(TNT.new_stormwizard_kills, 0)
-			}
+			deaths: defaultTo(TNT.deaths_capture, 0),
+			points: defaultTo(TNT.points_capture, 0),
+			totalkills: defaultTo(TNT.kills_capture, 0),
+			airtime: defaultTo(TNT.air_time_capture, 0)
+		},
+		wizkills: {
+			fire: defaultTo(TNT.new_firewizard_kills, 0),
+			ice: defaultTo(TNT.new_icewizard_kills, 0),
+			wither: defaultTo(TNT.new_witherwizard_kills, 0),
+			kinetic: defaultTo(TNT.new_kineticwizard_kills, 0),
+			blood: defaultTo(TNT.new_bloodwizard_kills, 0),
+			toxic: defaultTo(TNT.new_toxicwizard_kills, 0),
+			hydro: defaultTo(TNT.new_hydrowizard_kills, 0),
+			ancient: defaultTo(TNT.new_ancientwizard_kills, 0),
+			storm: defaultTo(TNT.new_stormwizard_kills, 0)
 		},
 		overall: {
-			coins:    defaultTo(TNT.coins, 0),
-			wins:     defaultTo(TNT.wins, 0),
-			streak:   defaultTo(TNT.winstreak, 0),
+			coins: defaultTo(TNT.coins, 0),
+			wins: defaultTo(TNT.wins, 0),
+			streak: defaultTo(TNT.winstreak, 0),
 			playtime: defaultTo(D.achievements.tntgames_tnt_triathlon, 0)
 		},
 		duels: {
-			wins: 0, deaths: 0, losses: 0, shots: 0, bestWS: 0, currentWS: 0, WL: 0
+			wins: 0,
+			deaths: 0,
+			losses: 0,
+			shots: 0,
+			bestWS: 0,
+			currentWS: 0
+		},
+		ratio: {
+			duels: {
+				WL: 0
+			},
+			wizards: {
+				KD: defaultTo(ratio(TNT.kills_capture, TNT.deaths_capture), 0),
+				KAD: defaultTo(ratio(TNT.kills_capture + TNT.assists_capture, TNT.deaths_capture), 0),
+				KW: defaultTo(ratio(TNT.kills_capture, TNT.wins_capture), 0)
+			},
+			tag: {
+				TK: defaultTo(ratio(D.achievements.tntgames_clinic, TNT.kills_tntag), 0),
+				KW: defaultTo(ratio(TNT.kills_tntag, TNT.wins_tntag), 0)
+			},
+			bowspleef: {
+				WL: defaultTo(ratio(TNT.wins_bowspleef, TNT.deaths_bowspleef), 0),
+				KD: defaultTo(ratio(TNT.kills_bowspleef, TNT.deaths_bowspleef), 0)
+			},
+			pvp: {
+				WL: defaultTo(ratio(TNT.wins_pvprun, TNT.deaths_pvprun), 0),
+				KD: defaultTo(ratio(TNT.kills_pvprun, TNT.deaths_pvprun), 0)
+			},
+			run: {
+				WL: defaultTo(ratio(TNT.wins_tntrun, TNT.deaths_tntrun), 0)
+			}
 		}
 	};
 
 	if (typeof DUEL !== "undefined") {
 		result.duels = {
-			wins:      defaultTo(DUEL.bowspleef_duel_wins, 0),
-			deaths:    defaultTo(DUEL.bowspleef_duel_deaths, 0),
-			losses:    defaultTo(DUEL.bowspleef_duel_losses, 0),
-			shots:     defaultTo(DUEL.bowspleef_duel_bow_shots, 0),
-			bestWS:    defaultTo(DUEL.best_tnt_games_winstreak, 0),
-			currentWS: defaultTo(DUEL.current_tnt_games_winstreak, 0),
-			WL:        defaultTo(ratio(DUEL.bowspleef_duel_wins, DUEL.bowspleef_duel_losses), 0)
+			wins: defaultTo(DUEL.bowspleef_duel_wins, 0),
+			deaths: defaultTo(DUEL.bowspleef_duel_deaths, 0),
+			losses: defaultTo(DUEL.bowspleef_duel_losses, 0),
+			shots: defaultTo(DUEL.bowspleef_duel_bow_shots, 0),
+			bestWS: defaultTo(DUEL.best_tnt_games_winstreak, 0),
+			currentWS: defaultTo(DUEL.current_tnt_games_winstreak, 0)
 		};
+
+		result.ratio.duels.WL = defaultTo(ratio(DUEL.bowspleef_duel_wins, DUEL.bowspleef_duel_losses), 0);
 	}
 
 	return result;
@@ -485,7 +398,7 @@ const createStatsEmbed = ({message, stats, previous, game, timeframe=""}) => {
 			embed.addField("**PvP Run Kills**",  display("pvp.kills",           stats, previous), true);
 			embed.addField("**PvP Run Wins**",   display("pvp.wins",            stats, previous), true);
 			embed.addField("**Wizards Wins**",   display("wizards.wins",        stats, previous), true);
-			embed.addField("**Wizards Kills**",  display("wizards.kills.total", stats, previous), true);
+			embed.addField("**Wizards Kills**",  display("wizards.totalkills",  stats, previous), true);
 			embed.addField("**Wizards Points**", display("wizards.points",      stats, previous), true);
 			return embed;
 		case "run":
@@ -493,7 +406,7 @@ const createStatsEmbed = ({message, stats, previous, game, timeframe=""}) => {
 			embed.addField("**Wins**",           display("run.wins",            stats, previous), true);
 			embed.addField("**Deaths**",         display("run.deaths",          stats, previous), true);
 			embed.addField("**Potions Thrown**", display("run.potions",         stats, previous), true);
-			embed.addField("**W/L Ratio**",      display("run.WL",              stats, previous), true);
+			embed.addField("**W/L Ratio**",      display("ratio.run.WL",        stats, previous), true);
 			embed.addField("**Blocks Broken**",  display("run.blocks",          stats, previous), true);
 			return embed;
 		case "pvp":
@@ -501,37 +414,38 @@ const createStatsEmbed = ({message, stats, previous, game, timeframe=""}) => {
 			embed.addField("**Wins**",           display("pvp.wins",            stats, previous), true);
 			embed.addField("**Deaths**",         display("pvp.deaths",          stats, previous), true);
 			embed.addField("**Kills**",          display("pvp.kills",           stats, previous), true);
-			embed.addField("**W/L Ratio**",      display("pvp.WL",              stats, previous), true);
-			embed.addField("**K/D Ratio**",      display("pvp.KD",              stats, previous), true);
+			embed.addField("**W/L Ratio**",      display("ratio.pvp.WL",        stats, previous), true);
+			embed.addField("**K/D Ratio**",      display("ratio.pvp.KD",        stats, previous), true);
 			return embed;
 		case "bowspleef":
 			embed.addField("**Wins**",           display("bowspleef.wins",      stats, previous), true);
 			embed.addField("**Deaths**",         display("bowspleef.deaths",    stats, previous), true);
 			embed.addField("**Kills**",          display("bowspleef.kills",     stats, previous), true);
 			embed.addField("**Shots**",          display("bowspleef.shots",     stats, previous), true);
-			embed.addField("**W/L Ratio**",      display("bowspleef.WL",        stats, previous), true);
+			embed.addField("**W/L Ratio**",      display("ratio.bowspleef.WL",  stats, previous), true);
+			embed.addField("**K/D Ratio**",      display("ratio.bowspleef.KD",  stats, previous), true);
 			return embed;
 		case "tag":
 			embed.addField("**Wins**",           display("tag.wins",            stats, previous), true);
 			embed.addField("**Kills**",          display("tag.kills",           stats, previous), true);
 			embed.addField("**Tags**",           display("tag.tags",            stats, previous), true);
-			embed.addField("**T/K Ratio**",      display("tag.TK",              stats, previous), true);
-			embed.addField("**K/W Ratio**",      display("tag.KW",              stats, previous), true);
+			embed.addField("**T/K Ratio**",      display("ratio.tag.TK",        stats, previous), true);
+			embed.addField("**K/W Ratio**",      display("ratio.tag.KW",        stats, previous), true);
 			return embed;
 		case "wizards":
 			// TODO: Airtime, KA/D Ratio, K/W Ratio, Kills with each class (verbose only)
 			embed.addField("**Wins**",           display("wizards.wins",        stats, previous), true);
 			embed.addField("**Deaths**",         display("wizards.deaths",      stats, previous), true);
-			embed.addField("**Kills**", 		 display("wizards.kills.total", stats, previous), true);
+			embed.addField("**Kills**", 		 display("wizards.totalkills",  stats, previous), true);
 			embed.addField("**Assists**",        display("wizards.assists",     stats, previous), true);
 			embed.addField("**Points**",         display("wizards.points",      stats, previous), true);
-			embed.addField("**K/D Ratio**",      display("wizards.KD",          stats, previous), true);
+			embed.addField("**K/D Ratio**",      display("ratio.wizards.KD",	stats, previous), true);
 			return embed;
 		case "duels":
 			embed.addField("**Wins**",           display("duels.wins",          stats, previous), true);
 			embed.addField("**Losses**",         display("duels.losses",        stats, previous), true);
 			embed.addField("**Shots**",          display("duels.shots",         stats, previous), true);
-			embed.addField("**W/L Ratio**",      display("duels.WL",            stats, previous), true);
+			embed.addField("**W/L Ratio**",      display("ratio.duels.WL",		stats, previous), true);
 			embed.addField("**Current WS**",     display("duels.currentWS",     stats, previous), true);
 			embed.addField("**Best WS**",        display("duels.bestWS",        stats, previous), true);
 			return embed;
