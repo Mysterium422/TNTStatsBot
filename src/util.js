@@ -370,13 +370,7 @@ const display = (pathStr, stats, previous, formatter = toLString) => {
 	return result;
 };
 
-/**
- * Get the stats embed
- * @param {import("../util").HypixelStats} stats The statistics
- * @param {string} game Game type
- * @returns Embed to send to user
- */
-const createStatsEmbed = ({message, stats, previous, game, timeframe=""}) => {
+const createStatsEmbed = ({message, stats, previous, game}) => {
 	const embed = new Discord.MessageEmbed();
 	embed.setAuthor(message.author.tag, avatarOf(message.author));
 	embed.setFooter(randomChoice(embedFooter.text), embedFooter.image.green);
@@ -384,7 +378,7 @@ const createStatsEmbed = ({message, stats, previous, game, timeframe=""}) => {
 	embed.setURL(`https://plancke.io/hypixel/player/stats/${stats.info.displayname}`);
 	embed.setThumbnail(`https://visage.surgeplay.com/head/128/${stats.info.uuid}`);
 	embed.setTimestamp();
-	embed.setTitle(`${stats.info.displayname} | ${GAMES_READABLE[game]} Statistics ${timeframe}`);
+	embed.setTitle(`${stats.info.displayname} | ${GAMES_READABLE[game]} Statistics`);
 
 	switch (game) {
 		case "all":
@@ -455,6 +449,84 @@ const createStatsEmbed = ({message, stats, previous, game, timeframe=""}) => {
 	}
 };
 
+const createTimedEmbed = ({message, stats, previous, game, timeframe}) => {
+	const embed = new Discord.MessageEmbed();
+	embed.setAuthor(message.author.tag, avatarOf(message.author));
+	embed.setFooter(randomChoice(embedFooter.text), embedFooter.image.green);
+	embed.setColor("#0099ff"); // TODO: Based on user's rank
+	embed.setURL(`https://plancke.io/hypixel/player/stats/${stats.info.displayname}`);
+	embed.setThumbnail(`https://visage.surgeplay.com/head/128/${stats.info.uuid}`);
+	embed.setTimestamp();
+	embed.setTitle(`${stats.info.displayname} | ${GAMES_READABLE[game]} Statistics *[**${timeframe}**]*`);
+
+	switch (game) {
+		case "all":
+			embed.addField("**Coins**",          (stats.overall.coins - previous.overall.coins)          .toLocaleString(), true);
+			embed.addField("**Wins**",           (stats.overall.wins - previous.overall.wins)            .toLocaleString(), true);
+			embed.addField("**Playtime**",       (stats.overall.playtime - previous.overall.playtime)    .toLocaleString(), true);
+			embed.addField("**TNT Tag Wins**",   (stats.tag.wins - previous.tag.wins)                    .toLocaleString(), true);
+			embed.addField("**TNT Run Record**", (stats.run.record - previous.run.record)                .toLocaleString(), true);
+			embed.addField("**TNT Run Wins**",   (stats.run.wins - previous.run.wins)                    .toLocaleString(), true);
+			embed.addField("**Bowspleef Wins**", (stats.bowspleef.wins - previous.bowspleef.wins)        .toLocaleString(), true);
+			embed.addField("**PvP Run Kills**",  (stats.pvp.kills - previous.pvp.kills)                  .toLocaleString(), true);
+			embed.addField("**PvP Run Wins**",   (stats.pvp.wins - previous.pvp.wins)                    .toLocaleString(), true);
+			embed.addField("**Wizards Wins**",   (stats.wizards.wins - previous.wizards.wins)            .toLocaleString(), true);
+			embed.addField("**Wizards Kills**",  (stats.wizards.totalkills - previous.wizards.totalkills).toLocaleString(), true);
+			embed.addField("**Wizards Points**", (stats.wizards.points - previous.wizards.points)        .toLocaleString(), true);
+			return embed;
+		case "run":
+			embed.addField("**Record**",         (stats.run.record - previous.run.record)                .toLocaleString(), true);
+			embed.addField("**Wins**",           (stats.run.wins - previous.run.wins)                    .toLocaleString(), true);
+			embed.addField("**Deaths**",         (stats.run.deaths - previous.run.deaths)                .toLocaleString(), true);
+			embed.addField("**Potions Thrown**", (stats.run.potions - previous.run.potions)              .toLocaleString(), true);
+			embed.addField("**W/L Ratio**",      (stats.ratio.run.WL - previous.ratio.run.WL)            .toLocaleString(), true);
+			embed.addField("**Blocks Broken**",  (stats.run.blocks - previous.run.blocks)                .toLocaleString(), true);
+			return embed;
+		case "pvp":
+			embed.addField("**Record**",         (stats.pvp.record - previous.pvp.record)                .toLocaleString(), true);
+			embed.addField("**Wins**",           (stats.pvp.wins - previous.pvp.wins)                    .toLocaleString(), true);
+			embed.addField("**Deaths**",         (stats.pvp.deaths - previous.pvp.deaths)                .toLocaleString(), true);
+			embed.addField("**Kills**",          (stats.pvp.kills - previous.pvp.kills)                  .toLocaleString(), true);
+			embed.addField("**W/L Ratio**",      (stats.ratio.pvp.WL - previous.ratio.pvp.WL)            .toLocaleString(), true);
+			embed.addField("**K/D Ratio**",      (stats.ratio.pvp.KD - previous.ratio.pvp.KD)            .toLocaleString(), true);
+			return embed;
+		case "bowspleef":
+			embed.addField("**Wins**",           (stats.bowspleef.wins - previous.bowspleef.wins)        .toLocaleString(), true);
+			embed.addField("**Deaths**",         (stats.bowspleef.deaths - previous.bowspleef.deaths)    .toLocaleString(), true);
+			embed.addField("**Kills**",          (stats.bowspleef.kills - previous.bowspleef.kills)      .toLocaleString(), true);
+			embed.addField("**Shots**",          (stats.bowspleef.shots - previous.bowspleef.shots)      .toLocaleString(), true);
+			embed.addField("**W/L Ratio**",      (stats.ratio.bowspleef.WL - previous.ratio.bowspleef.WL).toLocaleString(), true);
+			embed.addField("**K/D Ratio**",      (stats.ratio.bowspleef.KD - previous.ratio.bowspleef.KD).toLocaleString(), true);
+			return embed;
+		case "tag":
+			embed.addField("**Wins**",           (stats.tag.wins - previous.tag.wins)                    .toLocaleString(), true);
+			embed.addField("**Kills**",          (stats.tag.kills - previous.tag.kills)                  .toLocaleString(), true);
+			embed.addField("**Tags**",           (stats.tag.tags - previous.tag.tags)                    .toLocaleString(), true);
+			embed.addField("**T/K Ratio**",      (stats.ratio.tag.TK - previous.ratio.tag.TK)            .toLocaleString(), true);
+			embed.addField("**K/W Ratio**",      (stats.ratio.tag.KW - previous.ratio.tag.KW)            .toLocaleString(), true);
+			return embed;
+		case "wizards":
+			// TODO: Airtime, KA/D Ratio, K/W Ratio, Kills with each class (verbose only)
+			embed.addField("**Wins**",           (stats.wizards.wins - previous.wizards.wins)            .toLocaleString(), true);
+			embed.addField("**Deaths**",         (stats.wizards.deaths - previous.wizards.deaths)        .toLocaleString(), true);
+			embed.addField("**Kills**",          (stats.wizards.totalkills - previous.wizards.totalkills).toLocaleString(), true);
+			embed.addField("**Assists**",        (stats.wizards.assists - previous.wizards.assists)      .toLocaleString(), true);
+			embed.addField("**Points**",         (stats.wizards.points - previous.wizards.points)        .toLocaleString(), true);
+			embed.addField("**K/D Ratio**",      (stats.ratio.wizards.KD - previous.ratio.wizards.KD)    .toLocaleString(), true);
+			return embed;
+		case "duels":
+			embed.addField("**Wins**",           (stats.duels.wins - previous.duels.wins)                .toLocaleString(), true);
+			embed.addField("**Losses**",         (stats.duels.losses - previous.duels.losses)            .toLocaleString(), true);
+			embed.addField("**Shots**",          (stats.duels.shots - previous.duels.shots)              .toLocaleString(), true);
+			embed.addField("**W/L Ratio**",      (stats.ratio.duels.WL - previous.ratio.duels.WL)        .toLocaleString(), true);
+			embed.addField("**Current WS**",     (stats.duels.currentWS - previous.duels.currentWS)      .toLocaleString(), true);
+			embed.addField("**Best WS**",        (stats.duels.bestWS - previous.duels.bestWS)            .toLocaleString(), true);
+			return embed;
+		case null:
+			embed.setDescription("No game was provided.");
+			return embed;
+	}
+};
 
 const parseStatsArgs = async (message, args) => {
 	let uuid = null,
@@ -497,5 +569,5 @@ module.exports = {
 	ratio, formatTimestamp, getMentioned, successEmbed, fetchStats,
 	mojangNameFetch, avatarOf, hypixelToStandard, formatMinutes,
 	formatSeconds, display, getUUIDFromDiscord, parseUser, toLString,
-	parseStatsArgs, createStatsEmbed
+	parseStatsArgs, createStatsEmbed, createTimedEmbed
 };
