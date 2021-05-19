@@ -351,9 +351,7 @@ const parseUser = async (arg, mentioned = null) => {
 	}
 };
 
-const toLString = n => n.toLocaleString();
-
-const display = (pathStr, stats, previous, formatter = toLString) => {
+const display = (pathStr, stats, previous, formatter = n => n.toLocaleString()) => {
 	const path = pathStr.split(".");
 	const statsValue = path.reduce((a, cv) => a[cv], stats);
 	let result = formatter(statsValue);
@@ -568,6 +566,6 @@ module.exports = {
 	randomChoice, noop, errorEmbed, hypixelFetch, mojangUUIDFetch,
 	ratio, formatTimestamp, getMentioned, successEmbed, fetchStats,
 	mojangNameFetch, avatarOf, hypixelToStandard, formatMinutes,
-	formatSeconds, display, getUUIDFromDiscord, parseUser, toLString,
+	formatSeconds, getUUIDFromDiscord,
 	parseStatsArgs, createStatsEmbed, createTimedEmbed
 };

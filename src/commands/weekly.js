@@ -1,4 +1,4 @@
-const {getTimedStats, cacheTimedStats} = require("../cache.js");
+const {getTimedStats, cacheTimedStats, setAndOrGet} = require("../cache.js");
 const {parseStatsArgs, fetchStats, hypixelToStandard, createTimedEmbed, errorEmbed, formatTimestamp} = require("../util");
 
 module.exports = {
@@ -12,21 +12,14 @@ module.exports = {
 
 		const stats = hypixelToStandard(data.user.player);
 		const isWeekly = command !== "monthly";
-
-		// TODO: Check both weekly & monthly, set if not exist
-		// TODO: Do in !kills & !stats
-		let previous = await getTimedStats(uuid, isWeekly);
-		if (previous === null) await cacheTimedStats(uuid, isWeekly, stats);
+		const previous = await setAndOrGet(uuid, isWeekly, stats);
 
 		const embed = createTimedEmbed({
-			message,
-			stats,
-			previous,
-			game,
+			message, stats, previous, game,
 			timeframe: isWeekly ? "Weekly" : "Monthly"
 		});
-
-		embed.setDescription("**Showing changes since:** " + formatTimestamp(previous === null ? Date.now() : previous.info.timestamp));
+		
+		embed.setDescription("**Showing changes since:** " + formatTimestamp((previous === null ? stats : previous).info.timestamp));
 		return message.channel.send(embed);
 	},
 	aliases: ["monthly"],

@@ -1,4 +1,4 @@
-const {cacheUserStats, getUserStats} = require("../cache.js");
+const {cacheUserStats, getUserStats, setAndOrGet, getTimedStats, cacheTimedStats} = require("../cache.js");
 const {
 	errorEmbed,
 	fetchStats,
@@ -19,8 +19,11 @@ module.exports = {
 		const stats = hypixelToStandard(data.user.player);
 		const previous = await getUserStats(message.author.id, uuid);
 		await cacheUserStats(message.author.id, uuid, stats);
+		
+		message.channel.send(createStatsEmbed({message, stats, previous, game}));
 
-		return message.channel.send(createStatsEmbed({message, stats, previous, game}));
+		await getTimedStats(uuid, true).then(cache => cache === null ? cacheTimedStats(uuid, true) : null);
+		await getTimedStats(uuid, false).then(cache => cache === null ? cacheTimedStats(uuid, true) : null);
 	},
 	aliases: [],
 	requiresConfiguredChannel: true

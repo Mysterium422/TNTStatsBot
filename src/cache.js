@@ -26,4 +26,25 @@ const getTimedStats = async (uuid, isWeekly) => {
 	else return JSON.parse(result[0].data);
 };
 
-module.exports = {cacheUserStats, getUserStats, cacheTimedStats, getTimedStats};
+// Take in stats, return the previous cached stats for isWeekly
+const setAndOrGet = async (uuid, isWeekly, stats) => {
+	const result = await db.select(db.TABLES.TimedCache, {uuid});
+	const mainIndex = result.findIndex(row => row.isWeekly === isWeekly - 0);
+
+	if (mainIndex === -1 || result.length === 0) {
+		await cacheTimedStats(uuid, isWeekly, stats);
+	} else if (result.length === 1 || result.length === 0) {
+		await cacheTimedStats(uuid, !isWeekly, stats);
+	}
+
+	if (mainIndex !== -1) return JSON.parse(result[mainIndex].data);
+	else return stats;
+};
+
+module.exports = {
+	cacheUserStats,
+	getUserStats,
+	cacheTimedStats,
+	getTimedStats,
+	setAndOrGet
+};
