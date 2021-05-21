@@ -18,58 +18,66 @@ discordLinks:
 
 **My Server** - <https://discord.gg/7Qb5xuJD4C>`,
 
-help_home: prefix =>
-`:house:: Home
-:bar_chart:: Stat Commands
-:tools:: QoL Commands
-:information_source:: Bot Information Commands
-:track_next:: Latest Update Info
+help: {
 
-**${prefix}tntconfigure [game] [prefix]** - Configure the bot to *this* channel. Game options include All, Wizards, Bowspleef, TNT Tag, TNT Run, PVP Run.
-**${prefix}tntremove** - Remove this channel from the bot's list of channels.
-**${prefix}tnthelp** - Opens this menu`,
+home: `**React to view a specific page**
+:house: : **Home**
+:tools: : **Configuration**
+:repeat: : **Update Information**
 
-help_stats: prefix =>
-`**${prefix}stats all [username]** - Shows overall TNT Games Stats
-**${prefix}stats run [username]** - Shows TNT Run Stats
-**${prefix}stats tag [username]** - Shows TNT Tag Stats
-**${prefix}stats bowspleef [username]** - Shows Bowspleef Stats
-**${prefix}stats wizards [username]** - Shows TNT Wizards Stats
-**${prefix}stats pvp [username]** - Shows PVP Run Stats
-**${prefix}kills [username]** - Shows TNT Wizards kills by class
 
-*()s show changes since your last stats call for that user*
-*Game defaults to your channel-configured game if not specified*
-*Username defaults to your verified username if not specified*`,
+:bar_chart: : **Statistics Commands**
+:link: : **Account Linking**
+:gear: : **User Settings**
 
-help_qol: prefix =>
-`**${prefix}account [User ping]** - Shows the account of the specified player if they are verified
-**${prefix}set [username]** - Sets your username. Requires you to set your discord tag in Hypixel
-**${prefix}settings [setting] [value]** - Configures the setting to the value specified
-**${prefix}reset** - Updates your personal stats in the cache. Only useful if reset setting is false
-**${prefix}ping** - Check bot connection
+:information_source: : **Other Commands**`,
 
-:gear:: Settings Info`,
+stats: prefix =>
+`**\`${prefix}kills [user]\`** - TNT Wizards kills by class
+**\`${prefix}stats [game] [user]\`** - Shows TNT games stats
 
-help_info: prefix =>
-`**${prefix}help** - Opens this menu
-**${prefix}info** - Shows bot info
-**${prefix}invite** - Pastes bot invite link
-**${prefix}source** - Pastes bot source code link
-**${prefix}discord** - Pastes the links of TNT Game discord servers
-**${prefix}mysterium** - See more about the bot creator
-**${prefix}bugs** - Pastes server invite link to report bugs`,
+Possible Games:
+    \`all\` - Overall TNT Games Stats
+    \`run\` - TNT Run Stats
+    \`tag\` - TNT Tag Stats
+    \`bowspleef\` - Bowspleef Stats
+    \`wizards\` - TNT Wizards Stats
+    \`pvp\` - PVP Run Stats
 
-help_update:
-`- Everything rewritten by Lebster
+*Brackets show changes since your last stats call for that user*
+*\`[game]\` defaults to the channel-configured game if not specified*
+*\`[user]\` defaults to your linked account if not specified*
+
+**\`${prefix}reset [user]\`** - Reset your brackets for \`[user]\` (defaults to yourself)
+*Only useful if you have the **auto reset** setting disabled*`,
+
+linking: prefix =>
+`**\`${prefix}account [mention]\`** - Shows the linked account of the mentioned user (defaults to yourself)
+**\`${prefix}set [username]\`** - Links your Discord account to your Minecraft account
+Prevents you from requiring to specify your username in other commands`,
+
+info: prefix =>
+`**\`${prefix}help\`** - Opens this menu
+**\`${prefix}info\`** - Shows bot info
+**\`${prefix}invite\`** - Bot invite link
+**\`${prefix}source\`** - Link to bot source code
+**\`${prefix}discord\`** - Links of TNT Game Discord servers
+**\`${prefix}author\`** - Read more about the bot creators
+**\`${prefix}bugs\`** - Server invite link for reporting bugs
+**\`${prefix}ping\`** - Check bot connection`,
+
+update:
+`**Latest Update: v5.0.0**
+- Everything rewritten by Lebster
 - Full changelog soon!`,
 
-help_settings: 
+settings: 
 `**Verbose** *(True/False)* - Show more stats
 Default: __False__
 
 **Reset** *(True/False)* - Do not update cache so brackets will stay until you do /reset. (Only works on your registered ign)
-Default: __True__`,
+Default: __True__`
+},
 
 invite:
 `Use \`/TNTconfigure\` to set up the bot:

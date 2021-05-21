@@ -3,45 +3,57 @@ const {noop, successEmbed} = require("../util.js");
 
 module.exports = {
 	run: async ({client, message, channelInfo: {prefix}}) => {
+		// TODO: Embeds for each menu
+		// FIXME: No configuration menu!
+		const reactions = {
+			"🏠": {
+				name: "Help Menu - Home",
+				string: strings.help.home
+			},
+			"🛠": {
+				name: "Help Menu - Configuration",
+				string: strings.help.config
+			},
+			"🔁": {
+				name: "Help Menu - Update Information",
+				string: strings.help.update
+			},
+			"📊": {
+				name: "Help Menu - Stats Commands",
+				string: strings.help.stats(prefix)
+			},
+			"🔗": {
+				name: "Help Menu - Account Linking",
+				string: strings.help.linking(prefix)
+			},
+			"⚙️": {
+				name: "Help Menu - User Settings",
+				string: strings.help.settings
+			},
+			"ℹ": {
+				name: "Help Menu - Other Commands",
+				string: strings.help.info(prefix)
+			}
+		};
+
 		const embed = successEmbed(
 			message.author,
-			strings.help_home(prefix),
-			"Help Menu - Home",
+			reactions["🏠"].string,
+			reactions["🏠"].name,
 			"https://findicons.com/files/icons/1008/quiet/128/information.png"
 		);
 
 		const msg = await message.channel.send(embed);
-		msg.react("🏠")
-			.then(msg.react("📊"))
-			.then(msg.react("🛠"))
-			.then(msg.react("ℹ"))
-			.then(msg.react("⏭"));
+		for (const emoji in reactions) await msg.react(emoji);
 
 		const collector = msg.createReactionCollector((_, user) => user.id === message.author.id, {time: 60000});
 		collector.on("collect", async (reaction, user) => {
 			collector.resetTimer({time: 60000});
 			await reaction.users.remove(user.id).catch(noop);
-			const embed = successEmbed(message.author);
-			
-			if (reaction.emoji.name === "🏠") {
-				msg.edit(embed.setTitle("Help Menu - Home").setDescription(strings.help_home(prefix)));
-			} else if (reaction.emoji.name === "📊") {
-				msg.edit(embed.setTitle("Help Menu - Stats Commands").setDescription(strings.help_stats(prefix)));
-			} else if (reaction.emoji.name === "ℹ") {
-				msg.edit(embed.setTitle("Help Menu - Bot Info Commands").setDescription(strings.help_info(prefix)));
-			} else if (reaction.emoji.name === "⏭") {
-				msg.edit(embed.setTitle("Latest Update: v5.0.0").setDescription(strings.help_update));
-			}
 
-			if (reaction.emoji.name == "⚙") {
-				msg.edit(embed.setTitle("Help Menu - Settings Info").setDescription(strings.help_settings));
-				return;
-			} else if (reaction.emoji.name === "🛠") {
-				msg.edit(embed.setTitle("Help Menu - QoL Commands").setDescription(strings.help_qol(prefix)));
-				msg.react("⚙");
-			} else if (reaction.message.reactions.cache.has("⚙")) {
-				await reaction.message.reactions.cache.get("⚙").users.remove(client.user.id);
-			}
+			if (!(reaction.emoji.name in reactions)) return;
+			const menu = reactions[reaction.emoji.name];
+			msg.edit(embed.setTitle(menu.name).setDescription(menu.string));
 		});
 	},
 	aliases: ["tnthelp"],
