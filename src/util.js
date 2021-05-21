@@ -100,6 +100,7 @@ const successEmbed = (author, description = "", title = "Success", thumbnail = n
 	return result;
 };
 
+// TODO: Make a file for stats related functions
 const fetchStats = async uuid => {
 	const data = await hypixelFetch("player?uuid=" + uuid);
 	if (data === null) {

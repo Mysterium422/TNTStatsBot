@@ -13,7 +13,8 @@ const TABLES = {
 	VerifiedUsers: "verified_users",
 	ConfiguredChannels: "configured_channels",
 	UserCache: "user_cache",
-	TimedCache: "timed_cache"
+	TimedCache: "timed_cache",
+	UserSettings: "user_settings"
 };
 
 const createTables = () => {
@@ -52,6 +53,15 @@ const createTables = () => {
 			return knex.schema.createTable(TABLES.TimedCache, table => {
 				table.string("uuid").notNullable();
 				table.boolean("isWeekly").notNullable();
+				table.jsonb("data").notNullable();
+			});
+		}
+	});
+
+	knex.schema.hasTable(TABLES.UserSettings).then(exists => {
+		if (!exists) {
+			return knex.schema.createTable(TABLES.UserSettings, table => {
+				table.string("discord").primary();
 				table.jsonb("data").notNullable();
 			});
 		}
@@ -101,8 +111,17 @@ const getChannelInfo = async message => {
 	return result[0];
 };
 
+const getUserSettings = async user => {
+	const result = await select(TABLES.UserSettings, {
+		discord: user.id
+	});
+
+	if (result.length === 0) return null;
+	return result[0];
+};
+
 module.exports = {
 	add, all, update, select, del, reset,
 	TABLES, linkUUID, linkChannelPrefix,
-	getChannelInfo, createTables
+	getChannelInfo, createTables, getUserSettings
 };

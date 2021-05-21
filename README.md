@@ -6,6 +6,5 @@ Discord bot to show player stats from Hypixel's TNT Games
 - [x] Kills command
 - [x] Recordings
 - [x] Weekly/Monthly Cache
-- [ ] Leaderboards
 - [ ] Settings command
 - [ ] Polishing
