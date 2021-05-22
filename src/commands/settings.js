@@ -1,4 +1,4 @@
-const { getUserSettings } = require("../db.js");
+const {getUserSettings} = require("../db.js");
 
 module.exports = {
 	run: async ({message, args}) => {
