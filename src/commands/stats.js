@@ -8,8 +8,8 @@ const {
 } = require("../util.js");
 
 module.exports = {
-	run: async ({message, args}) => {
-		const parsed = await parseStatsArgs(message, args);
+	run: async ({message, args, channelInfo: {prefix}}) => {
+		const parsed = await parseStatsArgs(message, args, prefix);
 		if (!parsed.success) return message.channel.send(errorEmbed(...parsed.error));
 		const {uuid, game} = parsed;
 

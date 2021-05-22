@@ -35,7 +35,6 @@ const errorEmbed = (error = "Something went wrong...", description = ":robot: be
 const config = require("../config.json");
 const fetch = require("node-fetch");
 
-// TODO: Caching with keyv (npm install keyv)
 const hypixelFetch = query => fetch(`https://api.hypixel.net/${query}&key=${config.hypixel_key}`).then(response => response.json());
 const mojangUUIDFetch = query => fetch(`https://api.mojang.com/users/profiles/minecraft/${query}`).then(response => (response.status === 204 ? null : response.json()));
 const mojangNameFetch = query => fetch(`https://api.mojang.com/user/profiles/${query}/names`).then(response => (response.status === 204 ? null : response.json()));
@@ -347,7 +346,7 @@ const parseUser = async (arg, mentioned = null) => {
 		}
 	} else {
 		const uuid = await getUUIDFromDiscord(mentioned.id);
-		if (uuid === null) return {success: false, error: ["Invalid user", "That user has not linked their Hypixel account"]};
+		if (uuid === null) return {success: false, error: ["Invalid user", strings.unlinked]};
 		else return {success: true, uuid};
 	}
 };
@@ -527,7 +526,7 @@ const createTimedEmbed = ({message, stats, previous, game, timeframe}) => {
 	}
 };
 
-const parseStatsArgs = async (message, args) => {
+const parseStatsArgs = async (message, args, prefix) => {
 	let uuid = null,
 		game = null;
 
@@ -548,7 +547,7 @@ const parseStatsArgs = async (message, args) => {
 		return {success: false, error: ["Too many arguments!"]};
 	} else if (args.length === 0 || (args.length === 1 && args[0] in GAMES)) {
 		uuid = await getUUIDFromDiscord(message.author.id);
-		if (uuid === null) return {success: false, error: ["Discord account not linked", strings.unlinked]};
+		if (uuid === null) return {success: false, error: ["Discord account not verified", strings.unverified(prefix)]};
 	} else if (args.length === 2 || (args.length === 1 && !(args[0] in GAMES))) {
 		const user = await parseUser(args[0], getMentioned(message));
 		if (!user.success) return user;

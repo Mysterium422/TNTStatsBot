@@ -65,7 +65,7 @@ client.on("message", async message => {
 			return await commands[command].run({
 				client, message, args,
 				command, channelInfo: channel,
-				multiArgs: messageContent.slice(command.length)
+				multiArgs: messageContent.slice(command.length).trim()
 			});
 		} catch (error) {
 			await message.channel.send("An internal error occoured, see the stacktrace below:\n```" + error.stack + "```"); // FIXME: Debug Only!!

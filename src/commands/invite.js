@@ -1,7 +1,7 @@
 const strings = require("../strings.js");
 
 module.exports = {
-	run: ({message}) => message.channel.send(strings.invite),
+	run: ({message, channelInfo: {prefix}}) => message.channel.send(strings.invite(prefix)),
 	aliases: [],
 	requiresConfiguredChannel: true
 };
