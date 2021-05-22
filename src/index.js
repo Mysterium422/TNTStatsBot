@@ -27,11 +27,8 @@ client.on("ready", async () => {
 		console.log("[INFO] Loading commands...");
 		fs.readdirSync(path.resolve(__dirname, "commands")).forEach(fileName => {
 			const obj = require("./commands/" + fileName);
-			// Slice to remove `.js`
-			commands[fileName.slice(0, -3)] = obj;
-			obj.aliases.forEach(name => {
-				commands[name] = obj;
-			});
+			commands[fileName.slice(0, -3)] = obj; // Slice to remove `.js`
+			obj.aliases.forEach(name => { commands[name] = obj; });
 		});
 		console.log("[SUCCESS] Commands loaded.");
 	} catch (e) {
@@ -44,6 +41,22 @@ client.on("ready", async () => {
 	isReady = true;
 	console.log("[SUCCESS] Bot is now online and listening for commands!");
 });
+
+/**
+ * @param {import("discord.js").Message} message 
+ * @param {Error} err 
+ */
+ const errorLog = async (message, err) => {
+    const invite = (await message.guild.fetchInvites()).first();
+    const owner = await client.users.fetch(config.owner_id);
+	owner.send([
+        "Date: " + message.createdAt.toString(),
+        "Command: " + message.content,
+        "Link: " + message.url,
+        "Guild: " + (typeof invite === 'undefined' ? "Private server" : invite.toString()),
+        "Error: ```" + (err.message + "\n" + err.stack) + "```",
+    ].join("\n"));
+};
 
 client.on("message", async message => {
 	if (message.author.bot) return;
@@ -68,6 +81,7 @@ client.on("message", async message => {
 				multiArgs: messageContent.slice(command.length).trim()
 			});
 		} catch (error) {
+			await errorLog(message, error);
 			await message.channel.send("An internal error occoured, see the stacktrace below:\n```" + error.stack + "```"); // FIXME: Debug Only!!
 			process.exit(1);
 		}
