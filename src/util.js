@@ -48,19 +48,6 @@ const formatTimestamp = timestamp =>
 
 const ratio = (a = 0, b = 0) => (b === 0 ? a : a === 0 ? 0 : a / b);
 
-const booleanPhrases = {
-	false: false,
-	true: true,
-	f: false,
-	t: true,
-	y: true,
-	no: false,
-	n: false,
-	yes: true,
-	"1": true,
-	"0": false
-};
-
 const ChatColors = {
 	black:        "#000000",   "0": "#000000",
 	dark_blue:    "#0000AA",   "1": "#0000AA",
@@ -560,7 +547,6 @@ const parseStatsArgs = async (message, args, prefix) => {
 
 module.exports = {
 	embedFooter, ChatColors,
-	booleanPhrases,
 	GAMES, GAMES_READABLE,
 
 	randomChoice, noop, errorEmbed, hypixelFetch, mojangUUIDFetch,

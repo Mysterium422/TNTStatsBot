@@ -1,6 +1,7 @@
 const path = require("path"),
-	fs = require("fs");
-
+	fs = require("fs"),
+	{getDefaultSettings} = require("./settings.js");
+	
 const knex = require("knex")({
 	client: "sqlite3",
 	connection: {
@@ -8,7 +9,7 @@ const knex = require("knex")({
 	},
 	useNullAsDefault: true
 });
-
+	
 const TABLES = {
 	VerifiedUsers: "verified_users",
 	ConfiguredChannels: "configured_channels",
@@ -16,7 +17,7 @@ const TABLES = {
 	TimedCache: "timed_cache",
 	UserSettings: "user_settings"
 };
-
+	
 const createTables = () => {
 	knex.schema.hasTable(TABLES.VerifiedUsers).then(exists => {
 		if (!exists) {
@@ -26,7 +27,7 @@ const createTables = () => {
 			});
 		}
 	});
-
+	
 	knex.schema.hasTable(TABLES.ConfiguredChannels).then(exists => {
 		if (!exists) {
 			return knex.schema.createTable(TABLES.ConfiguredChannels, table => {
@@ -37,7 +38,7 @@ const createTables = () => {
 			});
 		}
 	});
-
+	
 	knex.schema.hasTable(TABLES.UserCache).then(exists => {
 		if (!exists) {
 			return knex.schema.createTable(TABLES.UserCache, table => {
@@ -47,7 +48,7 @@ const createTables = () => {
 			});
 		}
 	});
-
+	
 	knex.schema.hasTable(TABLES.TimedCache).then(exists => {
 		if (!exists) {
 			return knex.schema.createTable(TABLES.TimedCache, table => {
@@ -57,7 +58,7 @@ const createTables = () => {
 			});
 		}
 	});
-
+	
 	knex.schema.hasTable(TABLES.UserSettings).then(exists => {
 		if (!exists) {
 			return knex.schema.createTable(TABLES.UserSettings, table => {
@@ -67,7 +68,7 @@ const createTables = () => {
 		}
 	});
 };
-
+	
 const reset = async () => {
 	console.warn("[NOTICE] Resetting database...");
 	// Delete the database file if it exists
@@ -75,13 +76,13 @@ const reset = async () => {
 		fs.unlinkSync(path.resolve(__dirname, "../database.sql"));
 	}
 };
-
+	
 const all = database => knex(database);
 const add = (database, row) => knex(database).insert(row);
 const update = (database, query, newvalue) => knex(database).where(query).update(newvalue);
 const select = (database, query) => knex(database).where(query);
 const del = (database, query) => knex(database).where(query).del();
-
+	
 const linkUUID = async (uuid, discord) => {
 	const existing = await select(TABLES.VerifiedUsers, {discord});
 	if (existing.length === 0) {
@@ -90,38 +91,53 @@ const linkUUID = async (uuid, discord) => {
 		return update(TABLES.VerifiedUsers, {discord}, {uuid});
 	}
 };
-
+	
 const linkChannelPrefix = async (channel, prefix, game) => {
 	const selector = {guild: channel.guild.id, channel: channel.id},
 		newValues = {prefix, game};
-
+	
 	const updated = await update(TABLES.ConfiguredChannels, selector, newValues);
 	if (updated === 0) {
 		return add(TABLES.ConfiguredChannels, {...selector, ...newValues});
 	} else return updated;
 };
-
+	
 const getChannelInfo = async message => {
 	const result = await select(TABLES.ConfiguredChannels, {
 		guild: message.guild.id,
 		channel: message.channel.id
 	});
-
+	
 	if (result.length === 0) return null;
 	return result[0];
 };
-
+	
 const getUserSettings = async user => {
 	const result = await select(TABLES.UserSettings, {
 		discord: user.id
 	});
-
+	
 	if (result.length === 0) return null;
-	return result[0];
+	return JSON.parse(result[0].data);
 };
+	
+const setUserSetting = async (user, setting, value) => {
+	const result = await select(TABLES.UserSettings, {
+		discord: user.id
+	});
+	
+	const newObj = result.length === 0 ? getDefaultSettings() : result[0];
+	newObj[setting] = value;
+	const data = JSON.stringify(newObj);
 
+	const updated = await update(TABLES.UserSettings, {discord: user.id}, {data}); 
+	if (updated === 0) {
+		return add(TABLES.UserSettings, {discord: user.id, data});
+	} else return updated;
+};
+	
 module.exports = {
 	add, all, update, select, del, reset,
 	TABLES, linkUUID, linkChannelPrefix,
-	getChannelInfo, createTables, getUserSettings
+	getChannelInfo, createTables, getUserSettings, setUserSetting
 };

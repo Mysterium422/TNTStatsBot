@@ -76,13 +76,40 @@ For example, saying:
 Configures the bot to listen to the prefix \`/\`,
 and sets ***TNT Wizards*** as the default game for commands.`,
 
-settings:
-`**No settings help exists right now!**`
+settings: prefix =>
+`**Verbose ** *(True/__False__)*
+    Show more statistics in \`${prefix}stats\`
+
+**Auto Reset** *(__True__/False)*
+    Automatically reset brackets for \`${prefix}stats\` 
+    Disable to make brackets stay until you do \`${prefix}reset\`
+
+*Default values are __underlined__*`
 },
 
 invite: prefix =>
 `See \`${prefix}help configuration\` for help with setting up the bot:
 https://discord.com/oauth2/authorize?client_id=735055542178938960&scope=bot&permissions=2147994688`,
+
+settings: {
+unknown: setting =>
+`Unknown setting '\`${setting}\`'`,
+
+invalid: (prefix, setting, value) =>
+`Setting \`${setting}\` cannot be set to '\`${value}\`'
+See \`${prefix}help settings\` for acceptable values`,
+
+updated: (setting, value) =>
+`Updated setting \`${setting}\` to '\`${value}\`'`,
+
+value: (setting, value) =>
+`Setting \`${setting}\` currently has the value '\`${value}\`'`,
+
+unspecified: prefix =>
+`You haven't specified the setting name!
+Syntax: **\`${prefix}setting [setting name] [new value]\`**`
+
+},
 
 source:
 "Contribute here: https://github.com/LebsterFace/TNTStatsBot",

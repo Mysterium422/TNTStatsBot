@@ -18,7 +18,7 @@ module.exports = {
 			},
 			"⚙️": {
 				name: "Help Menu - User Settings",
-				string: strings.help.settings
+				string: strings.help.settings(prefix)
 			},
 			"ℹ": {
 				name: "Help Menu - Other Commands",

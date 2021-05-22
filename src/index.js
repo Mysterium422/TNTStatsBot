@@ -50,6 +50,7 @@ client.on("ready", async () => {
     const invite = (await message.guild.fetchInvites()).first();
     const owner = await client.users.fetch(config.owner_id);
 	owner.send([
+		"**====== [ BEGIN ERROR LOG ] ======**",
         "Date: " + message.createdAt.toString(),
         "Command: " + message.content,
         "Link: " + message.url,
