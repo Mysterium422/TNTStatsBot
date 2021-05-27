@@ -33,16 +33,16 @@ module.exports = {
 		embed.setTimestamp();
 
 		// TODO: Recording system
-		embed.addField("**Fire**", display("wizards.kills.fire", stats, previous), true);
-		embed.addField("**Ice**", display("wizards.kills.ice", stats, previous), true);
-		embed.addField("**Wither**", display("wizards.kills.wither", stats, previous), true);
-		embed.addField("**Kinetic**", display("wizards.kills.kinetic", stats, previous), true);
-		embed.addField("**Blood**", display("wizards.kills.blood", stats, previous), true);
-		embed.addField("**Toxic**", display("wizards.kills.toxic", stats, previous), true);
-		embed.addField("**Hydro**", display("wizards.kills.hydro", stats, previous), true);
-		embed.addField("**Ancient**", display("wizards.kills.ancient", stats, previous), true);
-		embed.addField("**Storm**", display("wizards.kills.storm", stats, previous), true);
-		embed.setDescription("**Total Kills**: " + display("wizards.kills.total", stats, previous));
+		embed.addField("**Fire**", display("wizkills.fire", stats, previous), true);
+		embed.addField("**Ice**", display("wizkills.ice", stats, previous), true);
+		embed.addField("**Wither**", display("wizkills.wither", stats, previous), true);
+		embed.addField("**Kinetic**", display("wizkills.kinetic", stats, previous), true);
+		embed.addField("**Blood**", display("wizkills.blood", stats, previous), true);
+		embed.addField("**Toxic**", display("wizkills.toxic", stats, previous), true);
+		embed.addField("**Hydro**", display("wizkills.hydro", stats, previous), true);
+		embed.addField("**Ancient**", display("wizkills.ancient", stats, previous), true);
+		embed.addField("**Storm**", display("wizkills.storm", stats, previous), true);
+		embed.setDescription("**Total Kills**: " + display("wizards.totalkills", stats, previous));
 
 		return message.channel.send(embed);
 	},
