@@ -1,3 +1,6 @@
+// @ts-check
+"use strict";
+
 const db = require("./db");
 
 const cacheUserStats = async (discord, uuid, data) => {

@@ -1,3 +1,6 @@
+// @ts-check
+"use strict";
+
 const db = require("../db");
 const strings = require("../strings.js");
 const {errorEmbed, successEmbed, GAMES, GAMES_READABLE} = require("../util.js");

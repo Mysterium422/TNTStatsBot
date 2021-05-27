@@ -1,3 +1,6 @@
+// @ts-check
+"use strict";
+
 const {cacheUserStats, getUserStats, getTimedStats, cacheTimedStats} = require("../cache.js"),
 	{getUserSettings} = require("../db.js"),
 	{errorEmbed} = require("../util.js"),

@@ -1,3 +1,6 @@
+// @ts-check
+"use strict";
+
 const db = require("../db"),
 	strings = require("../strings.js"),
 	config = require("../../config.json"),

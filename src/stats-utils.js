@@ -1,4 +1,25 @@
-const {embedFooter, randomChoice, hypixelFetch, defaultTo, ratio, getMentioned, avatarOf, getRank, formatMinutes, formatSeconds, GAMES_READABLE, GAMES, getUUIDFromDiscord, parseUser} = require("./util");
+// @ts-check
+"use strict";
+
+const {
+	embedFooter,
+	randomChoice,
+	hypixelFetch,
+	defaultTo,
+	ratio,
+	getMentioned,
+	avatarOf,
+	getRank,
+	formatMinutes,
+	formatSeconds,
+	GAMES_READABLE,
+	GAMES,
+	getUUIDFromDiscord,
+	parseUser
+} = require("./util"),
+	db = require("./db"),
+	strings = require("./strings"),
+	Discord = require("discord.js");
 
 const display = (pathStr, stats, previous, formatter = n => n.toLocaleString()) => {
 	const path = pathStr.split(".");
@@ -198,7 +219,7 @@ const parseStatsArgs = async (message, args, prefix) => {
 		uuid = await getUUIDFromDiscord(message.author.id);
 		if (uuid === null) return {success: false, error: ["Discord account not verified", strings.unverified(prefix)]};
 	} else if (args.length === 2 || (args.length === 1 && !(args[0] in GAMES))) {
-		const user = await parseUser(args[0], getMentioned(message));
+		const user = await parseUser({arg: args[0], mentioned: getMentioned(message)});
 		if (!user.success) return user;
 		uuid = user.uuid;
 	}

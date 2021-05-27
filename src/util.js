@@ -1,3 +1,6 @@
+// @ts-check
+"use strict";
+
 const Discord = require("discord.js"),
 	db = require("./db"),
 	strings = require("./strings");

@@ -1,3 +1,6 @@
+// @ts-check
+"use strict";
+
 const {successEmbed} = require("../util.js");
 
 module.exports = {

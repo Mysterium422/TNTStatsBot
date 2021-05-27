@@ -1,3 +1,6 @@
+// @ts-check
+"use strict";
+
 const {getUserSettings, setUserSetting} = require("../db.js");
 const {SETTINGS_READABLE, SETTINGS, booleanPhrases} = require("../settings.js");
 const strings = require("../strings.js");

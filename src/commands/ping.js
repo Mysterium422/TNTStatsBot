@@ -1,3 +1,6 @@
+// @ts-check
+"use strict";
+
 const {performance} = require("perf_hooks");
 const {hypixelFetch, successEmbed} = require("../util.js");
 const db = require("../db");

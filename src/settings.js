@@ -1,3 +1,6 @@
+// @ts-check
+"use strict";
+
 const booleanPhrases = {
 	false: false,
 	true: true,

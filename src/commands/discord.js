@@ -1,3 +1,6 @@
+// @ts-check
+"use strict";
+
 const strings = require("../strings.js");
 
 module.exports = {

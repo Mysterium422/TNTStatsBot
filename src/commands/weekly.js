@@ -1,3 +1,6 @@
+// @ts-check
+"use strict";
+
 const {setAndOrGet} = require("../cache.js"),
 	{errorEmbed, formatTimestamp} = require("../util"),
 	{parseStatsArgs, fetchStats, hypixelToStandard, createTimedEmbed} = require("../stats-utils");

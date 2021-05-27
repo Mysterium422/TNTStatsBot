@@ -1,3 +1,5 @@
+// @ts-check
+"use strict";
 const {getMentioned, errorEmbed, UUIDtoName} = require("../util.js");
 const db = require("../db");
 

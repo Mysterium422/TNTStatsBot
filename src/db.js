@@ -1,3 +1,6 @@
+// @ts-check
+"use strict";
+
 const path = require("path"),
 	fs = require("fs"),
 	{getDefaultSettings} = require("./settings.js");

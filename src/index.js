@@ -1,4 +1,6 @@
-// FIND PACKAGES
+// @ts-check
+"use strict";
+
 const Discord = require("discord.js"),
 	fs = require("fs"),
 	db = require("./db"),

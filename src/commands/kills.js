@@ -1,3 +1,6 @@
+// @ts-check
+"use strict";
+
 const Discord = require("discord.js"),
 	strings = require("../strings.js"),
 	{getUserStats} = require("../cache.js"),

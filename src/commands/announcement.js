@@ -1,3 +1,6 @@
+// @ts-check
+"use strict";
+
 const {errorEmbed, successEmbed, avatarOf} = require("../util.js");
 const config = require("../../config.json");
 const db = require("../db");

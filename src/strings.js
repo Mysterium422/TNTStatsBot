@@ -1,3 +1,6 @@
+// @ts-check
+"use strict";
+
 module.exports = {
 unlinked:
 `You need to link you Discord account to your profile on Hypixel!
