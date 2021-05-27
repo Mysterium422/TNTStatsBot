@@ -83,7 +83,7 @@ client.on("message", async message => {
 			});
 		} catch (error) {
 			await errorLog(message, error);
-			await message.channel.send("An internal error occoured, see the stacktrace below:\n```" + error.stack + "```"); // FIXME: Debug Only!!
+			await message.channel.send("An internal error occurred, see the stacktrace below:\n```" + error.stack + "```"); // FIXME: Debug Only!!
 			process.exit(1);
 		}
 	} else {
