@@ -1,24 +1,17 @@
 const db = require("../db");
 const strings = require("../strings.js");
 const config = require("../../config.json");
-const {errorEmbed, mojangUUIDFetch, fetchStats, mojangNameFetch} = require("../util.js");
+const {errorEmbed, parseUser, fetchStats} = require("../util.js");
 	
 module.exports = {
 	run: async ({message, args}) => {
-		let uuid = null,
-			discord_id = null;
-	
-		if (args.length === 1) {
-			uuid = args[0];
-			discord_id = message.author.id;
-		} else {
-			return message.channel.send(errorEmbed("Invalid usage", "Expected `[playername/uuid]`"));
-		}
-		
-		const mojangResponse = await (uuid.length > 16 ? mojangNameFetch : mojangUUIDFetch)(uuid),
-			  playername = uuid.length > 16 ? mojangResponse[0].name : uuid;
-		if (uuid.length <= 16) uuid = mojangResponse.id;
-	
+		// TODO: confusing error message
+		if (args.length !== 1) return message.channel.send(errorEmbed("Invalid usage", "See the help menu for info"));
+
+		const parsed = await parseUser({arg: args[0], getName: true});
+		if (!parsed.success) return message.channel.send(errorEmbed(...parsed.error));
+		const {uuid, playername} = parsed;
+
 		if (message.author.id !== config.owner_id) {
 			const data = await fetchStats(uuid);
 				
@@ -35,7 +28,7 @@ module.exports = {
 			}
 		}
 	
-		await db.linkUUID(uuid, discord_id);
+		await db.linkUUID(uuid, message.author.id);
 		return message.channel.send("Successfully set your IGN to `" + playername + "`");
 	},
 	aliases: [],

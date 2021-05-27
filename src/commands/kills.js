@@ -23,7 +23,7 @@ module.exports = {
 			uuid = await getUUIDFromDiscord(message.author.id);
 			if (uuid === null) return message.channel.send(errorEmbed("Discord account not linked", strings.unlinked));
 		} else if (args.length === 1) {
-			const user = await parseUser(args[0], getMentioned(message));
+			const user = await parseUser({arg: args[0], mentioned: getMentioned(message)});
 			if (!user.success) return message.channel.send(...user.error);
 			uuid = user.uuid;
 		}

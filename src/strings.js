@@ -13,6 +13,15 @@ To do so, run the command: \`${prefix}set [your username]\`
 
 *Alternatively, you can specify your username after the command*`,
 
+uuid_invalid:
+`The provided UUID was invalid`,
+
+playername_invalid:
+`The provided playername was invalid`,
+
+bad_link:
+`The mentioned user has an invalid Minecraft account linked`,
+
 discordLinks:
 `**Discord Links**
 **TNT Games** - <https://discord.gg/5gTM5UZdQb>

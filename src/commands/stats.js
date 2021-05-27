@@ -26,8 +26,8 @@ module.exports = {
 		
 		message.channel.send(createStatsEmbed({message, stats, previous, game}));
 
-		await getTimedStats(uuid, true).then(cache => cache === null ? cacheTimedStats(uuid, true) : null);
-		await getTimedStats(uuid, false).then(cache => cache === null ? cacheTimedStats(uuid, true) : null);
+		await getTimedStats(uuid, true).then(cache => cache === null ? cacheTimedStats(uuid, true, stats) : null);
+		await getTimedStats(uuid, false).then(cache => cache === null ? cacheTimedStats(uuid, true, stats) : null);
 	},
 	aliases: [],
 	requiresConfiguredChannel: true

@@ -36,9 +36,21 @@ const config = require("../config.json");
 const fetch = require("node-fetch");
 
 const hypixelFetch = query => fetch(`https://api.hypixel.net/${query}&key=${config.hypixel_key}`).then(response => response.json());
-const mojangUUIDFetch = query => fetch(`https://api.mojang.com/users/profiles/minecraft/${query}`).then(response => (response.status === 204 ? null : response.json()));
-const mojangNameFetch = query => fetch(`https://api.mojang.com/user/profiles/${query}/names`).then(response => (response.status === 204 ? null : response.json()));
 const defaultTo = (v, def = null) => (typeof v === "undefined" ? def : v);
+const isValidPlayername = name => /^[A-Za-z0-9_]{3,16}$/.test(name);
+
+const nameToUUID = async name => {
+	if (!isValidPlayername(name)) return null;
+	const response = await fetch(`https://api.mojang.com/users/profiles/minecraft/${name}`);
+	if (response.status === 204) return null;
+	return response.json().then(j => j.id);
+};
+
+const UUIDtoName = async uuid => {
+	const response = await fetch(`https://api.mojang.com/user/profiles/${uuid}/names`).then(response => response.json());
+	if (response.error) return null;
+	else return response[response.length - 1].name;
+};
 
 const formatTimestamp = timestamp =>
 	new Date(timestamp).toLocaleString("default", {
@@ -67,6 +79,11 @@ const ChatColors = {
 	white:        "#FFFFFF",   "f": "#FFFFFF"
 };
 
+/**
+ * Get the first mentioned user in a message
+ * @param {Discord.Message} message 
+ * @returns {Discord.User} user
+ */
 const getMentioned = message => {
 	const result = message.mentions.users.first();
 	return typeof result === "undefined" ? null : result;
@@ -315,26 +332,32 @@ const getUUIDFromDiscord = async discord => {
 	return row[0].uuid;
 };
 
-const parseUser = async (arg, mentioned = null) => {
+// TODO: JSDoc everything
+const parseUser = async ({arg, mentioned = null, getName = false}) => {
 	if (mentioned === null) {
-		// If it's too short to be a UUID...
-		if (arg.length <= 16) {
-			// Fetch the UUID from Mojang
-			const mojangResponse = await mojangUUIDFetch(arg);
-			if (mojangResponse === null) {
-				// If the playername is invalid, return an error
-				return {success: false, error: ["Invalid playername", `Failed to fetch the UUID of '${arg}' from the Mojang API`]};
-			} else {
-				// Otherwise use the response from Mojang
-				return {success: true, uuid: mojangResponse.id};
-			}
+		if (arg.length > 16) {
+			// UUID specified
+			let playername = await UUIDtoName(arg);
+			if (playername === null) return {success: false, error: ["Invalid UUID", strings.uuid_invalid]};
+			else return {success: true, uuid: arg, playername};
 		} else {
-			return {success: true, uuid: arg};
+			// Playername specified
+			const uuid = await nameToUUID(arg);
+			if (uuid === null) return {success: false, error: ["Invalid playername", strings.playername_invalid]};
+			return {success: true, uuid, playername: arg};
 		}
 	} else {
+		// Mention specified
 		const uuid = await getUUIDFromDiscord(mentioned.id);
 		if (uuid === null) return {success: false, error: ["Invalid user", strings.unlinked]};
-		else return {success: true, uuid};
+
+		let playername = null;
+		if (getName) {
+			playername = await UUIDtoName(uuid);
+			if (playername === null) return {success: false, error: ["Invalid user", strings.bad_link]};
+		}
+
+		return {success: true, uuid, playername};
 	}
 };
 
@@ -547,11 +570,13 @@ const parseStatsArgs = async (message, args, prefix) => {
 
 module.exports = {
 	embedFooter, ChatColors,
-	GAMES, GAMES_READABLE,
+	GAMES, GAMES_READABLE, parseUser,
 
-	randomChoice, noop, errorEmbed, hypixelFetch, mojangUUIDFetch,
+	nameToUUID, UUIDtoName,
+
+	randomChoice, noop, errorEmbed, hypixelFetch,
 	ratio, formatTimestamp, getMentioned, successEmbed, fetchStats,
-	mojangNameFetch, avatarOf, hypixelToStandard, formatMinutes,
+	avatarOf, hypixelToStandard, formatMinutes,
 	formatSeconds, getUUIDFromDiscord,
 	parseStatsArgs, createStatsEmbed, createTimedEmbed
 };
