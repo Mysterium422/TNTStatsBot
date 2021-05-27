@@ -48,7 +48,7 @@ home: `**React to view a specific page**
 
 stats: prefix =>
 `**\`${prefix}kills [user]\`** - TNT Wizards kills by class
-**\`${prefix}stats [game] [user]\`** - Shows TNT games stats
+**\`${prefix}stats [user] [help]\`** - Shows TNT games stats
 
 Possible Games:
 \`all\` - Overall TNT Games Stats
