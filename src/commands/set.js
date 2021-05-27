@@ -1,8 +1,9 @@
-const db = require("../db");
-const strings = require("../strings.js");
-const config = require("../../config.json");
-const {errorEmbed, parseUser, fetchStats} = require("../util.js");
-	
+const db = require("../db"),
+	strings = require("../strings.js"),
+	config = require("../../config.json"),
+	{errorEmbed, parseUser} = require("../util.js"),
+	{fetchStats} = require("../stats-utils.js");
+
 module.exports = {
 	run: async ({message, args}) => {
 		// TODO: confusing error message
@@ -14,7 +15,7 @@ module.exports = {
 
 		if (message.author.id !== config.owner_id) {
 			const data = await fetchStats(uuid);
-				
+
 			if (!data.success) {
 				return message.channel.send(errorEmbed(...data.error));
 			} else if (
@@ -27,7 +28,7 @@ module.exports = {
 				return message.channel.send(errorEmbed("Discord account incorrect", `${playername} has their Hypixel profile linked to a different discord user. Did you link the correct discord account?`));
 			}
 		}
-	
+
 		await db.linkUUID(uuid, message.author.id);
 		return message.channel.send("Successfully set your IGN to `" + playername + "`");
 	},

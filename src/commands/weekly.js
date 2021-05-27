@@ -1,12 +1,6 @@
-const {setAndOrGet} = require("../cache.js");
-const {
-	parseStatsArgs,
-	fetchStats,
-	hypixelToStandard,
-	createTimedEmbed,
-	errorEmbed,
-	formatTimestamp
-} = require("../util");
+const {setAndOrGet} = require("../cache.js"),
+	{errorEmbed, formatTimestamp} = require("../util"),
+	{parseStatsArgs, fetchStats, hypixelToStandard, createTimedEmbed} = require("../stats-utils");
 
 module.exports = {
 	run: async ({command, message, args, channelInfo: {prefix}}) => {
@@ -25,7 +19,7 @@ module.exports = {
 			message, stats, previous, game,
 			timeframe: isWeekly ? "Weekly" : "Monthly"
 		});
-		
+
 		embed.setDescription("**Showing changes since:** " + formatTimestamp((previous === null ? stats : previous).info.timestamp));
 		return message.channel.send(embed);
 	},

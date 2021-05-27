@@ -1,12 +1,7 @@
-const {cacheUserStats, getUserStats, setAndOrGet, getTimedStats, cacheTimedStats} = require("../cache.js");
-const { getUserSettings } = require("../db.js");
-const {
-	errorEmbed,
-	fetchStats,
-	hypixelToStandard,
-	parseStatsArgs,
-	createStatsEmbed
-} = require("../util.js");
+const {cacheUserStats, getUserStats, getTimedStats, cacheTimedStats} = require("../cache.js"),
+	{getUserSettings} = require("../db.js"),
+	{errorEmbed} = require("../util.js"),
+	{fetchStats, hypixelToStandard, parseStatsArgs, createStatsEmbed} = require("../stats-utils");
 
 module.exports = {
 	run: async ({message, args, channelInfo: {prefix}}) => {
@@ -23,11 +18,11 @@ module.exports = {
 		if (userSettings === null || userSettings.reset) {
 			await cacheUserStats(message.author.id, uuid, stats);
 		}
-		
+
 		message.channel.send(createStatsEmbed({message, stats, previous, game}));
 
-		await getTimedStats(uuid, true).then(cache => cache === null ? cacheTimedStats(uuid, true, stats) : null);
-		await getTimedStats(uuid, false).then(cache => cache === null ? cacheTimedStats(uuid, true, stats) : null);
+		await getTimedStats(uuid, true).then(cache => (cache === null ? cacheTimedStats(uuid, true, stats) : null));
+		await getTimedStats(uuid, false).then(cache => (cache === null ? cacheTimedStats(uuid, true, stats) : null));
 	},
 	aliases: [],
 	requiresConfiguredChannel: true

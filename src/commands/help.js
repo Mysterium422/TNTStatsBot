@@ -1,5 +1,5 @@
 const strings = require("../strings.js");
-const {noop, successEmbed} = require("../util.js");
+const {successEmbed} = require("../util.js");
 	
 module.exports = {
 	run: async ({client, message, channelInfo: {prefix}, multiArgs}) => {
@@ -49,7 +49,7 @@ module.exports = {
 		const collector = msg.createReactionCollector((_, user) => user.id === message.author.id, {time: 60000});
 		collector.on("collect", async (reaction, user) => {
 			collector.resetTimer({time: 60000});
-			await reaction.users.remove(user.id).catch(noop);
+			await reaction.users.remove(user.id).catch(() => {});
 	
 			if (!(reaction.emoji.name in reactions)) return;
 			const menu = reactions[reaction.emoji.name];
