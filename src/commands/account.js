@@ -20,8 +20,7 @@ module.exports = {
 			return message.channel.send(errorEmbed("Invalid mention", "That user has not linked their account"));
 		}
 
-		const currentName = await UUIDtoName(row[0].uuid);
-		return message.channel.send(encodeURI("https://namemc.com/profile/" + currentName));
+		return message.channel.send(encodeURI("https://namemc.com/profile/" + row[0].uuid));
 	},
 	aliases: [],
 	requiresConfiguredChannel: true
