@@ -7,8 +7,8 @@ const {cacheUserStats, getUserStats, getTimedStats, cacheTimedStats} = require("
 	{fetchStats, hypixelToStandard, parseStatsArgs, createStatsEmbed} = require("../stats-utils");
 
 module.exports = {
-	run: async ({message, args, channelInfo: {prefix}}) => {
-		const parsed = await parseStatsArgs(message, args, prefix);
+	run: async ({message, args, channelInfo}) => {
+		const parsed = await parseStatsArgs(message, args, channelInfo);
 		if (!parsed.success) return message.channel.send(errorEmbed(...parsed.error));
 		const {uuid, game} = parsed;
 

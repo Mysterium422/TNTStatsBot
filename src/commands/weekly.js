@@ -6,8 +6,8 @@ const {setAndOrGet} = require("../cache.js"),
 	{parseStatsArgs, fetchStats, hypixelToStandard, createTimedEmbed} = require("../stats-utils");
 
 module.exports = {
-	run: async ({command, message, args, channelInfo: {prefix}}) => {
-		const parsed = await parseStatsArgs(message, args, prefix);
+	run: async ({command, message, args, channelInfo}) => {
+		const parsed = await parseStatsArgs(message, args, channelInfo);
 		if (!parsed.success) return message.channel.send(errorEmbed(...parsed.error));
 		const {uuid, game} = parsed;
 

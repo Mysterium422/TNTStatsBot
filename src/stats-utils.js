@@ -1,6 +1,6 @@
 // @ts-check
 "use strict";
-
+		
 const {
 	embedFooter,
 	randomChoice,
@@ -20,12 +20,12 @@ const {
 	db = require("./db"),
 	strings = require("./strings"),
 	Discord = require("discord.js");
-
+		
 const display = (pathStr, stats, previous, formatter = n => n.toLocaleString()) => {
 	const path = pathStr.split(".");
 	const statsValue = path.reduce((a, cv) => a[cv], stats);
 	let result = formatter(statsValue);
-
+		
 	if (previous !== null) {
 		const previousValue = path.reduce((a, cv) => a[cv], previous);
 		if (statsValue < previousValue) {
@@ -34,10 +34,10 @@ const display = (pathStr, stats, previous, formatter = n => n.toLocaleString()) 
 			result += " (+" + formatter(statsValue - previousValue) + ")";
 		}
 	}
-
+		
 	return result;
 };
-
+		
 const createStatsEmbed = ({message, stats, previous, game}) => {
 	const embed = new Discord.MessageEmbed();
 	embed.setAuthor(message.author.tag, avatarOf(message.author));
@@ -47,7 +47,7 @@ const createStatsEmbed = ({message, stats, previous, game}) => {
 	embed.setThumbnail(`https://visage.surgeplay.com/head/128/${stats.info.uuid}`);
 	embed.setTimestamp();
 	embed.setTitle(`${stats.info.displayname} | ${GAMES_READABLE[game]} Statistics`);
-
+		
 	switch (game) {
 		case "all":
 			embed.addField("**Coins**", display("overall.coins", stats, previous), true);
@@ -116,7 +116,7 @@ const createStatsEmbed = ({message, stats, previous, game}) => {
 			return embed;
 	}
 };
-
+		
 const createTimedEmbed = ({message, stats, previous, game, timeframe}) => {
 	const embed = new Discord.MessageEmbed();
 	embed.setAuthor(message.author.tag, avatarOf(message.author));
@@ -126,7 +126,7 @@ const createTimedEmbed = ({message, stats, previous, game, timeframe}) => {
 	embed.setThumbnail(`https://visage.surgeplay.com/head/128/${stats.info.uuid}`);
 	embed.setTimestamp();
 	embed.setTitle(`${stats.info.displayname} | ${GAMES_READABLE[game]} Statistics *[**${timeframe}**]*`);
-
+		
 	switch (game) {
 		case "all":
 			embed.addField("**Coins**", (stats.overall.coins - previous.overall.coins).toLocaleString(), true);
@@ -195,42 +195,39 @@ const createTimedEmbed = ({message, stats, previous, game, timeframe}) => {
 			return embed;
 	}
 };
-
-const parseStatsArgs = async (message, args, prefix) => {
+		
+const parseStatsArgs = async (message, args, channelConfig) => {
 	let uuid = null,
 		game = null;
-
-	if (args.length === 1 && args[0] in GAMES) {
-		game = GAMES[args[0]];
-	} else if (args.length === 2) {
-		if (args[1] in GAMES) {
-			game = GAMES[args[1]];
-		} else {
-			return {success: false, error: ["Invalid game type", strings.invalid_game_type]};
-		}
-	} else {
-		const channelConfig = await db.getChannelInfo(message);
-		game = channelConfig.game;
-	}
-
-	if (args.length > 2) {
-		return {success: false, error: ["Too many arguments!"]};
-	} else if (args.length === 0 || (args.length === 1 && args[0] in GAMES)) {
+		
+	let gameFirst = args[0] in GAMES;
+		
+	if (args.length === 0 || (args.length === 1 && gameFirst)) {
 		uuid = await getUUIDFromDiscord(message.author.id);
-		if (uuid === null) return {success: false, error: ["Discord account not verified", strings.unverified(prefix)]};
-	} else if (args.length === 2 || (args.length === 1 && !(args[0] in GAMES))) {
-		const user = await parseUser({arg: args[0], mentioned: getMentioned(message)});
+		if (uuid === null) return {success: false, error: ["Discord account not verified", strings.unverified(channelConfig.prefix)]};
+	} else if ((args.length === 1 && !gameFirst) || args.length === 2) {
+		let argPos = args.length === 1 ? 0 : gameFirst ? 1 : 0;
+		const user = await parseUser({arg: args[argPos], mentioned: getMentioned(message)});
 		if (!user.success) return user;
 		uuid = user.uuid;
 	}
-
+			
+	if (args.length === 0) {
+		game = channelConfig.game;
+	} else if (args.length === 1) {
+		game = gameFirst ? GAMES[args[0]] : channelConfig.game;
+	} else if (args.length === 2) {
+		game = gameFirst ? GAMES[args[0]] : GAMES[args[1]];
+	}
+	
+	debugger;
 	return {success: true, uuid, game};
 };
-
+		
 const hypixelToStandard = D => {
 	const TNT = D.stats.TNTGames,
 		DUEL = D.stats.Duels;
-
+		
 	const result = {
 		info: {
 			uuid: D.uuid,
@@ -321,7 +318,7 @@ const hypixelToStandard = D => {
 			}
 		}
 	};
-
+		
 	if (typeof DUEL !== "undefined") {
 		result.duels = {
 			wins: defaultTo(DUEL.bowspleef_duel_wins, 0),
@@ -331,13 +328,13 @@ const hypixelToStandard = D => {
 			bestWS: defaultTo(DUEL.best_tnt_games_winstreak, 0),
 			currentWS: defaultTo(DUEL.current_tnt_games_winstreak, 0)
 		};
-
+		
 		result.ratio.duels.WL = defaultTo(ratio(DUEL.bowspleef_duel_wins, DUEL.bowspleef_duel_losses), 0);
 	}
-
+		
 	return result;
 };
-
+		
 const fetchStats = async uuid => {
 	const data = await hypixelFetch("player?uuid=" + uuid);
 	if (data === null) {
@@ -361,13 +358,13 @@ const fetchStats = async uuid => {
 			error: ["Invalid playername/uuid", "That player has never played TNT Games!"]
 		};
 	}
-
+		
 	return {
 		success: true,
 		user: data
 	};
 };
-
+		
 module.exports = {
 	createStatsEmbed,
 	createTimedEmbed,
