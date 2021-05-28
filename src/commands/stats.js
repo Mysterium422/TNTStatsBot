@@ -18,9 +18,7 @@ module.exports = {
 		const stats = hypixelToStandard(data.user.player);
 		const previous = await getUserStats(message.author.id, uuid);
 		const userSettings = await getUserSettings(message.author);
-		if (userSettings === null || userSettings.reset) {
-			await cacheUserStats(message.author.id, uuid, stats);
-		}
+		if (userSettings.reset) await cacheUserStats(message.author.id, uuid, stats);
 
 		message.channel.send(createStatsEmbed({message, stats, previous, game}));
 

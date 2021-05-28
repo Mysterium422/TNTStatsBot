@@ -207,7 +207,7 @@ const parseStatsArgs = async (message, args, channelConfig) => {
 		if (uuid === null) return {success: false, error: ["Discord account not verified", strings.unverified(channelConfig.prefix)]};
 	} else if ((args.length === 1 && !gameFirst) || args.length === 2) {
 		let argPos = args.length === 1 ? 0 : gameFirst ? 1 : 0;
-		const user = await parseUser({arg: args[argPos], mentioned: getMentioned(message)});
+		const user = await parseUser(args[argPos], getMentioned(message));
 		if (!user.success) return user;
 		uuid = user.uuid;
 	}
@@ -220,7 +220,6 @@ const parseStatsArgs = async (message, args, channelConfig) => {
 		game = gameFirst ? GAMES[args[0]] : GAMES[args[1]];
 	}
 	
-	debugger;
 	return {success: true, uuid, game};
 };
 		

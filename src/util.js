@@ -37,18 +37,21 @@ const errorEmbed = (error = "Something went wrong...", description = ":robot: be
 const config = require("../config.json");
 const fetch = require("node-fetch");
 
+// @ts-ignore
 const hypixelFetch = query => fetch(`https://api.hypixel.net/${query}&key=${config.hypixel_key}`).then(response => response.json());
 const defaultTo = (v, def = null) => (typeof v === "undefined" ? def : v);
 const isValidPlayername = name => /^[A-Za-z0-9_]{3,16}$/.test(name);
 
 const nameToUUID = async name => {
 	if (!isValidPlayername(name)) return null;
+	// @ts-ignore
 	const response = await fetch(`https://api.mojang.com/users/profiles/minecraft/${name}`);
 	if (response.status === 204) return null;
 	return response.json().then(j => j.id);
 };
 
 const UUIDtoName = async uuid => {
+	// @ts-ignore
 	const response = await fetch(`https://api.mojang.com/user/profiles/${uuid}/names`).then(response => response.json());
 	if (response.error) return null;
 	else return response[response.length - 1].name;
@@ -194,31 +197,24 @@ const getUUIDFromDiscord = async discord => {
 };
 
 // TODO: JSDoc everything
-const parseUser = async ({arg, mentioned = null, getName = false}) => {
+const parseUser = async (arg, mentioned = null) => {
 	if (mentioned === null) {
 		if (arg.length > 16) {
 			// UUID specified
 			let playername = await UUIDtoName(arg);
 			if (playername === null) return {success: false, error: ["Invalid UUID", strings.uuid_invalid]};
-			else return {success: true, uuid: arg, playername};
+			else return {success: true, uuid: arg};
 		} else {
 			// Playername specified
 			const uuid = await nameToUUID(arg);
 			if (uuid === null) return {success: false, error: ["Invalid playername", strings.playername_invalid]};
-			return {success: true, uuid, playername: arg};
+			return {success: true, uuid};
 		}
 	} else {
 		// Mention specified
 		const uuid = await getUUIDFromDiscord(mentioned.id);
 		if (uuid === null) return {success: false, error: ["Invalid user", strings.unlinked]};
-
-		let playername = null;
-		if (getName) {
-			playername = await UUIDtoName(uuid);
-			if (playername === null) return {success: false, error: ["Invalid user", strings.bad_link]};
-		}
-
-		return {success: true, uuid, playername};
+		return {success: true, uuid};
 	}
 };
 

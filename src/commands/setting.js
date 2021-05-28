@@ -20,8 +20,7 @@ module.exports = {
 
 		if (typeof value === "undefined") {
 			const existingSettings = await getUserSettings(message.author);
-			let currentValue = existingSettings === null ? SETTINGS[settingName].default : existingSettings[settingName];
-			return message.channel.send(successEmbed(message.author, strings.settings.value(settingName, currentValue)));
+			return message.channel.send(successEmbed(message.author, strings.settings.value(settingName, existingSettings[settingName])));
 		}
 
 		let settingValue = null;

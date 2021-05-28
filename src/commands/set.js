@@ -12,13 +12,14 @@ module.exports = {
 		// TODO: confusing error message
 		if (args.length !== 1) return message.channel.send(errorEmbed("Invalid usage", "See the help menu for info"));
 
-		const parsed = await parseUser({arg: args[0], getName: true});
+		const parsed = await parseUser(args[0]);
 		if (!parsed.success) return message.channel.send(errorEmbed(...parsed.error));
-		const {uuid, playername} = parsed;
+		const {uuid} = parsed;
+
+		const data = await fetchStats(uuid);
+		let playername = data.user.player.displayname;
 
 		if (message.author.id !== config.owner_id) {
-			const data = await fetchStats(uuid);
-
 			if (!data.success) {
 				return message.channel.send(errorEmbed(...data.error));
 			} else if (
