@@ -109,18 +109,28 @@ const successEmbed = (author, description = "", title = "Success", thumbnail = n
 	return result;
 };
 
+/**
+ * @typedef {Object} Rank A Hypixel Rank
+ * @property {string} prefix Prefix
+ * @property {string} color Hex color
+ */
+/**
+ * Get the rank of a user
+ * @param {Object} D Hypixel API response
+ * @returns {Rank} The user's rank
+ */
 const getRank = D => {
 	const ranks = {
-		ADMIN:     {string: "[ADMIN]",   color: ChatColors.red},
-		MODERATOR: {string: "[MOD]",     color: ChatColors.dark_green},
-		HELPER:    {string: "[HELPER]",  color: ChatColors.blue},
-		YOUTUBER:  {string: "[YOUTUBE]", color: ChatColors.red},
-		SUPERSTAR: {string: "[MVP++]",   color: ChatColors.gold},
-		MVP_PLUS:  {string: "[MVP+]",    color: ChatColors.aqua},
-		MVP:       {string: "[MVP]",     color: ChatColors.aqua},
-		VIP_PLUS:  {string: "[VIP+]",    color: ChatColors.green},
-		VIP:       {string: "[VIP]",     color: ChatColors.green},
-		DEFAULT:   {string: "",          color: ChatColors.gray}
+		ADMIN:     {prefix: "[ADMIN]",   color: ChatColors.red},
+		MODERATOR: {prefix: "[MOD]",     color: ChatColors.dark_green},
+		HELPER:    {prefix: "[HELPER]",  color: ChatColors.blue},
+		YOUTUBER:  {prefix: "[YOUTUBE]", color: ChatColors.red},
+		SUPERSTAR: {prefix: "[MVP++]",   color: ChatColors.gold},
+		MVP_PLUS:  {prefix: "[MVP+]",    color: ChatColors.aqua},
+		MVP:       {prefix: "[MVP]",     color: ChatColors.aqua},
+		VIP_PLUS:  {prefix: "[VIP+]",    color: ChatColors.green},
+		VIP:       {prefix: "[VIP]",     color: ChatColors.green},
+		DEFAULT:   {prefix: "",          color: ChatColors.gray}
 	};
 
 	const rank = D.rank === "NORMAL" ? null : D.rank;
@@ -129,7 +139,7 @@ const getRank = D => {
 	const newPackageRank = D.newPackageRank === "NONE" ? null : D.newPackageRank;
 	if (typeof D.prefix === "string") {
 		return {
-			string: D.prefix.replace(/§[A-F0-9]/gi, ""),
+			prefix: D.prefix.replace(/§[A-F0-9]/gi, ""),
 			color: D.prefix.indexOf("§") !== -1 ? ChatColors[D.prefix[D.prefix.indexOf("§") + 1]] : ChatColors.gray
 		};
 	} else if (rank || monthlyPackageRank || newPackageRank || packageRank) {

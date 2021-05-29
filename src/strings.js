@@ -144,5 +144,8 @@ mysterium:
 Later, Lebster joined the project and rewrote the entire bot!
 **Lebster's Website**: <https://lebster.xyz>
 
-Please report any bugs here: https://discord.gg/7Qb5xuJD4C`
+Please report any bugs here: https://discord.gg/7Qb5xuJD4C`,
+
+reset: displayname =>
+`Successfully reset your cache of \`${displayname}\`'s statistics.`
 };

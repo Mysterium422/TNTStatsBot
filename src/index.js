@@ -84,9 +84,11 @@ client.on("message", async message => {
 				multiArgs: messageContent.slice(command.length).trim()
 			});
 		} catch (error) {
-			await errorLog(message, error);
+			// TODO: Setting in config.json
+			// await errorLog(message, error);
 			await message.channel.send("An internal error occurred, see the stacktrace below:\n```" + error.stack + "```"); // FIXME: Debug Only!!
-			throw error;
+			console.error(error);
+			process.exit(0);
 		}
 	} else {
 		return message.channel.send("Command does not exist!");

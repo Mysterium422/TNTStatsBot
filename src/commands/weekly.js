@@ -3,8 +3,8 @@
 
 const {setAndOrGet} = require("../cache.js"),
 	{errorEmbed, formatTimestamp} = require("../util"),
-	{parseStatsArgs, fetchStats, hypixelToStandard, createTimedEmbed} = require("../stats-utils"),
-	{getUserSettings} = require("../db.js");
+	{getUserSettings} = require("../db.js"),
+	{parseStatsArgs, fetchStats, HypixelStats} = require("../stats-utils.js");
 
 module.exports = {
 	run: async ({command, message, args, channelInfo}) => {
@@ -14,22 +14,18 @@ module.exports = {
 
 		const data = await fetchStats(uuid);
 		if (!data.success) return message.channel.send(errorEmbed(...data.error));
+		const stats = new HypixelStats(data.user.player);
 
-		const stats = hypixelToStandard(data.user.player);
 		const isWeekly = command !== "monthly";
 		const previous = await setAndOrGet(uuid, isWeekly, stats);
 		const settings = getUserSettings(message.author);
-
-		const embed = createTimedEmbed({
-			message, stats, previous, game, settings,
-			timeframe: isWeekly ? "Weekly" : "Monthly"
-		});
+		const embed = stats.getDifference(previous).toEmbed(game, message.author, settings);
 
 		// Prepend description
-		embed.setDescription(
-			"**Showing changes since:** " + formatTimestamp((previous === null ? stats : previous).info.timestamp) +
-			(embed.description === null ? "" : "\n" + embed.description)
-		);
+		// embed.setDescription(
+		// 	"**Showing changes since:** " + formatTimestamp((previous === null ? stats : previous).info.timestamp) +
+		// 	(embed.description === null ? "" : "\n" + embed.description)
+		// );
 
 		return message.channel.send(embed);
 	},

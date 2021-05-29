@@ -7,5 +7,6 @@ Discord bot to show player stats from Hypixel's TNT Games
 - [x] Recordings
 - [x] Weekly/Monthly Cache
 - [x] Settings command
+- [ ] Restructure weekly&monthly embed
 - [ ] Scheduled weekly&monthly resets
 - [ ] Polishing
