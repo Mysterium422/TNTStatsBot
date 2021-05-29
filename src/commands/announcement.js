@@ -13,7 +13,7 @@ module.exports = {
 
 		const embed = successEmbed(message.author, multiArgs, "__Announcement__", avatarOf(client.user));
 		const rows = await db.all(db.TABLES.ConfiguredChannels);
-		return Promise.all(rows.map(({channel}) => 
+		return Promise.all(rows.map(({channel}) =>
 			client.channels.fetch(channel).then(c => c.send(embed))
 		));
 	},

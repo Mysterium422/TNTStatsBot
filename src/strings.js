@@ -93,7 +93,7 @@ settings: prefix =>
     Show more statistics in \`${prefix}stats\`
 
 **Auto Reset** *(__True__/False)*
-    Automatically reset brackets for \`${prefix}stats\` 
+    Automatically reset brackets for \`${prefix}stats\`
     Disable to make brackets stay until you do \`${prefix}reset\`
 
 *Default values are __underlined__*`

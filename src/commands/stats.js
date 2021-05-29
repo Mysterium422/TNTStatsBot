@@ -17,10 +17,10 @@ module.exports = {
 
 		const stats = hypixelToStandard(data.user.player);
 		const previous = await getUserStats(message.author.id, uuid);
-		const userSettings = await getUserSettings(message.author);
-		if (userSettings.reset) await cacheUserStats(message.author.id, uuid, stats);
-
-		message.channel.send(createStatsEmbed({message, stats, previous, game}));
+		const settings = await getUserSettings(message.author);
+		if (settings.reset) await cacheUserStats(message.author.id, uuid, stats);
+		// TODO: take in settings to use for verbose option
+		message.channel.send(createStatsEmbed({message, stats, previous, game, settings}));
 
 		await getTimedStats(uuid, true).then(cache => (cache === null ? cacheTimedStats(uuid, true, stats) : null));
 		await getTimedStats(uuid, false).then(cache => (cache === null ? cacheTimedStats(uuid, true, stats) : null));

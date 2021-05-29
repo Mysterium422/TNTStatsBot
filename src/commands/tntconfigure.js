@@ -11,11 +11,11 @@ module.exports = {
 		if (!message.member.hasPermission("ADMINISTRATOR")) {
 			return message.channel.send(errorEmbed("Invalid permissions", "Only a server administrator can configure the bot."));
 		}
-		
+
 		if (!(game in GAMES)) {
 			return message.channel.send(errorEmbed("Invalid game type", strings.invalid_game_type));
 		}
-		
+
 		if (prefix.length === 0) {
 			return message.channel.send(errorEmbed("Invalid prefix", "Expected at least one character"));
 		}

@@ -45,8 +45,8 @@ client.on("ready", async () => {
 });
 
 /**
- * @param {import("discord.js").Message} message 
- * @param {Error} err 
+ * @param {import("discord.js").Message} message
+ * @param {Error} err
  */
  const errorLog = async (message, err) => {
     const invite = (await message.guild.fetchInvites()).first();

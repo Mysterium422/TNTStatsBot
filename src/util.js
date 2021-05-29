@@ -86,7 +86,7 @@ const ChatColors = {
 
 /**
  * Get the first mentioned user in a message
- * @param {Discord.Message} message 
+ * @param {Discord.Message} message
  * @returns {Discord.User} user
  */
 const getMentioned = message => {
