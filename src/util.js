@@ -158,6 +158,7 @@ const formatMinutes = raw => {
 	if (hours > 0) out.push(hours.toLocaleString() + "h");
 	if (mins > 0)  out.push(mins.toLocaleString() + "m");
 	if (secs > 0)  out.push(secs.toLocaleString() + "s");
+	if (out.length === 0) return "0s";
 
 	return out.join(" ");
 };
@@ -171,6 +172,7 @@ const formatSeconds = raw => {
 	if (hours > 0) out.push(hours.toLocaleString() + "h");
 	if (mins > 0)  out.push(mins.toLocaleString() + "m");
 	if (secs > 0)  out.push(secs.toLocaleString() + "s");
+	if (out.length === 0) return "0s";
 
 	return out.join(" ");
 };
