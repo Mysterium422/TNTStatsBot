@@ -1,25 +1,89 @@
 // @ts-check
 "use strict";
 
-const {
-	embedFooter,
-	randomChoice,
-	hypixelFetch,
-	defaultTo,
-	ratio,
-	getMentioned,
-	avatarOf,
-	getRank,
-	formatMinutes,
-	formatSeconds,
-	GAMES_READABLE,
-	GAMES,
-	getUUIDFromDiscord,
-	parseUser
-} = require("./util"),
+const {embedFooter, randomChoice, hypixelFetch, defaultTo, ratio, getMentioned, avatarOf, getRank, formatMinutes, formatSeconds, GAMES_READABLE, GAMES, getUUIDFromDiscord, parseUser} = require("./util"),
 	db = require("./db"),
 	strings = require("./strings"),
 	Discord = require("discord.js");
+
+/**
+ * Represents a HypixelStats object
+ * @typedef {object} HypixelStats
+ * @property {object} info
+ * @property {string} info.uuid
+ * @property {string} info.displayname
+ * @property {object} info.rank
+ * @property {string} info.rank.string
+ * @property {string} info.rank.color
+ * @property {number} info.timestamp
+ * @property {object} run
+ * @property {number} run.record
+ * @property {number} run.wins
+ * @property {number} run.deaths
+ * @property {number} run.potions
+ * @property {number} run.blocks
+ * @property {object} pvp
+ * @property {number} pvp.record
+ * @property {number} pvp.wins
+ * @property {number} pvp.deaths
+ * @property {number} pvp.kills
+ * @property {object} bowspleef
+ * @property {number} bowspleef.wins
+ * @property {number} bowspleef.deaths
+ * @property {number} bowspleef.shots
+ * @property {number} bowspleef.kills
+ * @property {object} tag
+ * @property {number} tag.wins
+ * @property {number} tag.kills
+ * @property {number} tag.tags
+ * @property {object} wizards
+ * @property {number} wizards.wins
+ * @property {number} wizards.assists
+ * @property {number} wizards.deaths
+ * @property {number} wizards.points
+ * @property {number} wizards.totalkills
+ * @property {number} wizards.airtime
+ * @property {object} wizkills
+ * @property {number} wizkills.fire
+ * @property {number} wizkills.ice
+ * @property {number} wizkills.wither
+ * @property {number} wizkills.kinetic
+ * @property {number} wizkills.blood
+ * @property {number} wizkills.toxic
+ * @property {number} wizkills.hydro
+ * @property {number} wizkills.ancient
+ * @property {number} wizkills.storm
+ * @property {object} overall
+ * @property {number} overall.coins
+ * @property {number} overall.wins
+ * @property {number} overall.streak
+ * @property {number} overall.playtime
+ * @property {object} duels
+ * @property {number} duels.wins
+ * @property {number} duels.deaths
+ * @property {number} duels.losses
+ * @property {number} duels.shots
+ * @property {number} duels.bestWS
+ * @property {number} duels.currentWS
+ * @property {object} ratio
+ * @property {object} ratio.duels
+ * @property {number} ratio.duels.WL
+ * @property {object} ratio.wizards
+ * @property {number} ratio.wizards.KD
+ * @property {number} ratio.wizards.KAD
+ * @property {number} ratio.wizards.KW
+ * @property {object} ratio.tag
+ * @property {number} ratio.tag.TK
+ * @property {number} ratio.tag.KW
+ * @property {object} ratio.bowspleef
+ * @property {number} ratio.bowspleef.WL
+ * @property {number} ratio.bowspleef.KD
+ * @property {object} ratio.pvp
+ * @property {number} ratio.pvp.WL
+ * @property {number} ratio.pvp.KD
+ * @property {object} ratio.run
+ * @property {number} ratio.run.WL
+ */
 
 const display = (pathStr, stats, previous, formatter = n => n.toLocaleString()) => {
 	const path = pathStr.split(".");
@@ -97,8 +161,10 @@ const createStatsEmbed = ({message, stats, previous, game, settings}) => {
 		case "wizards":
 			embed.addField("**Wins**", display("wizards.wins", stats, previous), true);
 			embed.addField("**Deaths**", display("wizards.deaths", stats, previous), true);
-			if (!settings.verbose) // displayed as "Total Kills" (line 120)
-				embed.addField("**Kills**", display("wizards.totalkills", stats, previous), true);
+			if (!settings.verbose) {
+				embed.addField("**Kills**", display("wizards.totalkills", stats, previous), true); // displayed as "Total Kills" (line 120)
+			}
+
 			embed.addField("**Assists**", display("wizards.assists", stats, previous), true);
 			embed.addField("**Points**", display("wizards.points", stats, previous), true);
 			embed.addField("**K/D Ratio**", display("ratio.wizards.KD", stats, previous), true);
@@ -107,7 +173,7 @@ const createStatsEmbed = ({message, stats, previous, game, settings}) => {
 			embed.addField("**Airtime**", display("wizards.airtime", stats, previous, t => formatSeconds(t / 20)), true);
 			embed.addField("**KA/D Ratio**", display("ratio.wizards.KAD", stats, previous), true);
 			embed.addField("**K/W Ratio**", display("ratio.wizards.KW", stats, previous), true);
-			// Intentional fallthrough
+		// Intentional fallthrough
 		case "kills":
 			embed.addField("**Fire**", display("wizkills.fire", stats, previous), true);
 			embed.addField("**Ice**", display("wizkills.ice", stats, previous), true);
@@ -134,6 +200,12 @@ const createStatsEmbed = ({message, stats, previous, game, settings}) => {
 	}
 };
 
+/**
+ * @param {Object} a
+ * @param {HypixelStats} a.stats 
+ * @param {HypixelStats} a.previous 
+ */
+// @ts-ignore
 const createTimedEmbed = ({message, stats, previous, game, timeframe, settings}) => {
 	const embed = new Discord.MessageEmbed();
 	embed.setAuthor(message.author.tag, avatarOf(message.author));
@@ -164,7 +236,7 @@ const createTimedEmbed = ({message, stats, previous, game, timeframe, settings})
 			embed.addField("**Wins**", (stats.run.wins - previous.run.wins).toLocaleString(), true);
 			embed.addField("**Deaths**", (stats.run.deaths - previous.run.deaths).toLocaleString(), true);
 			embed.addField("**Potions Thrown**", (stats.run.potions - previous.run.potions).toLocaleString(), true);
-			embed.addField("**W/L Ratio**", (stats.ratio.run.WL - previous.ratio.run.WL).toLocaleString(), true);
+			embed.addField("**W/L Ratio**", ratio(stats.run.wins - previous.run.wins, stats.run.deaths - previous.run.deaths), true);
 			embed.addField("**Blocks Broken**", (stats.run.blocks - previous.run.blocks).toLocaleString(), true);
 			return embed;
 		case "pvp":
@@ -172,39 +244,41 @@ const createTimedEmbed = ({message, stats, previous, game, timeframe, settings})
 			embed.addField("**Wins**", (stats.pvp.wins - previous.pvp.wins).toLocaleString(), true);
 			embed.addField("**Deaths**", (stats.pvp.deaths - previous.pvp.deaths).toLocaleString(), true);
 			embed.addField("**Kills**", (stats.pvp.kills - previous.pvp.kills).toLocaleString(), true);
-			embed.addField("**W/L Ratio**", (stats.ratio.pvp.WL - previous.ratio.pvp.WL).toLocaleString(), true);
-			embed.addField("**K/D Ratio**", (stats.ratio.pvp.KD - previous.ratio.pvp.KD).toLocaleString(), true);
+			embed.addField("**W/L Ratio**", ratio(stats.pvp.wins - previous.pvp.wins, stats.pvp.deaths - previous.pvp.deaths), true);
+			embed.addField("**K/D Ratio**", ratio(stats.pvp.kills - previous.pvp.kills, stats.pvp.deaths - previous.pvp.deaths), true);
 			return embed;
 		case "bowspleef":
 			embed.addField("**Wins**", (stats.bowspleef.wins - previous.bowspleef.wins).toLocaleString(), true);
 			embed.addField("**Deaths**", (stats.bowspleef.deaths - previous.bowspleef.deaths).toLocaleString(), true);
 			embed.addField("**Kills**", (stats.bowspleef.kills - previous.bowspleef.kills).toLocaleString(), true);
 			embed.addField("**Shots**", (stats.bowspleef.shots - previous.bowspleef.shots).toLocaleString(), true);
-			embed.addField("**W/L Ratio**", (stats.ratio.bowspleef.WL - previous.ratio.bowspleef.WL).toLocaleString(), true);
-			embed.addField("**K/D Ratio**", (stats.ratio.bowspleef.KD - previous.ratio.bowspleef.KD).toLocaleString(), true);
+			embed.addField("**W/L Ratio**", ratio(stats.bowspleef.wins - previous.bowspleef.wins, stats.bowspleef.deaths - previous.bowspleef.deaths), true);
+			embed.addField("**K/D Ratio**", ratio(stats.bowspleef.kills - previous.bowspleef.kills, stats.bowspleef.deaths - previous.bowspleef.deaths), true);
 			return embed;
 		case "tag":
 			embed.addField("**Wins**", (stats.tag.wins - previous.tag.wins).toLocaleString(), true);
 			embed.addField("**Kills**", (stats.tag.kills - previous.tag.kills).toLocaleString(), true);
 			embed.addField("**Tags**", (stats.tag.tags - previous.tag.tags).toLocaleString(), true);
-			embed.addField("**T/K Ratio**", (stats.ratio.tag.TK - previous.ratio.tag.TK).toLocaleString(), true);
-			embed.addField("**K/W Ratio**", (stats.ratio.tag.KW - previous.ratio.tag.KW).toLocaleString(), true);
+			embed.addField("**T/K Ratio**", ratio(stats.tag.tags - previous.tag.tags, stats.tag.kills - previous.tag.kills), true);
+			embed.addField("**K/W Ratio**", ratio(stats.tag.kills - previous.tag.kills, stats.tag.wins - previous.tag.wins), true);
 			return embed;
 		case "wizards":
 			// TODO: Airtime, KA/D Ratio, K/W Ratio, Kills with each class (verbose only)
 			embed.addField("**Wins**", (stats.wizards.wins - previous.wizards.wins).toLocaleString(), true);
 			embed.addField("**Deaths**", (stats.wizards.deaths - previous.wizards.deaths).toLocaleString(), true);
-			if (!settings.verbose) // displayed as "Total Kills" (line 218)
-				embed.addField("**Kills**", (stats.wizards.totalkills - previous.wizards.totalkills).toLocaleString(), true);
+			if (!settings.verbose) {
+				embed.addField("**Kills**", (stats.wizards.totalkills - previous.wizards.totalkills).toLocaleString(), true); // displayed as "Total Kills" (line 218)
+			}
+
 			embed.addField("**Assists**", (stats.wizards.assists - previous.wizards.assists).toLocaleString(), true);
 			embed.addField("**Points**", (stats.wizards.points - previous.wizards.points).toLocaleString(), true);
-			embed.addField("**K/D Ratio**", (stats.ratio.wizards.KD - previous.ratio.wizards.KD).toLocaleString(), true);
+			embed.addField("**K/D Ratio**", ratio(stats.wizards.totalkills - previous.wizards.totalkills, stats.wizards.deaths - previous.wizards.deaths), true);
 			if (!settings.verbose) return embed;
 
 			embed.addField("**Airtime**", formatSeconds((stats.wizards.airtime - previous.wizards.airtime) / 20), true);
-			embed.addField("**KA/D Ratio**", (stats.ratio.wizards.KAD - previous.ratio.wizards.KDA).toLocaleString(), true);
-			embed.addField("**K/W Ratio**", (stats.ratio.wizards.KW - previous.ratio.wizards.KW).toLocaleString(), true);
-			// Intentional fallthrough
+			embed.addField("**KA/D Ratio**", ratio(stats.wizards.totalkills + stats.wizards.assists - (previous.wizards.totalkills + previous.wizards.assists), stats.wizards.deaths - previous.wizards.deaths), true);
+			embed.addField("**K/W Ratio**", ratio(stats.wizards.totalkills - previous.wizards.totalkills, stats.wizards.wins - previous.wizards.wins), true);
+		// Intentional fallthrough
 		case "kills":
 			embed.addField("**Fire**", (stats.wizkills.fire - previous.wizkills.fire).toLocaleString(), true);
 			embed.addField("**Ice**", (stats.wizkills.ice - previous.wizkills.ice).toLocaleString(), true);
@@ -221,7 +295,7 @@ const createTimedEmbed = ({message, stats, previous, game, timeframe, settings})
 			embed.addField("**Wins**", (stats.duels.wins - previous.duels.wins).toLocaleString(), true);
 			embed.addField("**Losses**", (stats.duels.losses - previous.duels.losses).toLocaleString(), true);
 			embed.addField("**Shots**", (stats.duels.shots - previous.duels.shots).toLocaleString(), true);
-			embed.addField("**W/L Ratio**", (stats.ratio.duels.WL - previous.ratio.duels.WL).toLocaleString(), true);
+			embed.addField("**W/L Ratio**", ratio(stats.duels.wins - previous.duels.wins, stats.duels.losses - previous.duels.losses), true);
 			embed.addField("**Current WS**", (stats.duels.currentWS - previous.duels.currentWS).toLocaleString(), true);
 			embed.addField("**Best WS**", (stats.duels.bestWS - previous.duels.bestWS).toLocaleString(), true);
 			return embed;
@@ -365,7 +439,7 @@ const hypixelToStandard = D => {
 
 		result.ratio.duels.WL = defaultTo(ratio(DUEL.bowspleef_duel_wins, DUEL.bowspleef_duel_losses), 0);
 	}
-
+	console.log(JSON.stringify(result));
 	return result;
 };
 
