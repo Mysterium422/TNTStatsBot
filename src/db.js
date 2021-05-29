@@ -9,7 +9,7 @@ const path = require("path"),
 const knex = require("knex")({
 	client: "sqlite3",
 	connection: {
-		filename: path.resolve(__dirname, "../database.sql")
+		filename: path.resolve(__dirname, "../db.sqlite3")
 	},
 	useNullAsDefault: true
 });
@@ -76,8 +76,8 @@ const createTables = () => {
 const reset = async () => {
 	console.warn("[NOTICE] Resetting database...");
 	// Delete the database file if it exists
-	if (fs.existsSync(path.resolve(__dirname, "../database.sql"))) {
-		fs.unlinkSync(path.resolve(__dirname, "../database.sql"));
+	if (fs.existsSync(path.resolve(__dirname, "../db.sqlite3"))) {
+		fs.unlinkSync(path.resolve(__dirname, "../db.sqlite3"));
 	}
 };
 
