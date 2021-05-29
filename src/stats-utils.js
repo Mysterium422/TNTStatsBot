@@ -2,19 +2,7 @@
 "use strict";
 const strings = require("./strings.js"),
 	Discord = require("discord.js");
-const {
-		getRank,
-		defaultTo,
-		hypixelFetch,
-		GAMES,
-		parseUser,
-		getUUIDFromDiscord,
-		getMentioned,
-		embedFooter,
-		GAMES_READABLE,
-		randomChoice,
-		avatarOf
-} = require("./util.js");
+const {getRank, defaultTo, hypixelFetch, GAMES, parseUser, getUUIDFromDiscord, getMentioned, embedFooter, GAMES_READABLE, randomChoice, avatarOf, ratio, formatMinutes, formatSeconds} = require("./util.js");
 
 /**
  * Parse stats arguments
@@ -78,6 +66,17 @@ const fetchStats = async uuid => {
 	}
 
 	return {success: true, user: data};
+};
+
+/**
+ * Convert JSON to a HypixelStats object
+ * @param {object} json JSON to convert
+ */
+const fromJSON = json => {
+	const result = new HypixelStats(null);
+	result.info = json.info;
+	result.stats = json.stats;
+	return result;
 };
 
 class HypixelStats {
@@ -151,6 +150,9 @@ class HypixelStats {
 			}
 		};
 
+		this.ratios = null;
+
+		// TODO: Same check for TNTGames stats
 		if (typeof data.stats.Duels !== "undefined") {
 			this.stats.duels = {
 				wins: defaultTo(data.stats.Duels.bowspleef_duel_wins, 0),
@@ -163,13 +165,21 @@ class HypixelStats {
 		}
 	}
 
+	/**
+	 * Get the difference between a pair of stats
+	 * @param {HypixelStats} other Other statistics
+	 * @returns {HypixelStats}
+	 */
 	getDifference(other) {
 		if (other === null) return this;
-		
+
 		const result = new HypixelStats(null);
 		// @ts-ignore
 		result.stats = {};
 		result.info = this.info;
+
+		if (this.ratios === null) this.setRatios();
+		if (other.ratios === null) other.setRatios();
 
 		for (const categoryName in this.stats) {
 			result.stats[categoryName] = {};
@@ -178,13 +188,53 @@ class HypixelStats {
 			}
 		}
 
-		result.setRatios();
+		result.ratios = null;
 		return result;
 	}
 
-	setRatios() {}
+	setRatios() {
+		this.ratios = {
+			duels: {
+				WL: ratio(this.stats.duels.wins, this.stats.duels.losses)
+			},
+			wizards: {
+				KD: ratio(this.stats.wizards.totalkills, this.stats.wizards.deaths),
+				KAD: ratio(this.stats.wizards.totalkills + this.stats.wizards.assists, this.stats.wizards.deaths),
+				KW: ratio(this.stats.wizards.totalkills, this.stats.wizards.wins)
+			},
+			tag: {
+				TK: ratio(this.stats.tag.tags, this.stats.tag.kills),
+				KW: ratio(this.stats.tag.kills, this.stats.tag.wins)
+			},
+			bowspleef: {
+				WL: ratio(this.stats.bowspleef.wins, this.stats.bowspleef.deaths),
+				KD: ratio(this.stats.bowspleef.kills, this.stats.bowspleef.deaths)
+			},
+			pvp: {
+				WL: ratio(this.stats.pvp.wins, this.stats.pvp.deaths),
+				KD: ratio(this.stats.pvp.kills, this.stats.pvp.deaths)
+			},
+			run: {
+				WL: ratio(this.stats.run.wins, this.stats.run.deaths)
+			}
+		};
 
-	toEmbed(game, author, settings) {
+		return this;
+	}
+
+	/**
+	 * Converts this HypixelStats object to a Discord embed
+	 * @param {Object} params
+	 * @param {HypixelStats=} params.previous
+	 * @param {string} params.game
+	 * @param {Object} params.author
+	 * @param {Object} params.settings
+	 * @returns {import("discord.js").MessageEmbed}
+	 */
+	toEmbed({game, author, settings, previous = this}) {
+		if (this.ratios === null) this.setRatios();
+		if (previous.ratios === null) previous.setRatios();
+
 		const embed = new Discord.MessageEmbed();
 		embed.setAuthor(author.tag, avatarOf(author));
 		embed.setFooter(randomChoice(embedFooter.text), embedFooter.image.green);
@@ -195,6 +245,95 @@ class HypixelStats {
 		embed.setTitle(`${this.info.displayname} | ${GAMES_READABLE[game]} Statistics`);
 		embed.setDescription("Work in progress!");
 
+		const display = (A, B, formatter = n => n.toLocaleString()) => formatter(A) + (A === B ? "" : ` (${A > B ? "+" : ""}${formatter(A - B)})`);
+
+		switch (game) {
+			case "all":
+				embed.addField("**Coins**", display(this.stats.overall.coins, previous.stats.overall.coins), true);
+				embed.addField("**Wins**", display(this.stats.overall.wins, previous.stats.overall.wins), true);
+				embed.addField("**Playtime**", display(this.stats.overall.playtime, previous.stats.overall.playtime, formatMinutes), true);
+				embed.addField("**TNT Tag Wins**", display(this.stats.tag.wins, previous.stats.tag.wins), true);
+				embed.addField("**TNT Run Record**", display(this.stats.run.record, previous.stats.run.record), true);
+				embed.addField("**TNT Run Wins**", display(this.stats.run.wins, previous.stats.run.wins), true);
+				embed.addField("**Bowspleef Wins**", display(this.stats.bowspleef.wins, previous.stats.bowspleef.wins), true);
+				embed.addField("**PvP Run Kills**", display(this.stats.pvp.kills, previous.stats.pvp.kills), true);
+				embed.addField("**PvP Run Wins**", display(this.stats.pvp.wins, previous.stats.pvp.wins), true);
+				embed.addField("**Wizards Wins**", display(this.stats.wizards.wins, previous.stats.wizards.wins), true);
+				embed.addField("**Wizards Kills**", display(this.stats.wizards.totalkills, previous.stats.wizards.totalkills), true);
+				embed.addField("**Wizards Points**", display(this.stats.wizards.points, previous.stats.wizards.points), true);
+				return embed;
+			case "run":
+				embed.addField("**Record**", display(this.stats.run.record, previous.stats.run.record, formatSeconds), true);
+				embed.addField("**Wins**", display(this.stats.run.wins, previous.stats.run.wins), true);
+				embed.addField("**Deaths**", display(this.stats.run.deaths, previous.stats.run.deaths), true);
+				embed.addField("**Potions Thrown**", display(this.stats.run.potions, previous.stats.run.potions), true);
+				embed.addField("**W/L Ratio**", display(this.ratios.run.WL, previous.ratios.run.WL), true);
+				embed.addField("**Blocks Broken**", display(this.stats.run.blocks, previous.stats.run.blocks), true);
+				return embed;
+			case "pvp":
+				embed.addField("**Record**", display(this.stats.pvp.record, previous.stats.pvp.record, formatSeconds), true);
+				embed.addField("**Wins**", display(this.stats.pvp.wins, previous.stats.pvp.wins), true);
+				embed.addField("**Deaths**", display(this.stats.pvp.deaths, previous.stats.pvp.deaths), true);
+				embed.addField("**Kills**", display(this.stats.pvp.kills, previous.stats.pvp.kills), true);
+				embed.addField("**W/L Ratio**", display(this.ratios.pvp.WL, previous.ratios.pvp.WL), true);
+				embed.addField("**K/D Ratio**", display(this.ratios.pvp.KD, previous.ratios.pvp.KD), true);
+				return embed;
+			case "bowspleef":
+				embed.addField("**Wins**", display(this.stats.bowspleef.wins, previous.stats.bowspleef.wins), true);
+				embed.addField("**Deaths**", display(this.stats.bowspleef.deaths, previous.stats.bowspleef.deaths), true);
+				embed.addField("**Kills**", display(this.stats.bowspleef.kills, previous.stats.bowspleef.kills), true);
+				embed.addField("**Shots**", display(this.stats.bowspleef.shots, previous.stats.bowspleef.shots), true);
+				embed.addField("**W/L Ratio**", display(this.ratios.bowspleef.WL, previous.ratios.bowspleef.WL), true);
+				embed.addField("**K/D Ratio**", display(this.ratios.bowspleef.KD, previous.ratios.bowspleef.KD), true);
+				return embed;
+			case "tag":
+				embed.addField("**Wins**", display(this.stats.tag.wins, previous.stats.tag.wins), true);
+				embed.addField("**Kills**", display(this.stats.tag.kills, previous.stats.tag.kills), true);
+				embed.addField("**Tags**", display(this.stats.tag.tags, previous.stats.tag.tags), true);
+				embed.addField("**T/K Ratio**", display(this.ratios.tag.TK, previous.ratios.tag.TK), true);
+				embed.addField("**K/W Ratio**", display(this.ratios.tag.KW, previous.ratios.tag.KW), true);
+				return embed;
+			case "wizards":
+				embed.addField("**Wins**", display(this.stats.wizards.wins, previous.stats.wizards.wins), true);
+				embed.addField("**Deaths**", display(this.stats.wizards.deaths, previous.stats.wizards.deaths), true);
+				if (!settings.verbose) {
+					embed.addField("**Kills**", display(this.stats.wizards.totalkills, previous.stats.wizards.totalkills), true);
+				}
+
+				embed.addField("**Assists**", display(this.stats.wizards.assists, previous.stats.wizards.assists), true);
+				embed.addField("**Points**", display(this.stats.wizards.points, previous.stats.wizards.points), true);
+				embed.addField("**K/D Ratio**", display(this.ratios.wizards.KD, previous.ratios.wizards.KD), true);
+				if (!settings.verbose) return embed;
+
+				embed.addField("**Airtime**", display(this.stats.wizards.airtime, previous.stats.wizards.airtime, t => formatSeconds(t / 20)), true);
+				embed.addField("**KA/D Ratio**", display(this.ratios.wizards.KAD, previous.ratios.wizards.KAD), true);
+				embed.addField("**K/W Ratio**", display(this.ratios.wizards.KW, previous.ratios.wizards.KW), true);
+			// Intentional fallthrough
+			case "kills":
+				embed.addField("**Fire**", display(this.stats.kills.fire, previous.stats.kills.fire), true);
+				embed.addField("**Ice**", display(this.stats.kills.ice, previous.stats.kills.ice), true);
+				embed.addField("**Wither**", display(this.stats.kills.wither, previous.stats.kills.wither), true);
+				embed.addField("**Kinetic**", display(this.stats.kills.kinetic, previous.stats.kills.kinetic), true);
+				embed.addField("**Blood**", display(this.stats.kills.blood, previous.stats.kills.blood), true);
+				embed.addField("**Toxic**", display(this.stats.kills.toxic, previous.stats.kills.toxic), true);
+				embed.addField("**Hydro**", display(this.stats.kills.hydro, previous.stats.kills.hydro), true);
+				embed.addField("**Ancient**", display(this.stats.kills.ancient, previous.stats.kills.ancient), true);
+				embed.addField("**Storm**", display(this.stats.kills.storm, previous.stats.kills.storm), true);
+				embed.addField("**Total Kills**: ", display(this.stats.wizards.totalkills, previous.stats.wizards.totalkills));
+				return embed;
+			case "duels":
+				embed.addField("**Wins**", display(this.stats.duels.wins, previous.stats.duels.wins), true);
+				embed.addField("**Losses**", display(this.stats.duels.losses, previous.stats.duels.losses), true);
+				embed.addField("**Shots**", display(this.stats.duels.shots, previous.stats.duels.shots), true);
+				embed.addField("**W/L Ratio**", display(this.ratios.duels.WL, previous.ratios.duels.WL), true);
+				embed.addField("**Current WS**", display(this.stats.duels.currentWS, previous.stats.duels.currentWS), true);
+				embed.addField("**Best WS**", display(this.stats.duels.bestWS, previous.stats.duels.bestWS), true);
+				return embed;
+			case null:
+				embed.setDescription("No game was provided.");
+				return embed;
+		}
+
 		return embed;
 	}
 }
@@ -202,5 +341,6 @@ class HypixelStats {
 module.exports = {
 	HypixelStats,
 	fetchStats,
-	parseStatsArgs
+	parseStatsArgs,
+	fromJSON
 };

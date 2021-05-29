@@ -2,9 +2,9 @@
 "use strict";
 
 const {setAndOrGet} = require("../cache.js"),
-	{errorEmbed, formatTimestamp} = require("../util"),
+	{errorEmbed} = require("../util"),
 	{getUserSettings} = require("../db.js"),
-	{parseStatsArgs, fetchStats, HypixelStats} = require("../stats-utils.js");
+	{parseStatsArgs, fetchStats, HypixelStats, fromJSON} = require("../stats-utils.js");
 
 module.exports = {
 	run: async ({command, message, args, channelInfo}) => {
@@ -18,8 +18,9 @@ module.exports = {
 
 		const isWeekly = command !== "monthly";
 		const previous = await setAndOrGet(uuid, isWeekly, stats);
-		const settings = getUserSettings(message.author);
-		const embed = stats.getDifference(previous).toEmbed(game, message.author, settings);
+
+		const settings = await getUserSettings(message.author);
+		const embed = stats.getDifference(fromJSON(previous)).toEmbed({game, author: message.author, settings});
 
 		// Prepend description
 		// embed.setDescription(

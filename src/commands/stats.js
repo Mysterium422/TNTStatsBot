@@ -4,7 +4,7 @@
 const {cacheUserStats, getUserStats, getTimedStats, cacheTimedStats} = require("../cache.js"),
 	{getUserSettings} = require("../db.js"),
 	{errorEmbed} = require("../util.js"),
-	{fetchStats, HypixelStats, parseStatsArgs} = require("../stats-utils.js");
+	{fetchStats, HypixelStats, parseStatsArgs, fromJSON} = require("../stats-utils.js");
 
 const commandFunction = async (uuid, game, message) => {
 	const data = await fetchStats(uuid);
@@ -14,10 +14,13 @@ const commandFunction = async (uuid, game, message) => {
 	const previous = await getUserStats(message.author.id, uuid);
 	const settings = await getUserSettings(message.author);
 	if (settings.reset) await cacheUserStats(message.author.id, uuid, stats);
+	
+	const embed = stats.toEmbed({
+		game, author: message.author, settings,
+		previous: fromJSON(previous)
+	});
 
-	const embed = stats.getDifference(previous).toEmbed(game, message.author, settings);
 	await message.channel.send(embed);
-
 	await getTimedStats(uuid, true).then(cache => (cache === null ? cacheTimedStats(uuid, true, stats) : null));
 	await getTimedStats(uuid, false).then(cache => (cache === null ? cacheTimedStats(uuid, true, stats) : null));
 };
