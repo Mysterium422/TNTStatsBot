@@ -1,7 +1,7 @@
 // @ts-check
 "use strict";
 
-const {setAndOrGet} = require("../cache.js"),
+const {useTimedStats} = require("../cache.js"),
 	{errorEmbed} = require("../util"),
 	{getUserSettings} = require("../db.js"),
 	{parseStatsArgs, fetchStats, HypixelStats, fromJSON} = require("../stats-utils.js");
@@ -17,7 +17,7 @@ module.exports = {
 		const stats = new HypixelStats(data.user.player);
 
 		const isWeekly = command !== "monthly";
-		const previous = await setAndOrGet(uuid, isWeekly, stats);
+		const previous = await useTimedStats(uuid, isWeekly, stats);
 
 		const settings = await getUserSettings(message.author);
 		const embed = stats.getDifference(fromJSON(previous)).toEmbed({game, author: message.author, settings});

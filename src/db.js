@@ -5,6 +5,9 @@ const path = require("path"),
 	fs = require("fs"),
 	{getDefaultSettings} = require("./settings.js");
 
+/**
+ * @type {import("knex").Knex}
+ */
 // @ts-ignore
 const knex = require("knex")({
 	client: "sqlite3",
@@ -81,31 +84,126 @@ const reset = async () => {
 	}
 };
 
-const all = database => knex(database);
-const add = (database, row) => knex(database).insert(row);
-const update = (database, query, newvalue) => knex(database).where(query).update(newvalue);
-const select = (database, query) => knex(database).where(query);
-const del = (database, query) => knex(database).where(query).del();
+/**
+ * @typedef {Object} VerifiedUserRow
+ * @property {string} uuid Minecraft UUID
+ * @property {string} discord Discord account ID
+ */
 
+/**
+ * @typedef {Object} ConfiguredChannelRow
+ * @property {String} guild Guild ID
+ * @property {String} channel Channel ID
+ * @property {String} prefix Bot prefix
+ * @property {String} game Default game
+ */
+
+/**
+ * @typedef {Object} UserCacheRow
+ * @property {String} discord Discord account ID
+ * @property {String} uuid Minecraft UUID
+ * @property {String} data Statistics
+ */
+
+/**
+ * @typedef {Object} TimedCacheRow
+ * @property {Number} isWeekly Is the row weekly or monthly data?
+ * @property {String} uuid Minecraft UUID
+ * @property {String} data Statistics
+ */
+
+/**
+ * @typedef {Object} UserSettingsRow
+ * @property {String} discord Discord ID
+ * @property {String} data Statistics
+ */
+
+/**
+ * Get all rows in a table
+ * @param {String} table Table to select from
+ * @returns {Promise<Object[]>} All rows
+ */
+const all = table => knex(table);
+
+/**
+ * Add a row to a table
+ * @param {String} table Table to add to
+ * @param {Object} row Row to insert
+ * @returns {Promise<number[]>}
+ */
+const add = (table, row) => knex(table).insert(row);
+
+/**
+ * Update a row with new values
+ * @param {String} table Table to update in
+ * @param {Object} query Query to find the row
+ * @param {Object} newvalue New values for the row
+ * @returns {Promise<number>} Number of rows updated
+ */
+const update = (table, query, newvalue) => knex(table).where(query).update(newvalue);
+
+/**
+ * Select rows by a query
+ * @param {String} table Table to select from
+ * @param {Object} query Query to find the rows
+ * @returns {Promise<Object[]>} Rows which match the query
+ */
+const select = (table, query) => knex(table).where(query);
+
+/**
+ * Delete rows by a query
+ * @param {String} table Table to delete from
+ * @param {Object} query Query to find the rows
+ * @returns {Promise<void>}
+ */
+const del = (table, query) => knex(table).where(query).del();
+
+/**
+ * Link a Minecraft UUID to a Discord account
+ * @param {String} uuid Minecraft UUID
+ * @param {String} discord Discord ID
+ */
 const linkUUID = async (uuid, discord) => {
-	const existing = await select(TABLES.VerifiedUsers, {discord});
-	if (existing.length === 0) {
-		return add(TABLES.VerifiedUsers, {uuid, discord});
-	} else {
-		return update(TABLES.VerifiedUsers, {discord}, {uuid});
-	}
+	const updated = await update(TABLES.VerifiedUsers, {discord, uuid});
+	if (updated === 0) await add(TABLES.VerifiedUsers, {uuid, discord});
 };
 
-const linkChannelPrefix = async (channel, prefix, game) => {
+/**
+ * Configure a Discord channel
+ * @param {import("discord.js").TextChannel} channel Channel to link
+ * @param {String} prefix Channel prefix
+ * @param {String} game Default game
+ */
+const configureChannel = async (channel, prefix, game) => {
 	const selector = {guild: channel.guild.id, channel: channel.id},
 		newValues = {prefix, game};
 
 	const updated = await update(TABLES.ConfiguredChannels, selector, newValues);
-	if (updated === 0) {
-		return add(TABLES.ConfiguredChannels, {...selector, ...newValues});
-	} else return updated;
+	if (updated === 0) await add(TABLES.ConfiguredChannels, {...selector, ...newValues});
 };
 
+/**
+ * Change a Discord user's bot setting
+ * @param {import("discord.js").User} user User
+ * @param {String} setting Setting to change
+ * @param {*} value New value
+ */
+const setUserSetting = async (user, setting, value) => {
+	const result = await select(TABLES.UserSettings, {discord: user.id});
+
+	const newObj = result.length === 0 ? getDefaultSettings() : result[0];
+	newObj[setting] = value;
+	const data = JSON.stringify(newObj);
+
+	const updated = await update(TABLES.UserSettings, {discord: user.id}, {data});
+	if (updated === 0) await add(TABLES.UserSettings, {discord: user.id, data});
+};
+
+/**
+ * Get the configuration of a channel
+ * @param {import("discord.js").Message} message Message
+ * @returns {Promise<ConfiguredChannelRow | null>} Channel configuration, or `null` if the channel is not configured
+ */
 const getChannelInfo = async message => {
 	const result = await select(TABLES.ConfiguredChannels, {
 		guild: message.guild.id,
@@ -113,38 +211,25 @@ const getChannelInfo = async message => {
 	});
 
 	if (result.length === 0) return null;
-	return result[0];
+	else return result[0];
 };
 
+/**
+ * Get the bot settings of a user.
+ * @param {import("discord.js").User} user User
+ * @returns {Promise<import("./settings").UserSettings>} The user's settings
+ */
 const getUserSettings = async user => {
-	const result = await select(TABLES.UserSettings, {
-		discord: user.id
-	});
-
+	const result = await select(TABLES.UserSettings, {discord: user.id});
 	const res = result.length === 0 ? {} : JSON.parse(result[0].data);
 	return Object.assign(getDefaultSettings(), res);
-};
-
-const setUserSetting = async (user, setting, value) => {
-	const result = await select(TABLES.UserSettings, {
-		discord: user.id
-	});
-
-	const newObj = result.length === 0 ? getDefaultSettings() : result[0];
-	newObj[setting] = value;
-	const data = JSON.stringify(newObj);
-
-	const updated = await update(TABLES.UserSettings, {discord: user.id}, {data});
-	if (updated === 0) {
-		return add(TABLES.UserSettings, {discord: user.id, data});
-	} else return updated;
 };
 
 module.exports = {
 	add, all, update, select, del, reset,
 	TABLES,
 	linkUUID,
-	linkChannelPrefix,
+	configureChannel,
 	getChannelInfo,
 	createTables,
 	getUserSettings,

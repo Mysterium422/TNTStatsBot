@@ -23,7 +23,19 @@ const embedFooter = {
 	}
 };
 
+/**
+ * Pick a random item from an array
+ * @param {any[]} arr Array
+ * @returns {any} Random item
+ */
 const randomChoice = arr => arr[Math.floor(Math.random() * arr.length)];
+
+/**
+ * Creates a Discord embed which represents a user error
+ * @param {string=} error Error message
+ * @param {string=} description Description of the error
+ * @returns {Discord.MessageEmbed} Embed
+ */
 const errorEmbed = (error = "Something went wrong...", description = ":robot: beep boop") => {
 	const embed = new Discord.MessageEmbed();
 	embed.setColor("#F64B4B");
@@ -37,11 +49,34 @@ const errorEmbed = (error = "Something went wrong...", description = ":robot: be
 const config = require("../config.json");
 const fetch = require("node-fetch");
 
+/**
+ * Query the Hypixel API
+ * @param {string} query Query string
+ * @returns {Object} API Response
+ */
 // @ts-ignore
 const hypixelFetch = query => fetch(`https://api.hypixel.net/${query}&key=${config.hypixel_key}`).then(response => response.json());
+
+/**
+ * Use a default value if `v` is not defined
+ * @param {any} v Value
+ * @param {any} def Default value
+ * @returns `def` if `v` is `undefined`, otherwise `v`
+ */
 const defaultTo = (v, def = null) => (typeof v === "undefined" ? def : v);
+
+/**
+ * Check if a string is a valid Minecraft username
+ * @param {string} name Name to check
+ * @returns {boolean} Was the name valid?
+ */
 const isValidPlayername = name => /^[A-Za-z0-9_]{3,16}$/.test(name);
 
+/**
+ * Get the UUID associated with a Minecraft username
+ * @param {string} name Minecraft username
+ * @returns {Promise<string>|null} UUID, or `null` if an error occurred
+ */
 const nameToUUID = async name => {
 	if (!isValidPlayername(name)) return null;
 	// @ts-ignore
@@ -50,6 +85,11 @@ const nameToUUID = async name => {
 	return response.json().then(j => j.id);
 };
 
+/**
+ * Get the username associated with a Minecraft UUID
+ * @param {string} uuid Minecraft UUID
+ * @returns {Promise<string>|null} Username, or `null` if an error occurred
+ */
 const UUIDtoName = async uuid => {
 	// @ts-ignore
 	const response = await fetch(`https://api.mojang.com/user/profiles/${uuid}/names`).then(response => response.json());
@@ -57,12 +97,23 @@ const UUIDtoName = async uuid => {
 	else return response[response.length - 1].name;
 };
 
+/**
+ * Format a unix epoch timestamp
+ * @param {number} timestamp Timpestamp to format
+ * @returns {string} Formatted string
+ */
 const formatTimestamp = timestamp =>
 	new Date(timestamp).toLocaleString("default", {
 		dateStyle: "medium",
 		timeStyle: "short"
 	});
 
+/**
+ * Get the ratio between two numbers
+ * @param {number} a First number
+ * @param {number} b Second number
+ * @returns {number}
+ */
 const ratio = (a = 0, b = 0) => (b === 0 ? a : a === 0 ? 0 : a / b);
 
 const ChatColors = {
@@ -94,8 +145,21 @@ const getMentioned = message => {
 	return typeof result === "undefined" ? null : result;
 };
 
+/**
+ * Get the avatar of a user
+ * @param {Discord.User} user User
+ * @returns {string} URL to to the avatar of the specified user
+ */
 const avatarOf = user => `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}?size=128`;
 
+/**
+ * 
+ * @param {Discord.User} author Author of the message
+ * @param {string=} description Description
+ * @param {string=} title Title
+ * @param {string | null} thumbnail Thumbnail URL
+ * @returns 
+ */
 const successEmbed = (author, description = "", title = "Success", thumbnail = null) => {
 	const result = new Discord.MessageEmbed();
 	result.setColor("#3bcc71");
@@ -149,6 +213,11 @@ const getRank = D => {
 	}
 };
 
+/**
+ * Format a number of minutes
+ * @param {number} raw Number of minutes
+ * @returns {string} Formatted string
+ */
 const formatMinutes = raw => {
 	const hours = Math.trunc(raw / 60),
 		  mins = Math.floor(raw % 60),
@@ -163,6 +232,11 @@ const formatMinutes = raw => {
 	return out.join(" ");
 };
 
+/**
+ * Format a number of seconds
+ * @param {number} raw Number of seconds
+ * @returns {string} Formatted string
+ */
 const formatSeconds = raw => {
 	const hours = Math.trunc(raw / 3600),
 		  mins = Math.trunc(raw / 60 % 60),
@@ -222,13 +296,23 @@ const GAMES = {
 	wkills:        "kills"
 };
 
+/**
+ * Get the Minecraft UUID linked to a Discord ID
+ * @param {string} discord User ID
+ * @returns {Promise<string|null>} UUID, or `null` if have not linked
+ */
 const getUUIDFromDiscord = async discord => {
 	const row = await db.select(db.TABLES.VerifiedUsers, {discord});
 	if (row.length === 0) return null;
 	return row[0].uuid;
 };
 
-// TODO: JSDoc everything
+/**
+ * Parse a Minecraft UUID from a bot command
+ * @param {string} arg First argument
+ * @param {Discord.User} mentioned First mention
+ * @returns {Promise<{success: false, error: [string, string], uuid?: undefined} | {success: true, uuid: string, error?: undefined}>} Parsed user
+ */
 const parseUser = async (arg, mentioned = null) => {
 	if (mentioned === null) {
 		if (arg.length > 16) {

@@ -6,9 +6,10 @@ const {getRank, defaultTo, hypixelFetch, GAMES, parseUser, getUUIDFromDiscord, g
 
 /**
  * Parse stats arguments
- * @param {import("discord.js").Message} message Message containing the command
- * @param {string[]} args Args array
- * @param {object} channelConfig Configuration object for the channel
+ * @param {Discord.Message} message Message containing the command
+ * @param {String[]} args Args array
+ * @param {import("./db").ConfiguredChannelRow} channelConfig Configuration object for the channel
+ * @returns {Promise<{success: false, error: [String, String]} | {success: true, uuid: String, game: String, error?: undefined}>} Parsed arguments
  */
 const parseStatsArgs = async (message, args, channelConfig) => {
 	let uuid = null,
@@ -22,6 +23,7 @@ const parseStatsArgs = async (message, args, channelConfig) => {
 	} else if ((args.length === 1 && !gameFirst) || args.length === 2) {
 		let argPos = args.length === 1 ? 0 : gameFirst ? 1 : 0;
 		const user = await parseUser(args[argPos], getMentioned(message));
+		// @ts-ignore
 		if (!user.success) return user;
 		uuid = user.uuid;
 	}
@@ -40,6 +42,7 @@ const parseStatsArgs = async (message, args, channelConfig) => {
 /**
  * Fetch a the stats of a Minecraft player
  * @param {string} uuid Minecraft UUID
+ * @returns {Promise<{success: false, error: [String, String], user?: undefined} | {success: true, user: Object, error?: undefined}>} Fetched statistics
  */
 const fetchStats = async uuid => {
 	const data = await hypixelFetch("player?uuid=" + uuid);
@@ -70,16 +73,25 @@ const fetchStats = async uuid => {
 
 /**
  * Convert JSON to a HypixelStats object
- * @param {object} json JSON to convert
+ * @param {Object} json JSON to convert
+ * @param {Object} json.info Required property
+ * @param {Object} json.stats Required property
+ * @param {Object} json.ratios Required property
+ * @returns {HypixelStats} Converted statistics
  */
 const fromJSON = json => {
 	const result = new HypixelStats(null);
 	result.info = json.info;
 	result.stats = json.stats;
+	result.ratios = json.ratios;
 	return result;
 };
 
 class HypixelStats {
+	/**
+	 * Represents a Hypixel Statistics for a specific player
+	 * @param {Object | null} data Data to construct from
+	 */
 	constructor(data) {
 		if (data === null) return;
 
@@ -226,10 +238,10 @@ class HypixelStats {
 	 * Converts this HypixelStats object to a Discord embed
 	 * @param {Object} params
 	 * @param {HypixelStats=} params.previous
-	 * @param {string} params.game
-	 * @param {Object} params.author
-	 * @param {Object} params.settings
-	 * @returns {import("discord.js").MessageEmbed}
+	 * @param {String} params.game
+	 * @param {Discord.User} params.author
+	 * @param {import("./settings").UserSettings} params.settings
+	 * @returns {Discord.MessageEmbed}
 	 */
 	toEmbed({game, author, settings, previous = this}) {
 		if (this.ratios === null) this.setRatios();

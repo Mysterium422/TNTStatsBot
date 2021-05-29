@@ -21,8 +21,8 @@ const commandFunction = async (uuid, game, message) => {
 	});
 
 	await message.channel.send(embed);
-	await getTimedStats(uuid, true).then(cache => (cache === null ? cacheTimedStats(uuid, true, stats) : null));
-	await getTimedStats(uuid, false).then(cache => (cache === null ? cacheTimedStats(uuid, true, stats) : null));
+	await getTimedStats(uuid, 1).then(cache => (cache === null ? cacheTimedStats(uuid, true, stats) : null));
+	await getTimedStats(uuid, 0).then(cache => (cache === null ? cacheTimedStats(uuid, true, stats) : null));
 };
 
 module.exports = {
