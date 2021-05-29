@@ -139,14 +139,30 @@ const getRank = D => {
 	}
 };
 
-const formatMinutes = mins => {
-	const hours = Math.trunc(mins / 60);
-	return `${hours > 0 ? hours.toLocaleString() + "h" : ""} ${Math.floor(mins % 60).toLocaleString()}m`;
+const formatMinutes = raw => {
+	const hours = Math.trunc(raw / 60),
+		  mins = Math.floor(raw % 60),
+		  secs = Math.trunc(raw / 60 % 60);
+
+	let out = [];
+	if (hours > 0) out.push(hours.toLocaleString() + "h");
+	if (mins > 0)  out.push(mins.toLocaleString() + "m");
+	if (secs > 0)  out.push(secs.toLocaleString() + "s");
+
+	return out.join(" ");
 };
 
-const formatSeconds = secs => {
-	const mins = Math.trunc(secs / 60);
-	return `${mins > 0 ? mins.toLocaleString() + "m" : ""} ${Math.floor(secs % 60).toLocaleString()}s`;
+const formatSeconds = raw => {
+	const hours = Math.trunc(raw / 3600),
+		  mins = Math.trunc(raw / 60 % 60),
+		  secs = Math.floor(raw % 60);
+
+	let out = [];
+	if (hours > 0) out.push(hours.toLocaleString() + "h");
+	if (mins > 0)  out.push(mins.toLocaleString() + "m");
+	if (secs > 0)  out.push(secs.toLocaleString() + "s");
+
+	return out.join(" ");
 };
 
 const GAMES_READABLE = {
@@ -156,7 +172,8 @@ const GAMES_READABLE = {
 	pvp: "PVP Run",
 	tag: "TNT Tag",
 	bowspleef: "Bow Spleef",
-	duels: "Bow Spleef Duels"
+	duels: "Bow Spleef Duels",
+	kills: "Wizards Kills"
 };
 
 const GAMES = {
@@ -187,7 +204,10 @@ const GAMES = {
 	tntwizards:    "wizards",
 	wiz:           "wizards",
 	wizard:        "wizards",
-	wizards:       "wizards"
+	wizards:       "wizards",
+	kills:         "kills",
+	wizkills:      "kills",
+	wkills:        "kills"
 };
 
 const getUUIDFromDiscord = async discord => {

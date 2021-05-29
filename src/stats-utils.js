@@ -38,7 +38,7 @@ const display = (pathStr, stats, previous, formatter = n => n.toLocaleString()) 
 	return result;
 };
 
-const createStatsEmbed = ({message, stats, previous, game}) => {
+const createStatsEmbed = ({message, stats, previous, game, settings}) => {
 	const embed = new Discord.MessageEmbed();
 	embed.setAuthor(message.author.tag, avatarOf(message.author));
 	embed.setFooter(randomChoice(embedFooter.text), embedFooter.image.green);
@@ -46,7 +46,7 @@ const createStatsEmbed = ({message, stats, previous, game}) => {
 	embed.setURL(`https://plancke.io/hypixel/player/stats/${stats.info.displayname}`);
 	embed.setThumbnail(`https://visage.surgeplay.com/head/128/${stats.info.uuid}`);
 	embed.setTimestamp();
-	embed.setTitle(`${stats.info.displayname} | ${GAMES_READABLE[game]} Statistics`);
+	embed.setTitle(`${stats.info.displayname} | ${GAMES_READABLE[game]}${game === "kills" ? "" : " Statistics"}`);
 
 	switch (game) {
 		case "all":
@@ -95,13 +95,30 @@ const createStatsEmbed = ({message, stats, previous, game}) => {
 			embed.addField("**K/W Ratio**", display("ratio.tag.KW", stats, previous), true);
 			return embed;
 		case "wizards":
-			// TODO: Airtime, KA/D Ratio, K/W Ratio, Kills with each class (verbose only)
 			embed.addField("**Wins**", display("wizards.wins", stats, previous), true);
 			embed.addField("**Deaths**", display("wizards.deaths", stats, previous), true);
-			embed.addField("**Kills**", display("wizards.totalkills", stats, previous), true);
+			if (!settings.verbose) // displayed as "Total Kills" (line 120)
+				embed.addField("**Kills**", display("wizards.totalkills", stats, previous), true);
 			embed.addField("**Assists**", display("wizards.assists", stats, previous), true);
 			embed.addField("**Points**", display("wizards.points", stats, previous), true);
 			embed.addField("**K/D Ratio**", display("ratio.wizards.KD", stats, previous), true);
+			if (!settings.verbose) return embed;
+
+			embed.addField("**Airtime**", display("wizards.airtime", stats, previous, t => formatSeconds(t / 20)), true);
+			embed.addField("**KA/D Ratio**", display("ratio.wizards.KAD", stats, previous), true);
+			embed.addField("**K/W Ratio**", display("ratio.wizards.KW", stats, previous), true);
+			// Intentional fallthrough
+		case "kills":
+			embed.addField("**Fire**", display("wizkills.fire", stats, previous), true);
+			embed.addField("**Ice**", display("wizkills.ice", stats, previous), true);
+			embed.addField("**Wither**", display("wizkills.wither", stats, previous), true);
+			embed.addField("**Kinetic**", display("wizkills.kinetic", stats, previous), true);
+			embed.addField("**Blood**", display("wizkills.blood", stats, previous), true);
+			embed.addField("**Toxic**", display("wizkills.toxic", stats, previous), true);
+			embed.addField("**Hydro**", display("wizkills.hydro", stats, previous), true);
+			embed.addField("**Ancient**", display("wizkills.ancient", stats, previous), true);
+			embed.addField("**Storm**", display("wizkills.storm", stats, previous), true);
+			embed.addField("**Total Kills**: ", display("wizards.totalkills", stats, previous));
 			return embed;
 		case "duels":
 			embed.addField("**Wins**", display("duels.wins", stats, previous), true);
@@ -117,7 +134,7 @@ const createStatsEmbed = ({message, stats, previous, game}) => {
 	}
 };
 
-const createTimedEmbed = ({message, stats, previous, game, timeframe}) => {
+const createTimedEmbed = ({message, stats, previous, game, timeframe, settings}) => {
 	const embed = new Discord.MessageEmbed();
 	embed.setAuthor(message.author.tag, avatarOf(message.author));
 	embed.setFooter(randomChoice(embedFooter.text), embedFooter.image.green);
@@ -125,7 +142,7 @@ const createTimedEmbed = ({message, stats, previous, game, timeframe}) => {
 	embed.setURL(`https://plancke.io/hypixel/player/stats/${stats.info.displayname}`);
 	embed.setThumbnail(`https://visage.surgeplay.com/head/128/${stats.info.uuid}`);
 	embed.setTimestamp();
-	embed.setTitle(`${stats.info.displayname} | ${GAMES_READABLE[game]} Statistics *[**${timeframe}**]*`);
+	embed.setTitle(`${stats.info.displayname} | ${GAMES_READABLE[game]} ${game === "kills" ? "" : "Statistics "}*[**${timeframe}**]*`);
 
 	switch (game) {
 		case "all":
@@ -177,10 +194,28 @@ const createTimedEmbed = ({message, stats, previous, game, timeframe}) => {
 			// TODO: Airtime, KA/D Ratio, K/W Ratio, Kills with each class (verbose only)
 			embed.addField("**Wins**", (stats.wizards.wins - previous.wizards.wins).toLocaleString(), true);
 			embed.addField("**Deaths**", (stats.wizards.deaths - previous.wizards.deaths).toLocaleString(), true);
-			embed.addField("**Kills**", (stats.wizards.totalkills - previous.wizards.totalkills).toLocaleString(), true);
+			if (!settings.verbose) // displayed as "Total Kills" (line 218)
+				embed.addField("**Kills**", (stats.wizards.totalkills - previous.wizards.totalkills).toLocaleString(), true);
 			embed.addField("**Assists**", (stats.wizards.assists - previous.wizards.assists).toLocaleString(), true);
 			embed.addField("**Points**", (stats.wizards.points - previous.wizards.points).toLocaleString(), true);
 			embed.addField("**K/D Ratio**", (stats.ratio.wizards.KD - previous.ratio.wizards.KD).toLocaleString(), true);
+			if (!settings.verbose) return embed;
+
+			embed.addField("**Airtime**", formatSeconds((stats.wizards.airtime - previous.wizards.airtime) / 20), true);
+			embed.addField("**KA/D Ratio**", (stats.ratio.wizards.KAD - previous.ratio.wizards.KDA).toLocaleString(), true);
+			embed.addField("**K/W Ratio**", (stats.ratio.wizards.KW - previous.ratio.wizards.KW).toLocaleString(), true);
+			// Intentional fallthrough
+		case "kills":
+			embed.addField("**Fire**", (stats.wizkills.fire - previous.wizkills.fire).toLocaleString(), true);
+			embed.addField("**Ice**", (stats.wizkills.ice - previous.wizkills.ice).toLocaleString(), true);
+			embed.addField("**Wither**", (stats.wizkills.wither - previous.wizkills.wither).toLocaleString(), true);
+			embed.addField("**Kinetic**", (stats.wizkills.kinetic - previous.wizkills.kinetic).toLocaleString(), true);
+			embed.addField("**Blood**", (stats.wizkills.blood - previous.wizkills.blood).toLocaleString(), true);
+			embed.addField("**Toxic**", (stats.wizkills.toxic - previous.wizkills.toxic).toLocaleString(), true);
+			embed.addField("**Hydro**", (stats.wizkills.hydro - previous.wizkills.hydro).toLocaleString(), true);
+			embed.addField("**Ancient**", (stats.wizkills.ancient - previous.wizkills.ancient).toLocaleString(), true);
+			embed.addField("**Storm**", (stats.wizkills.storm - previous.wizkills.storm).toLocaleString(), true);
+			embed.setDescription("**Total Kills**: " + (stats.wizards.totalkills - previous.wizards.totalkills).toLocaleString());
 			return embed;
 		case "duels":
 			embed.addField("**Wins**", (stats.duels.wins - previous.duels.wins).toLocaleString(), true);

@@ -86,7 +86,7 @@ client.on("message", async message => {
 		} catch (error) {
 			await errorLog(message, error);
 			await message.channel.send("An internal error occurred, see the stacktrace below:\n```" + error.stack + "```"); // FIXME: Debug Only!!
-			process.exit(1);
+			throw error;
 		}
 	} else {
 		return message.channel.send("Command does not exist!");
