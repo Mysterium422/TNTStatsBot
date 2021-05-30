@@ -84,8 +84,7 @@ client.on("message", async message => {
 				multiArgs: messageContent.slice(command.length).trim()
 			});
 		} catch (error) {
-			// TODO: Setting in config.json
-			// await errorLog(message, error);
+			if (config.notify_errors) await errorLog(message, error);
 			await message.channel.send("An internal error occurred, see the stacktrace below:\n```" + error.stack + "```"); // FIXME: Debug Only!!
 			console.error(error);
 			process.exit(0);

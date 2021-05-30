@@ -261,7 +261,7 @@ class HypixelStats {
 		const display = (A, B, formatter = n => n.toLocaleString()) => formatter(A) + (A === B ? "" : ` (${A > B ? "+" : ""}${formatter(A - B)})`);
 
 		switch (game) {
-			case "all":
+			case GAMES.all:
 				embed.addField("**Coins**", display(this.stats.overall.coins, previous.stats.overall.coins), true);
 				embed.addField("**Wins**", display(this.stats.overall.wins, previous.stats.overall.wins), true);
 				embed.addField("**Playtime**", display(this.stats.overall.playtime, previous.stats.overall.playtime, formatMinutes), true);
@@ -275,7 +275,7 @@ class HypixelStats {
 				embed.addField("**Wizards Kills**", display(this.stats.wizards.totalkills, previous.stats.wizards.totalkills), true);
 				embed.addField("**Wizards Points**", display(this.stats.wizards.points, previous.stats.wizards.points), true);
 				return embed;
-			case "run":
+			case GAMES.run:
 				embed.addField("**Record**", display(this.stats.run.record, previous.stats.run.record, formatSeconds), true);
 				embed.addField("**Wins**", display(this.stats.run.wins, previous.stats.run.wins), true);
 				embed.addField("**Deaths**", display(this.stats.run.deaths, previous.stats.run.deaths), true);
@@ -283,7 +283,7 @@ class HypixelStats {
 				embed.addField("**W/L Ratio**", display(this.ratios.run.WL, previous.ratios.run.WL), true);
 				embed.addField("**Blocks Broken**", display(this.stats.run.blocks, previous.stats.run.blocks), true);
 				return embed;
-			case "pvp":
+			case GAMES.pvp:
 				embed.addField("**Record**", display(this.stats.pvp.record, previous.stats.pvp.record, formatSeconds), true);
 				embed.addField("**Wins**", display(this.stats.pvp.wins, previous.stats.pvp.wins), true);
 				embed.addField("**Deaths**", display(this.stats.pvp.deaths, previous.stats.pvp.deaths), true);
@@ -291,7 +291,7 @@ class HypixelStats {
 				embed.addField("**W/L Ratio**", display(this.ratios.pvp.WL, previous.ratios.pvp.WL), true);
 				embed.addField("**K/D Ratio**", display(this.ratios.pvp.KD, previous.ratios.pvp.KD), true);
 				return embed;
-			case "bowspleef":
+			case GAMES.bow:
 				embed.addField("**Wins**", display(this.stats.bowspleef.wins, previous.stats.bowspleef.wins), true);
 				embed.addField("**Deaths**", display(this.stats.bowspleef.deaths, previous.stats.bowspleef.deaths), true);
 				embed.addField("**Kills**", display(this.stats.bowspleef.kills, previous.stats.bowspleef.kills), true);
@@ -299,20 +299,17 @@ class HypixelStats {
 				embed.addField("**W/L Ratio**", display(this.ratios.bowspleef.WL, previous.ratios.bowspleef.WL), true);
 				embed.addField("**K/D Ratio**", display(this.ratios.bowspleef.KD, previous.ratios.bowspleef.KD), true);
 				return embed;
-			case "tag":
+			case GAMES.tag:
 				embed.addField("**Wins**", display(this.stats.tag.wins, previous.stats.tag.wins), true);
 				embed.addField("**Kills**", display(this.stats.tag.kills, previous.stats.tag.kills), true);
 				embed.addField("**Tags**", display(this.stats.tag.tags, previous.stats.tag.tags), true);
 				embed.addField("**T/K Ratio**", display(this.ratios.tag.TK, previous.ratios.tag.TK), true);
 				embed.addField("**K/W Ratio**", display(this.ratios.tag.KW, previous.ratios.tag.KW), true);
 				return embed;
-			case "wizards":
+			case GAMES.wizards:
 				embed.addField("**Wins**", display(this.stats.wizards.wins, previous.stats.wizards.wins), true);
 				embed.addField("**Deaths**", display(this.stats.wizards.deaths, previous.stats.wizards.deaths), true);
-				if (!settings.verbose) {
-					embed.addField("**Kills**", display(this.stats.wizards.totalkills, previous.stats.wizards.totalkills), true);
-				}
-
+				embed.addField("**Kills**", display(this.stats.wizards.totalkills, previous.stats.wizards.totalkills), true);
 				embed.addField("**Assists**", display(this.stats.wizards.assists, previous.stats.wizards.assists), true);
 				embed.addField("**Points**", display(this.stats.wizards.points, previous.stats.wizards.points), true);
 				embed.addField("**K/D Ratio**", display(this.ratios.wizards.KD, previous.ratios.wizards.KD), true);
@@ -332,7 +329,10 @@ class HypixelStats {
 				embed.addField("**Hydro**", display(this.stats.kills.hydro, previous.stats.kills.hydro), true);
 				embed.addField("**Ancient**", display(this.stats.kills.ancient, previous.stats.kills.ancient), true);
 				embed.addField("**Storm**", display(this.stats.kills.storm, previous.stats.kills.storm), true);
-				embed.addField("**Total Kills**: ", display(this.stats.wizards.totalkills, previous.stats.wizards.totalkills));
+				if (game !== GAMES.wizards) {
+					embed.setDescription("**Total Kills**: " + display(this.stats.wizards.totalkills, previous.stats.wizards.totalkills));
+				}
+				
 				return embed;
 			case "duels":
 				embed.addField("**Wins**", display(this.stats.duels.wins, previous.stats.duels.wins), true);

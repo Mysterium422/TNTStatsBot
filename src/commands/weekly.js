@@ -2,7 +2,7 @@
 "use strict";
 
 const {useTimedStats} = require("../cache.js"),
-	{errorEmbed} = require("../util"),
+	{errorEmbed, formatTimestamp} = require("../util"),
 	{getUserSettings} = require("../db.js"),
 	{parseStatsArgs, fetchStats, HypixelStats, fromJSON} = require("../stats-utils.js");
 
@@ -22,11 +22,10 @@ module.exports = {
 		const settings = await getUserSettings(message.author);
 		const embed = stats.getDifference(fromJSON(previous)).toEmbed({game, author: message.author, settings});
 
-		// Prepend description
-		// embed.setDescription(
-		// 	"**Showing changes since:** " + formatTimestamp((previous === null ? stats : previous).info.timestamp) +
-		// 	(embed.description === null ? "" : "\n" + embed.description)
-		// );
+		embed.setDescription(
+			"**Showing changes since:** " + formatTimestamp((previous === null ? stats : previous).info.timestamp) +
+			(embed.description === null ? "" : "\n" + embed.description)
+		);
 
 		return message.channel.send(embed);
 	},
