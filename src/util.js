@@ -302,7 +302,7 @@ const GAMES = {
  * @returns {Promise<string|null>} UUID, or `null` if have not linked
  */
 const getUUIDFromDiscord = async discord => {
-	const row = await db.select(db.TABLES.VerifiedUsers, {discord});
+	const row = await db.where(db.TABLES.VerifiedUsers, {discord});
 	if (row.length === 0) return null;
 	return row[0].uuid;
 };

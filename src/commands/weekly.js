@@ -1,7 +1,7 @@
 // @ts-check
 "use strict";
 
-const {useTimedStats} = require("../cache.js"),
+const {useTimedStats, confirmTimedStats} = require("../cache.js"),
 	{errorEmbed, formatTimestamp} = require("../util"),
 	{getUserSettings} = require("../db.js"),
 	{parseStatsArgs, fetchStats, HypixelStats, fromJSON} = require("../stats-utils.js");
@@ -27,7 +27,8 @@ module.exports = {
 			(embed.description === null ? "" : "\n" + embed.description)
 		);
 
-		return message.channel.send(embed);
+		await message.channel.send(embed);
+		await confirmTimedStats(uuid, stats);
 	},
 	aliases: ["monthly"],
 	requiresConfiguredChannel: true

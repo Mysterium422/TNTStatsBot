@@ -143,12 +143,21 @@ const add = (table, row) => knex(table).insert(row);
 const update = (table, query, newvalue) => knex(table).where(query).update(newvalue);
 
 /**
- * Select rows by a query
- * @param {String} table Table to select from
+ * Fetch all rows which match a query
+ * @param {String} table Table to search
  * @param {Object} query Query to find the rows
  * @returns {Promise<Object[]>} Rows which match the query
  */
-const select = (table, query) => knex(table).where(query);
+const where = (table, query) => knex(table).where(query);
+
+/**
+ * Select columns from rows which match a query
+ * @param {String} table Table to select from
+ * @param {String[]} columns Columns to select
+ * @param {Object} query Query to find the rows
+ * @returns {Promise<Object[]>} Columns of rows which match the query
+ */
+const select = (table, columns, query) => knex(table).select(...columns).where(query);
 
 /**
  * Delete rows by a query
@@ -189,7 +198,7 @@ const configureChannel = async (channel, prefix, game) => {
  * @param {*} value New value
  */
 const setUserSetting = async (user, setting, value) => {
-	const result = await select(TABLES.UserSettings, {discord: user.id});
+	const result = await where(TABLES.UserSettings, {discord: user.id});
 
 	const newObj = result.length === 0 ? getDefaultSettings() : result[0];
 	newObj[setting] = value;
@@ -205,7 +214,7 @@ const setUserSetting = async (user, setting, value) => {
  * @returns {Promise<ConfiguredChannelRow | null>} Channel configuration, or `null` if the channel is not configured
  */
 const getChannelInfo = async message => {
-	const result = await select(TABLES.ConfiguredChannels, {
+	const result = await where(TABLES.ConfiguredChannels, {
 		guild: message.guild.id,
 		channel: message.channel.id
 	});
@@ -220,18 +229,19 @@ const getChannelInfo = async message => {
  * @returns {Promise<import("./settings").UserSettings>} The user's settings
  */
 const getUserSettings = async user => {
-	const result = await select(TABLES.UserSettings, {discord: user.id});
+	const result = await where(TABLES.UserSettings, {discord: user.id});
 	const res = result.length === 0 ? {} : JSON.parse(result[0].data);
 	return Object.assign(getDefaultSettings(), res);
 };
 
 module.exports = {
-	add, all, update, select, del, reset,
+	add, all, update, where, del, reset, select,
 	TABLES,
 	linkUUID,
 	configureChannel,
 	getChannelInfo,
 	createTables,
 	getUserSettings,
-	setUserSetting
+	setUserSetting,
+	knex
 };

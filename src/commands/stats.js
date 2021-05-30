@@ -1,7 +1,7 @@
 // @ts-check
 "use strict";
 
-const {cacheUserStats, getUserStats, getTimedStats, cacheTimedStats} = require("../cache.js"),
+const {cacheUserStats, getUserStats, confirmTimedStats} = require("../cache.js"),
 	{getUserSettings} = require("../db.js"),
 	{errorEmbed} = require("../util.js"),
 	{fetchStats, HypixelStats, parseStatsArgs, fromJSON} = require("../stats-utils.js");
@@ -21,8 +21,7 @@ const commandFunction = async (uuid, game, message) => {
 	});
 
 	await message.channel.send(embed);
-	await getTimedStats(uuid, 1).then(cache => (cache === null ? cacheTimedStats(uuid, true, stats) : null));
-	await getTimedStats(uuid, 0).then(cache => (cache === null ? cacheTimedStats(uuid, true, stats) : null));
+	await confirmTimedStats(uuid, stats);
 };
 
 module.exports = {

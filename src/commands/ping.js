@@ -10,7 +10,7 @@ module.exports = {
 		const discordToBot = message.createdTimestamp - Date.now();
 
 		let START = performance.now();
-		await db.select(db.TABLES.ConfiguredChannels, {guild: message.guild.id, channel: message.channel.id});
+		await db.where(db.TABLES.ConfiguredChannels, {guild: message.guild.id, channel: message.channel.id});
 		const botToDB = performance.now() - START;
 
 		START = performance.now();
