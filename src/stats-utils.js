@@ -77,9 +77,11 @@ const fetchStats = async uuid => {
  * @param {Object} json.info Required property
  * @param {Object} json.stats Required property
  * @param {Object} json.ratios Required property
- * @returns {HypixelStats} Converted statistics
+ * @returns {HypixelStats | null} Converted statistics
  */
 const fromJSON = json => {
+	if (json === null) return null;
+
 	const result = new HypixelStats(null);
 	result.info = json.info;
 	result.stats = json.stats;
@@ -108,7 +110,7 @@ class HypixelStats {
 				wins: defaultTo(data.stats.TNTGames.wins_tntrun, 0),
 				deaths: defaultTo(data.stats.TNTGames.deaths_tntrun, 0),
 				potions: defaultTo(data.stats.TNTGames.run_potions_splashed_on_players, 0),
-				blocks: defaultTo(data.achievements.tntgames_block_runner, 0)
+				blocks: defaultTo(data.achievements.tntgames_block_runner, 0) // FIXME: data.achievements can be undefined (try /set Notch)
 			},
 			pvp: {
 				record: defaultTo(data.stats.TNTGames.record_pvprun, 0),
@@ -255,7 +257,6 @@ class HypixelStats {
 		embed.setThumbnail(`https://visage.surgeplay.com/head/128/${this.info.uuid}`);
 		embed.setTimestamp();
 		embed.setTitle(`${this.info.displayname} | ${GAMES_READABLE[game]} Statistics`);
-		embed.setDescription("Work in progress!");
 
 		const display = (A, B, formatter = n => n.toLocaleString()) => formatter(A) + (A === B ? "" : ` (${A > B ? "+" : ""}${formatter(A - B)})`);
 

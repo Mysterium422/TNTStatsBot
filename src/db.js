@@ -164,8 +164,8 @@ const del = (table, query) => knex(table).where(query).del();
  * @param {String} discord Discord ID
  */
 const linkUUID = async (uuid, discord) => {
-	const updated = await update(TABLES.VerifiedUsers, {discord, uuid});
-	if (updated === 0) await add(TABLES.VerifiedUsers, {uuid, discord});
+	const updated = await update(TABLES.VerifiedUsers, {discord}, {uuid});
+	if (updated === 0) await add(TABLES.VerifiedUsers, {discord, uuid});
 };
 
 /**
@@ -176,7 +176,7 @@ const linkUUID = async (uuid, discord) => {
  */
 const configureChannel = async (channel, prefix, game) => {
 	const selector = {guild: channel.guild.id, channel: channel.id},
-		newValues = {prefix, game};
+		  newValues = {prefix, game};
 
 	const updated = await update(TABLES.ConfiguredChannels, selector, newValues);
 	if (updated === 0) await add(TABLES.ConfiguredChannels, {...selector, ...newValues});
