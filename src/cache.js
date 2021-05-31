@@ -2,7 +2,7 @@
 "use strict";
 
 const db = require("./db"),
-	{HypixelStats, fromJSON} = require("./stats-utils");
+	{HypixelStats, fromJSON, fetchStats} = require("./stats-utils");
 
 /**
 * Cache a user's viewing of a UUID's stats
@@ -72,10 +72,37 @@ const confirmTimedStats = async (uuid, stats) => {
 	}
 };
 
+/**
+ * Update the caches of every user in the TimedStats table
+ * @param {Boolean} isWeekly Weekly or Monthly?
+ * @param {Number} limit Maximum promises to run at once
+ * @returns {Promise<void[]>} Success
+ */
+const updateAllCaches = async (isWeekly, limit) => {
+	const promises = await db.select(db.TABLES.TimedCache, ["uuid"], {isWeekly})
+		.then(rows => rows.map(({uuid}) => fetchStats(uuid).then(response =>
+			response.success ? db.add(db.TABLES.TimedCache, {
+				isWeekly, uuid,
+				data: JSON.stringify(new HypixelStats(response.user.player))
+			}) : null
+		)));
+
+	await db.del(db.TABLES.TimedCache, {isWeekly});
+
+	const worker = async () => {
+		for (const [_, promise] of promises.entries()) {
+			await promise;
+		}
+	};
+
+	return Promise.all(Array.from({length: Math.min(promises.length, limit)}, worker));
+};
+
 module.exports = {
 	cacheUserStats,
 	getUserStats,
 	cacheTimedStats,
 	confirmTimedStats,
-	useTimedStats
+	useTimedStats,
+	updateAllCaches
 };

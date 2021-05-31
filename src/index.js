@@ -4,6 +4,8 @@
 const Discord = require("discord.js"),
 	fs = require("fs"),
 	db = require("./db"),
+	cache = require("./cache"),
+	cron = require("node-cron"),
 	path = require("path");
 
 const client = new Discord.Client();
@@ -12,6 +14,9 @@ const config = require("../config.json");
 let isReady = false;
 let mentionRegex = null;
 const commands = {};
+
+cron.schedule("0 5 * * THU", () => cache.updateAllCaches(true, 40));
+cron.schedule("0 0 1 * *", () => cache.updateAllCaches(false, 40));
 
 client.on("ready", async () => {
 	console.log("[INFO] Initializing...");
@@ -30,7 +35,9 @@ client.on("ready", async () => {
 		fs.readdirSync(path.resolve(__dirname, "commands")).forEach(fileName => {
 			const obj = require("./commands/" + fileName);
 			commands[fileName.slice(0, -3)] = obj; // Slice to remove `.js`
-			obj.aliases.forEach(name => { commands[name] = obj; });
+			obj.aliases.forEach(name => {
+				commands[name] = obj;
+			});
 		});
 		console.log("[SUCCESS] Commands loaded.");
 	} catch (e) {
@@ -48,17 +55,10 @@ client.on("ready", async () => {
  * @param {import("discord.js").Message} message
  * @param {Error} err
  */
- const errorLog = async (message, err) => {
-    const invite = (await message.guild.fetchInvites()).first();
-    const owner = await client.users.fetch(config.owner_id);
-	owner.send([
-		"**====== [ BEGIN ERROR LOG ] ======**",
-        "Date: " + message.createdAt.toString(),
-        "Command: " + message.content,
-        "Link: " + message.url,
-        "Guild: " + (typeof invite === 'undefined' ? "Private server" : invite.toString()),
-        "Error: ```" + (err.message + "\n" + err.stack) + "```",
-    ].join("\n"));
+const errorLog = async (message, err) => {
+	const invite = (await message.guild.fetchInvites()).first();
+	const owner = await client.users.fetch(config.owner_id);
+	owner.send(["**====== [ BEGIN ERROR LOG ] ======**", "Date: " + message.createdAt.toString(), "Command: " + message.content, "Link: " + message.url, "Guild: " + (typeof invite === "undefined" ? "Private server" : invite.toString()), "Error: ```" + (err.message + "\n" + err.stack) + "```"].join("\n"));
 };
 
 client.on("message", async message => {
@@ -79,8 +79,11 @@ client.on("message", async message => {
 		if (channel === null && commands[command].requiresConfiguredChannel) return;
 		try {
 			return await commands[command].run({
-				client, message, args,
-				command, channelInfo: channel,
+				client,
+				message,
+				args,
+				command,
+				channelInfo: channel,
 				multiArgs: messageContent.slice(command.length).trim()
 			});
 		} catch (error) {
