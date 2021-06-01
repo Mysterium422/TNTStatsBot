@@ -148,7 +148,7 @@ class HypixelStats {
 				ancient: defaultTo(data.stats.TNTGames.new_ancientwizard_kills, 0),
 				storm: defaultTo(data.stats.TNTGames.new_stormwizard_kills, 0)
 			},
-			overall: {
+			all: {
 				coins: defaultTo(data.stats.TNTGames.coins, 0),
 				wins: defaultTo(data.stats.TNTGames.wins, 0),
 				streak: defaultTo(data.stats.TNTGames.winstreak, 0),
@@ -236,6 +236,11 @@ class HypixelStats {
 		return this;
 	}
 
+	unsetRatios() {
+		this.ratios = null;
+		return this;
+	}
+
 	/**
 	 * Converts this HypixelStats object to a Discord embed
 	 * @param {Object} params
@@ -246,8 +251,9 @@ class HypixelStats {
 	 * @returns {Discord.MessageEmbed}
 	 */
 	toEmbed({game, author, settings, previous = this}) {
-		if (this.ratios === null) this.setRatios();
 		if (previous === null) previous = this;
+		if (this.ratios === null) this.setRatios();
+		if (previous.ratios === null) previous.setRatios();
 
 		const embed = new Discord.MessageEmbed();
 		embed.setAuthor(author.tag, avatarOf(author));
@@ -262,9 +268,9 @@ class HypixelStats {
 
 		switch (game) {
 			case GAMES.all:
-				embed.addField("**Coins**", display(this.stats.overall.coins, previous.stats.overall.coins), true);
-				embed.addField("**Wins**", display(this.stats.overall.wins, previous.stats.overall.wins), true);
-				embed.addField("**Playtime**", display(this.stats.overall.playtime, previous.stats.overall.playtime, formatMinutes), true);
+				embed.addField("**Coins**", display(this.stats.all.coins, previous.stats.all.coins), true);
+				embed.addField("**Wins**", display(this.stats.all.wins, previous.stats.all.wins), true);
+				embed.addField("**Playtime**", display(this.stats.all.playtime, previous.stats.all.playtime, formatMinutes), true);
 				embed.addField("**TNT Tag Wins**", display(this.stats.tag.wins, previous.stats.tag.wins), true);
 				embed.addField("**TNT Run Record**", display(this.stats.run.record, previous.stats.run.record), true);
 				embed.addField("**TNT Run Wins**", display(this.stats.run.wins, previous.stats.run.wins), true);
@@ -319,7 +325,7 @@ class HypixelStats {
 				embed.addField("**KA/D Ratio**", display(this.ratios.wizards.KAD, previous.ratios.wizards.KAD), true);
 				embed.addField("**K/W Ratio**", display(this.ratios.wizards.KW, previous.ratios.wizards.KW), true);
 			// Intentional fallthrough
-			case "kills":
+			case GAMES.kills:
 				embed.addField("**Fire**", display(this.stats.kills.fire, previous.stats.kills.fire), true);
 				embed.addField("**Ice**", display(this.stats.kills.ice, previous.stats.kills.ice), true);
 				embed.addField("**Wither**", display(this.stats.kills.wither, previous.stats.kills.wither), true);
@@ -334,7 +340,7 @@ class HypixelStats {
 				}
 				
 				return embed;
-			case "duels":
+			case GAMES.duels:
 				embed.addField("**Wins**", display(this.stats.duels.wins, previous.stats.duels.wins), true);
 				embed.addField("**Losses**", display(this.stats.duels.losses, previous.stats.duels.losses), true);
 				embed.addField("**Shots**", display(this.stats.duels.shots, previous.stats.duels.shots), true);

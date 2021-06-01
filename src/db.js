@@ -198,9 +198,10 @@ const configureChannel = async (channel, prefix, game) => {
  * @param {*} value New value
  */
 const setUserSetting = async (user, setting, value) => {
+	/** @type {UserSettingsRow[]} */
 	const result = await where(TABLES.UserSettings, {discord: user.id});
 
-	const newObj = result.length === 0 ? getDefaultSettings() : result[0];
+	const newObj = result.length === 0 ? getDefaultSettings() : JSON.parse(result[0].data);
 	newObj[setting] = value;
 	const data = JSON.stringify(newObj);
 

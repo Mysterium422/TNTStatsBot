@@ -6,13 +6,19 @@ const db = require("./db"),
 
 /**
 * Cache a user's viewing of a UUID's stats
-* @param {string} discord Discord ID
-* @param {string} uuid Minecraft UUID
+* @param {String} discord Discord ID
+* @param {String} uuid Minecraft UUID
 * @param {HypixelStats} data Stats to cache
+* @param {String} game Game to cache
 */
-const cacheUserStats = async (discord, uuid, data) => {
-	const updated = await db.update(db.TABLES.UserCache, {discord, uuid}, {data: JSON.stringify(data)});
-	if (updated === 0) await db.add(db.TABLES.UserCache, {discord, uuid, data: JSON.stringify(data)});
+const cacheUserStats = async (discord, uuid, data, game) => {
+	data.unsetRatios();
+	const existing = await db.select(db.TABLES.UserCache, ["data"], {discord, uuid});
+	if (existing.length === 0) return db.add(db.TABLES.UserCache, {discord, uuid, data: JSON.stringify(data)});
+	
+	const newData = fromJSON(JSON.parse(existing[0].data)).unsetRatios();
+	newData.stats[game] = data.stats[game];
+	return db.update(db.TABLES.UserCache, {discord, uuid}, {data: JSON.stringify(newData)});
 };
 
 /**

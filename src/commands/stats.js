@@ -13,7 +13,7 @@ const commandFunction = async (uuid, game, message) => {
 	const stats = new HypixelStats(data.user.player);
 	const previous = await getUserStats(message.author.id, uuid);
 	const settings = await getUserSettings(message.author);
-	if (settings.reset) await cacheUserStats(message.author.id, uuid, stats);
+	if (settings.reset) await cacheUserStats(message.author.id, uuid, stats, game);
 	
 	const embed = stats.toEmbed({ game, author: message.author, settings, previous });
 
