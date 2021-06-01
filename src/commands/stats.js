@@ -15,10 +15,7 @@ const commandFunction = async (uuid, game, message) => {
 	const settings = await getUserSettings(message.author);
 	if (settings.reset) await cacheUserStats(message.author.id, uuid, stats);
 	
-	const embed = stats.toEmbed({
-		game, author: message.author, settings,
-		previous: fromJSON(previous)
-	});
+	const embed = stats.toEmbed({ game, author: message.author, settings, previous });
 
 	await message.channel.send(embed);
 	await confirmTimedStats(uuid, stats);

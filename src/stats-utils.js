@@ -247,7 +247,7 @@ class HypixelStats {
 	 */
 	toEmbed({game, author, settings, previous = this}) {
 		if (this.ratios === null) this.setRatios();
-		if (previous.ratios === null) previous.setRatios();
+		if (previous === null) previous = this;
 
 		const embed = new Discord.MessageEmbed();
 		embed.setAuthor(author.tag, avatarOf(author));
