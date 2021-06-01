@@ -222,7 +222,7 @@ class HypixelStats {
 			},
 			bowspleef: {
 				WL: ratio(this.stats.bowspleef.wins, this.stats.bowspleef.deaths),
-				KD: ratio(this.stats.bowspleef.kills, this.stats.bowspleef.deaths)
+				SG: ratio(this.stats.bowspleef.shots, this.stats.bowspleef.wins + this.stats.bowspleef.deaths)
 			},
 			pvp: {
 				WL: ratio(this.stats.pvp.wins, this.stats.pvp.deaths),
@@ -300,10 +300,9 @@ class HypixelStats {
 			case GAMES.bow:
 				embed.addField("**Wins**", display(this.stats.bowspleef.wins, previous.stats.bowspleef.wins), true);
 				embed.addField("**Deaths**", display(this.stats.bowspleef.deaths, previous.stats.bowspleef.deaths), true);
-				embed.addField("**Kills**", display(this.stats.bowspleef.kills, previous.stats.bowspleef.kills), true);
 				embed.addField("**Shots**", display(this.stats.bowspleef.shots, previous.stats.bowspleef.shots), true);
 				embed.addField("**W/L Ratio**", display(this.ratios.bowspleef.WL, previous.ratios.bowspleef.WL), true);
-				embed.addField("**K/D Ratio**", display(this.ratios.bowspleef.KD, previous.ratios.bowspleef.KD), true);
+				embed.addField("**S/G Ratio**", display(this.ratios.bowspleef.SG, previous.ratios.bowspleef.SG), true);
 				return embed;
 			case GAMES.tag:
 				embed.addField("**Wins**", display(this.stats.tag.wins, previous.stats.tag.wins), true);
@@ -314,9 +313,9 @@ class HypixelStats {
 				return embed;
 			case GAMES.wizards:
 				embed.addField("**Wins**", display(this.stats.wizards.wins, previous.stats.wizards.wins), true);
-				embed.addField("**Deaths**", display(this.stats.wizards.deaths, previous.stats.wizards.deaths), true);
 				embed.addField("**Kills**", display(this.stats.wizards.totalkills, previous.stats.wizards.totalkills), true);
 				embed.addField("**Assists**", display(this.stats.wizards.assists, previous.stats.wizards.assists), true);
+				embed.addField("**Deaths**", display(this.stats.wizards.deaths, previous.stats.wizards.deaths), true);
 				embed.addField("**Points**", display(this.stats.wizards.points, previous.stats.wizards.points), true);
 				embed.addField("**K/D Ratio**", display(this.ratios.wizards.KD, previous.ratios.wizards.KD), true);
 				if (!settings.verbose) return embed;
