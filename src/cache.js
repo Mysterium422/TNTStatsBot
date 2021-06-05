@@ -11,14 +11,20 @@ const db = require("./db"),
 * @param {HypixelStats} data Stats to cache
 * @param {String} game Game to cache
 */
-const cacheUserStats = async (discord, uuid, data, game) => {
+const cacheUserStats = async (discord, uuid, data, game = null) => {
 	data.unsetRatios();
 	const existing = await db.select(db.TABLES.UserCache, ["data"], {discord, uuid});
-	if (existing.length === 0) return db.add(db.TABLES.UserCache, {discord, uuid, data: JSON.stringify(data)});
+	if (existing.length === 0) {
+		return db.add(db.TABLES.UserCache, {discord, uuid, data: JSON.stringify(data)});
+	}
 	
-	const newData = fromJSON(JSON.parse(existing[0].data)).unsetRatios();
-	newData.stats[game] = data.stats[game];
-	return db.update(db.TABLES.UserCache, {discord, uuid}, {data: JSON.stringify(newData)});
+	if (game === null) {
+		return db.update(db.TABLES.UserCache, {discord, uuid}, {data: JSON.stringify(data)});
+	} else {
+		const newData = fromJSON(JSON.parse(existing[0].data)).unsetRatios();
+		newData.stats[game] = data.stats[game];
+		return db.update(db.TABLES.UserCache, {discord, uuid}, {data: JSON.stringify(newData)});
+	}
 };
 
 /**
@@ -51,6 +57,7 @@ const getTimedStats = async (uuid, isWeekly) => {
  * @param {HypixelStats} stats Stats to cache
  */
 const confirmTimedStats = async (uuid, stats) => {
+	stats.unsetRatios();
 	/** @type {db.TimedCacheRow[]} */
 	const rows = await db.where(db.TABLES.TimedCache, {uuid});
 	if (rows.length === 2) return;

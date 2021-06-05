@@ -16,6 +16,7 @@ module.exports = {
 
 		const stats = new HypixelStats(data.user.player);
 		await cacheUserStats(message.author.id, parsed.uuid, stats);
+		
 		return message.channel.send(successEmbed(message.author, strings.reset(stats.info.displayname)));
 	},
 	aliases: [],
