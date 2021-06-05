@@ -15,7 +15,22 @@ const parseStatsArgs = async (message, args, channelConfig) => {
 	let uuid = null,
 		game = null;
 
-	let gameFirst = args[0] in GAMES;
+	const lowerArgs = args.map(a => a.toLowerCase());
+	let gameFirst = lowerArgs[0] in GAMES;
+
+	if (args.length === 0) {
+		game = channelConfig.game;
+	} else if (args.length === 1) {
+		game = gameFirst ? GAMES[lowerArgs[0]] : channelConfig.game;
+	} else if (args.length === 2) {
+		if (gameFirst) {
+			game = GAMES[lowerArgs[0]];
+		} else if (lowerArgs[1] in GAMES) {
+			game = GAMES[lowerArgs[1]];
+		} else {
+			return {success: false, error: ["Invalid game type", strings.invalid_game_type]};
+		}
+	}
 
 	if (args.length === 0 || (args.length === 1 && gameFirst)) {
 		uuid = await getUUIDFromDiscord(message.author.id);
@@ -26,14 +41,6 @@ const parseStatsArgs = async (message, args, channelConfig) => {
 		// @ts-ignore
 		if (!user.success) return user;
 		uuid = user.uuid;
-	}
-
-	if (args.length === 0) {
-		game = channelConfig.game;
-	} else if (args.length === 1) {
-		game = gameFirst ? GAMES[args[0]] : channelConfig.game;
-	} else if (args.length === 2) {
-		game = gameFirst ? GAMES[args[0]] : GAMES[args[1]];
 	}
 
 	return {success: true, uuid, game};

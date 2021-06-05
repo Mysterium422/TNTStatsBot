@@ -4,7 +4,7 @@
 const {cacheUserStats, getUserStats, confirmTimedStats} = require("../cache.js"),
 	{getUserSettings} = require("../db.js"),
 	{errorEmbed} = require("../util.js"),
-	{fetchStats, HypixelStats, parseStatsArgs, fromJSON} = require("../stats-utils.js");
+	{fetchStats, HypixelStats, parseStatsArgs} = require("../stats-utils.js");
 
 const commandFunction = async (uuid, game, message) => {
 	const data = await fetchStats(uuid);
