@@ -262,7 +262,7 @@ class HypixelStats {
 		embed.setURL(`https://plancke.io/hypixel/player/stats/${this.info.displayname}`);
 		embed.setThumbnail(`https://visage.surgeplay.com/head/128/${this.info.uuid}`);
 		embed.setTimestamp();
-		embed.setTitle(`${this.info.displayname} | ${GAMES_READABLE[game]} Statistics`);
+		embed.setTitle(`${this.info.rank.prefix} ${this.info.displayname} | ${GAMES_READABLE[game]} Statistics`);
 
 		const display = (A, B, formatter = n => n.toLocaleString()) => formatter(A) + (A === B ? "" : ` (${A > B ? "+" : ""}${formatter(A - B)})`);
 
