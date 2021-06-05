@@ -25,7 +25,7 @@ const cacheUserStats = async (discord, uuid, data, game) => {
 * Get a Discord User's cache of a UUID's statistics
 * @param {String} discord Discord ID
 * @param {String} uuid Minecraft UUID
-* @returns {Promise<HypixelStats | null>} UUID's cached statistics, or `null` if no cache was found
+* @returns {Promise<HypixelStats|null>} UUID's cached statistics, or `null` if no cache was found
 */
 const getUserStats = async (discord, uuid) => {
 	const result = await db.where(db.TABLES.UserCache, {discord, uuid});
@@ -34,28 +34,15 @@ const getUserStats = async (discord, uuid) => {
 };
 
 /**
- * Cache timed user stats
+ * Get the timed stats of a UUID
  * @param {String} uuid Minecraft UUID
  * @param {Boolean} isWeekly Are the stats weekly?
- * @param {HypixelStats} data Stats to cache
+* @returns {Promise<HypixelStats|null>} UUID's timed statistics, or `null` if no cache was found
  */
-const cacheTimedStats = async (uuid, isWeekly, data) => {
-	const updated = await db.update(db.TABLES.TimedCache, {uuid, isWeekly}, {data: JSON.stringify(data)});
-	if (updated === 0) await db.add(db.TABLES.TimedCache, {uuid, isWeekly, data: JSON.stringify(data)});
-};
-
-/**
-* Cache new stats & get the previously cached timed stats
-* @param {string} uuid UUID to which the stats belong
-* @param {boolean} isWeekly Are the new stats weekly (true) or monthly (false)?
-* @param {HypixelStats} stats New stats to cache
-* @returns {Promise<HypixelStats>} Last cached stats
-*/
-const useTimedStats = async (uuid, isWeekly, stats) => {
-	const result = await db.where(db.TABLES.TimedCache, {uuid});
-	const mainIndex = result.findIndex(row => (row.isWeekly === 1 && isWeekly) || (row.isWeekly === 0 && !isWeekly));
-	await cacheTimedStats(uuid, isWeekly, stats);
-	return mainIndex === -1 ? stats : fromJSON(JSON.parse(result[mainIndex].data));
+const getTimedStats = async (uuid, isWeekly) => {
+	const result = await db.where(db.TABLES.TimedCache, {uuid, isWeekly});
+	if (result.length === 0) return null;
+	else return fromJSON(JSON.parse(result[0].data));
 };
 
 /**
@@ -64,7 +51,7 @@ const useTimedStats = async (uuid, isWeekly, stats) => {
  * @param {HypixelStats} stats Stats to cache
  */
 const confirmTimedStats = async (uuid, stats) => {
-	/** @type {import("./db").TimedCacheRow[]} */
+	/** @type {db.TimedCacheRow[]} */
 	const rows = await db.where(db.TABLES.TimedCache, {uuid});
 	if (rows.length === 2) return;
 
@@ -107,8 +94,7 @@ const updateAllCaches = async (isWeekly, limit) => {
 module.exports = {
 	cacheUserStats,
 	getUserStats,
-	cacheTimedStats,
+	getTimedStats,
 	confirmTimedStats,
-	useTimedStats,
 	updateAllCaches
 };

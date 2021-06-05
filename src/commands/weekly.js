@@ -1,7 +1,7 @@
 // @ts-check
 "use strict";
 
-const {useTimedStats, confirmTimedStats} = require("../cache.js"),
+const {confirmTimedStats, getTimedStats} = require("../cache.js"),
 	{errorEmbed, formatTimestamp} = require("../util"),
 	{getUserSettings} = require("../db.js"),
 	{parseStatsArgs, fetchStats, HypixelStats, fromJSON} = require("../stats-utils.js");
@@ -17,10 +17,11 @@ module.exports = {
 		const stats = new HypixelStats(data.user.player);
 
 		const isWeekly = command !== "monthly";
-		const previous = await useTimedStats(uuid, isWeekly, stats);
+		await confirmTimedStats(uuid, stats);
+		const previous = await getTimedStats(uuid, isWeekly);
 
 		const settings = await getUserSettings(message.author);
-		const embed = stats.getDifference(fromJSON(previous)).toEmbed({game, author: message.author, settings});
+		const embed = stats.getDifference(previous).toEmbed({game, author: message.author, settings});
 
 		embed.setDescription(
 			"**Showing changes since:** " + formatTimestamp((previous === null ? stats : previous).info.timestamp) +
@@ -28,7 +29,6 @@ module.exports = {
 		);
 
 		await message.channel.send(embed);
-		await confirmTimedStats(uuid, stats);
 	},
 	aliases: ["monthly"],
 	requiresConfiguredChannel: true
