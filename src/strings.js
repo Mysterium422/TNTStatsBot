@@ -62,8 +62,10 @@ Possible Games:
 *\`[game]\` defaults to the channel-configured game if not specified*
 *\`[user]\` defaults to your linked account if not specified*
 
-**\`${prefix}reset [user]\`** - Reset your brackets for \`[user]\` (defaults to yourself)
-*Only useful if you have the **auto reset** setting disabled*
+**\`${prefix}reset\`** - Reset all your cached stats (meaning brackets will reset)
+*This does not reset your weekly / monthly stats!*
+*Only useful if you have the **auto reset** setting disabled.*
+
 
 **\`${prefix}account [mention]\`** - Shows the linked account of the mentioned user (defaults to yourself)
 **\`${prefix}set [username]\`** - Links your Discord account to your Minecraft account
@@ -146,6 +148,6 @@ Later, Lebster joined the project and rewrote the entire bot!
 
 Please report any bugs here: https://discord.gg/7Qb5xuJD4C`,
 
-reset: displayname =>
-`Successfully reset your cache of \`${displayname}\`'s statistics.`
+reset:
+`Successfully reset your cached statistics.`
 };
