@@ -38,7 +38,6 @@ const createTables = () => {
 	knex.schema.hasTable(TABLES.ConfiguredChannels).then(exists => {
 		if (!exists) {
 			return knex.schema.createTable(TABLES.ConfiguredChannels, table => {
-				table.string("guild").notNullable();
 				table.string("channel").notNullable();
 				table.string("prefix").notNullable();
 				table.string("game").notNullable();
@@ -184,11 +183,12 @@ const linkUUID = async (uuid, discord) => {
  * @param {String} game Default game
  */
 const configureChannel = async (channel, prefix, game) => {
-	const selector = {guild: channel.guild.id, channel: channel.id},
-		  newValues = {prefix, game};
+	const newValues = {prefix, game};
 
-	const updated = await update(TABLES.ConfiguredChannels, selector, newValues);
-	if (updated === 0) await add(TABLES.ConfiguredChannels, {...selector, ...newValues});
+	const updated = await update(TABLES.ConfiguredChannels, {channel: channel.id}, newValues);
+	if (updated === 0) {
+		return add(TABLES.ConfiguredChannels, {channel: channel.id, ...newValues});
+	}
 };
 
 /**
@@ -215,11 +215,7 @@ const setUserSetting = async (user, setting, value) => {
  * @returns {Promise<ConfiguredChannelRow | null>} Channel configuration, or `null` if the channel is not configured
  */
 const getChannelInfo = async message => {
-	const result = await where(TABLES.ConfiguredChannels, {
-		guild: message.guild.id,
-		channel: message.channel.id
-	});
-
+	const result = await where(TABLES.ConfiguredChannels, {channel: message.channel.id});
 	if (result.length === 0) return null;
 	else return result[0];
 };

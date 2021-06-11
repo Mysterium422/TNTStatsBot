@@ -6,8 +6,9 @@ const strings = require("../strings.js");
 const {errorEmbed, successEmbed, GAMES, GAMES_READABLE} = require("../util.js");
 
 module.exports = {
-	run: ({message, args: [game, ...prefix]}) => {
-		prefix = prefix.join(" ");
+	run: async ({message, args: [game, ...rawPrefix]}) => {
+		const prefix = rawPrefix.join(" ");
+
 		if (!message.member.hasPermission("ADMINISTRATOR")) {
 			return message.channel.send(errorEmbed("Invalid permissions", "Only a server administrator can configure the bot."));
 		}
@@ -22,7 +23,7 @@ module.exports = {
 
 		game = GAMES[game]; // Convert to the internal representation
 
-		db.configureChannel(message.channel, prefix, game);
+		await db.configureChannel(message.channel, prefix, game);
 		const embed = successEmbed(message.author, "", "Success! Channel Configured");
 		embed.addField("__Default Game:__", GAMES_READABLE[game], true);
 		embed.addField("__Bot Prefix:__", prefix, true);
