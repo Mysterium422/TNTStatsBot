@@ -73,14 +73,11 @@ info: prefix =>
 **\`${prefix}bugs\`** - Server invite link for reporting bugs
 **\`${prefix}ping\`** - Check bot connection`,
 
-config: bot =>
-`To configure the bot in a specific channel, mention the bot and specify the default game & prefix for that channel.
-
-For example, saying:
-**${bot} wizards /**
-
-Configures the bot to listen to the prefix \`/\`,
-and sets *TNT Wizards* as the default game for commands.`,
+config: (bot, prefix) =>
+`To configure the bot in a specific channel, mention the bot and use the \`config\` command:
+**${bot} \`config [game] [prefix]\`**
+To unconfigure the bot in a specific channel, use:
+**${bot} \`remove\`**`,
 
 settings: prefix =>
 `**Verbose ** *(True/__False__)*
