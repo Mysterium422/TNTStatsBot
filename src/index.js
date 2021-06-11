@@ -45,7 +45,7 @@ client.on("ready", async () => {
 		throw e;
 	}
 
-	client.user.setActivity("TNT Games | Use /TNThelp");
+	client.user.setActivity("TNT Games");
 	mentionRegex = new RegExp(`^<@!?${client.user.id}>`);
 	isReady = true;
 	console.log("[SUCCESS] Bot is now online and listening for commands!");
