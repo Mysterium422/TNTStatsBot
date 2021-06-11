@@ -10,7 +10,7 @@ module.exports = {
 		const prefix = rawPrefix.join(" ");
 
 		if (!message.member.hasPermission("ADMINISTRATOR")) {
-			return message.channel.send(errorEmbed("Invalid permissions", "Only a server administrator can configure the bot."));
+			return message.channel.send(errorEmbed("Invalid permissions", strings.admin_only));
 		}
 
 		if (!(game in GAMES)) {
@@ -18,7 +18,7 @@ module.exports = {
 		}
 
 		if (prefix.length === 0) {
-			return message.channel.send(errorEmbed("Invalid prefix", "Expected at least one character"));
+			return message.channel.send(errorEmbed("Invalid prefix", strings.invalid_prefix));
 		}
 
 		game = GAMES[game]; // Convert to the internal representation
