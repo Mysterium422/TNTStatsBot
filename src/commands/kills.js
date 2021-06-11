@@ -15,6 +15,8 @@ module.exports = {
 			const user = await parseUser(args[0], getMentioned(message));
 			if (!user.success) return message.channel.send(...user.error);
 			uuid = user.uuid;
+		} else {
+			return message.channel.send(errorEmbed("Too many arguments", strings.see_help));
 		}
 
 		return commandFunction(uuid, GAMES.kills, message);

@@ -10,7 +10,7 @@ const db = require("../db"),
 module.exports = {
 	run: async ({message, args}) => {
 		// TODO: confusing error message
-		if (args.length !== 1) return message.channel.send(errorEmbed("Invalid usage", "See the help menu for info"));
+		if (args.length !== 1) return message.channel.send(errorEmbed("Invalid usage", strings.see_help));
 
 		const parsed = await parseUser(args[0]);
 		if (!parsed.success) return message.channel.send(errorEmbed(...parsed.error));

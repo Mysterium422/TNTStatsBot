@@ -1,7 +1,7 @@
 // @ts-check
 "use strict";
-
 module.exports = {
+
 unlinked:
 `You need to link you Discord account to your profile on Hypixel!
 To do so, please follow this guide:
@@ -16,15 +16,6 @@ To do so, run the command: \`${prefix}set [your username]\`
 
 *Alternatively, you can specify your username after the command*`,
 
-uuid_invalid:
-`The provided UUID was invalid`,
-
-playername_invalid:
-`The provided playername was invalid`,
-
-bad_link:
-`The mentioned user has an invalid Minecraft account linked`,
-
 discordLinks:
 `**Discord Links**
 **TNT Games** - <https://discord.gg/5gTM5UZdQb>
@@ -38,7 +29,8 @@ discordLinks:
 
 help: {
 
-home: `**React to view a specific page**
+home:
+`**React to view a specific page**
 
 :house: : **Home**
 :tools: : **Configuration**
@@ -88,7 +80,7 @@ For example, saying:
 **${bot} wizards /**
 
 Configures the bot to listen to the prefix \`/\`,
-and sets ***TNT Wizards*** as the default game for commands.`,
+and sets *TNT Wizards* as the default game for commands.`,
 
 settings: prefix =>
 `**Verbose ** *(True/__False__)*
@@ -99,6 +91,7 @@ settings: prefix =>
     Disable to make brackets stay until you do \`${prefix}reset\`
 
 *Default values are __underlined__*`
+
 },
 
 invite: prefix =>
@@ -106,6 +99,7 @@ invite: prefix =>
 https://discord.com/oauth2/authorize?client_id=735055542178938960&scope=bot&permissions=2147994688`,
 
 settings: {
+    
 unknown: setting =>
 `Unknown setting '\`${setting}\`'`,
 
@@ -149,5 +143,14 @@ Later, Lebster joined the project and rewrote the entire bot!
 Please report any bugs here: https://discord.gg/7Qb5xuJD4C`,
 
 reset:
-`Successfully reset your cached statistics.`
+"Successfully reset your cached statistics",
+
+invalid_prefix:
+"Expected at least one character",
+
+admin_only:
+"Only a server administrator can configure the bot",
+
+see_help:
+"See the help menu for info"
 };

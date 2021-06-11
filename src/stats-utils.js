@@ -30,6 +30,8 @@ const parseStatsArgs = async (message, args, channelConfig) => {
 		} else {
 			return {success: false, error: ["Invalid game type", strings.invalid_game_type]};
 		}
+	} else {
+		return {success: false, error: ["Too many arguments", strings.see_help]};
 	}
 
 	if (args.length === 0 || (args.length === 1 && gameFirst)) {
