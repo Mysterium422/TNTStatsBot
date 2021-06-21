@@ -55,7 +55,7 @@ const fetch = require("node-fetch");
  * @returns {Object} API Response
  */
 // @ts-ignore
-const hypixelFetch = query => fetch(`https://api.hypixel.net/${query}&key=${config.hypixel_key}`).then(response => response.json());
+const hypixelFetch = query => fetch(`https://api.hypixel.net/${query}&key=${config.hypixel_key}`).then(response => response.status === 200 ? response.json() : null);
 
 /**
  * Use a default value if `v` is not defined
@@ -153,12 +153,12 @@ const getMentioned = message => {
 const avatarOf = user => `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}?size=128`;
 
 /**
- * 
+ * Creates an embed representing success
  * @param {Discord.User} author Author of the message
  * @param {string=} description Description
  * @param {string=} title Title
  * @param {string | null} thumbnail Thumbnail URL
- * @returns 
+ * @returns {Discord.MessageEmbed}
  */
 const successEmbed = (author, description = "", title = "Success", thumbnail = null) => {
 	const result = new Discord.MessageEmbed();

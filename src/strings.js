@@ -149,5 +149,8 @@ admin_only:
 "Only a server administrator can configure the bot",
 
 see_help:
-"See the help menu for info"
+"See the help menu for info",
+
+hypixel_down:
+"Hypixel could currently be offline? Please retry the command later."
 };

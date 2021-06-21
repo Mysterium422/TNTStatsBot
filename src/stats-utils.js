@@ -58,7 +58,7 @@ const fetchStats = async uuid => {
 	if (data === null) {
 		return {
 			success: false,
-			error: ["Failed to reach Hypixel API", "Hypixel could be offline?"]
+			error: ["Failed to reach Hypixel API", strings.hypixel_down]
 		};
 	} else if (!data.success) {
 		return {

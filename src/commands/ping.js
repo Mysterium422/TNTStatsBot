@@ -2,8 +2,10 @@
 "use strict";
 
 const {performance} = require("perf_hooks");
-const {hypixelFetch, successEmbed} = require("../util.js");
+const {hypixelFetch, successEmbed, errorEmbed} = require("../util.js");
 const db = require("../db");
+const strings = require("../strings.js");
+
 
 module.exports = {
 	run: async ({message}) => {
@@ -15,6 +17,7 @@ module.exports = {
 
 		START = performance.now();
 		const hypixelResponse = await hypixelFetch("ping?"); // Fake endpoint
+		if (hypixelResponse === null) return errorEmbed("Failed to reach Hypixel API", strings.hypixel_down);
 		const botToHypixel = performance.now() - START;
 		const hypixelString = hypixelResponse === "API ERROR" ? "No Response" : Math.round(botToHypixel) + "ms";
 
