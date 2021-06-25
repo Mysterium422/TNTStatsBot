@@ -48,4 +48,15 @@ const getDefaultSettings = () => {
 	return result;
 };
 
-module.exports = {SETTINGS, SETTINGS_READABLE, booleanPhrases, getDefaultSettings};
+const isDefault = settings => {
+	const DEFAULT = getDefaultSettings();
+	for (const key in DEFAULT) {
+		if (settings[key] !== DEFAULT[key]) {
+			return false;
+		}
+	}
+
+	return true;
+};
+
+module.exports = {SETTINGS, SETTINGS_READABLE, booleanPhrases, getDefaultSettings, isDefault};

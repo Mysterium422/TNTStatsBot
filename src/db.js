@@ -3,7 +3,7 @@
 
 const path = require("path"),
 	fs = require("fs"),
-	{getDefaultSettings} = require("./settings.js");
+	{getDefaultSettings, isDefault} = require("./settings.js");
 
 /**
  * @type {import("knex").Knex}
@@ -203,10 +203,13 @@ const setUserSetting = async (user, setting, value) => {
 
 	const newObj = result.length === 0 ? getDefaultSettings() : JSON.parse(result[0].data);
 	newObj[setting] = value;
-	const data = JSON.stringify(newObj);
-
-	const updated = await update(TABLES.UserSettings, {discord: user.id}, {data});
-	if (updated === 0) await add(TABLES.UserSettings, {discord: user.id, data});
+	if (isDefault(newObj)) {
+		await del(TABLES.UserSettings, {discord: user.id});
+	} else {
+		const data = JSON.stringify(newObj);
+		const updated = await update(TABLES.UserSettings, {discord: user.id}, {data});
+		if (updated === 0) await add(TABLES.UserSettings, {discord: user.id, data});
+	}
 };
 
 /**
