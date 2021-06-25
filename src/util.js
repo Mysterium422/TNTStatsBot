@@ -36,7 +36,7 @@ const randomChoice = arr => arr[Math.floor(Math.random() * arr.length)];
  * @param {string=} description Description of the error
  * @returns {Discord.MessageEmbed} Embed
  */
-const errorEmbed = (error = "Something went wrong...", description = ":robot: beep boop") => {
+const errorEmbed = (error = "Something went wrong...", description = "") => {
 	const embed = new Discord.MessageEmbed();
 	embed.setColor("#F64B4B");
 	embed.setTitle("ERROR: " + error);
