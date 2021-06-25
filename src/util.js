@@ -46,7 +46,8 @@ const errorEmbed = (error = "Something went wrong...", description = "") => {
 	return embed;
 };
 
-const config = require("../config.json");
+const path = require("path");
+const config = require(path.resolve(__dirname, "../config.json"));
 const fetch = require("node-fetch");
 
 /**
