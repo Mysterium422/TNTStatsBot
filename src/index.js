@@ -15,11 +15,11 @@ let isReady = false;
 let mentionRegex = null;
 const commands = {};
 
-cron.schedule("0 4 * * THU", () => cache.updateAllCaches(true, 40), {
+cron.schedule("30 9 * * 0", () => cache.updateAllCaches(true, 40), {
 	timezone: "Etc/UTC"
 });
 
-cron.schedule("0 0 1 * *", () => cache.updateAllCaches(false, 40), {
+cron.schedule("30 9 1 * *", () => cache.updateAllCaches(false, 40), {
 	timezone: "Etc/UTC"
 });
 
