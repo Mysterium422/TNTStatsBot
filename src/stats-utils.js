@@ -40,8 +40,7 @@ const parseStatsArgs = async (message, args, channelConfig) => {
 	} else if ((args.length === 1 && !gameFirst) || args.length === 2) {
 		let argPos = args.length === 1 ? 0 : gameFirst ? 1 : 0;
 		const user = await parseUser(args[argPos], getMentioned(message));
-		// @ts-ignore
-		if (!user.success) return user;
+		if (!user.success) return {success: false, error: user.error};
 		uuid = user.uuid;
 	}
 
