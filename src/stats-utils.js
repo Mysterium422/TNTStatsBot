@@ -68,12 +68,12 @@ const fetchStats = async uuid => {
 	} else if (data.player === null) {
 		return {
 			success: false,
-			error: ["Invalid playername/uuid", "That player has never logged on to Hypixel!"]
+			error: ["Invalid username/uuid", "That player has never logged on to Hypixel!"]
 		};
 	} else if (!("TNTGames" in data.player.stats)) {
 		return {
 			success: false,
-			error: ["Invalid playername/uuid", "That player has never played TNT Games!"]
+			error: ["Invalid username/uuid", "That player has never played TNT Games!"]
 		};
 	}
 

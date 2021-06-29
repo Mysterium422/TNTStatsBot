@@ -1,6 +1,6 @@
 {
   "name": "tnt-stats-bot",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "description": "Hypixel TNT Games statistics bot for discord",
   "main": "src/index.js",
   "scripts": {
@@ -8,11 +8,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/LebsterFace/TNTStatsBot.git"
+    "url": "https://github.com/Mysterium422/TNTStatsBot.git"
   },
   "keywords": [],
   "contributors": [
-    "Mysterium",
+    {
+      "name": "Mysterium",
+      "url": "https://mysterium.me",
+      "email": "mysterium422@gmail.com"
+    },
     {
       "name": "LebsterFace",
       "url": "https://lebster.xyz/",
@@ -20,7 +24,7 @@
     }
   ],
   "license": "AGPL-3.0-or-later",
-  "homepage": "https://github.com/LebsterFace/TNTStatsBot/blob/main/README.md",
+  "homepage": "https://github.com/Mysterium422/TNTStatsBot/blob/main/README.md",
   "dependencies": {
     "discord.js": "^12.5.3",
     "knex": "^0.95.4",

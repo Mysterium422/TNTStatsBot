@@ -20,12 +20,12 @@ discordLinks:
 `**Discord Links**
 **TNT Games** - <https://discord.gg/5gTM5UZdQb>
 **TNT Wizards** - <https://discord.gg/95T6ZHa>
-**TNT Run** - <https://discord.gg/W9xBSjt>
 **TNT Tag** - <https://discord.gg/FsneyHHRRt>
+**TNT Run** - <https://discord.gg/W9xBSjt>
 **PVP Run** - <https://discord.gg/DRX8Jkt>
 **Bow Spleef** - <https://discord.gg/sE4uNVs6MF>
 
-**Mysterium's Server** - <https://discord.gg/7Qb5xuJD4C>`,
+**Bot Server** - <https://discord.gg/7Qb5xuJD4C>`,
 
 help: {
 
@@ -39,8 +39,8 @@ home:
 :information_source: : **Other Commands**`,
 
 stats: prefix =>
-`**\`${prefix}kills [user]\`** - TNT Wizards kills by class
-**\`${prefix}stats [user] [help]\`** - Shows TNT games stats
+`**\`${prefix}kills [username]\`** - TNT Wizards kills by class
+**\`${prefix}stats [game] [username]\`** - Shows TNT games stats
 
 Possible Games:
 \`all\` - Overall TNT Games Stats
@@ -49,6 +49,7 @@ Possible Games:
 \`bowspleef\` - Bowspleef Stats
 \`wizards\` - TNT Wizards Stats
 \`pvp\` - PVP Run Stats
+\`duels\` - Bowspleef Duels Stats
 
 *Brackets show changes since your last stats call for that user*
 *\`[game]\` defaults to the channel-configured game if not specified*
@@ -68,7 +69,7 @@ info: prefix =>
 **\`${prefix}info\`** - Shows bot info
 **\`${prefix}invite\`** - Bot invite link
 **\`${prefix}source\`** - Link to bot source code
-**\`${prefix}discord\`** - Links of TNT Game Discord servers
+**\`${prefix}discord\`** - Links for TNT Games Discord servers
 **\`${prefix}author\`** - Read more about the bot creators
 **\`${prefix}bugs\`** - Server invite link for reporting bugs
 **\`${prefix}ping\`** - Check bot connection`,
@@ -84,8 +85,7 @@ settings: prefix =>
     Show more statistics in \`${prefix}stats\`
 
 **Auto Reset** *(__True__/False)*
-    Automatically reset brackets for \`${prefix}stats\`
-    Disable to make brackets stay until you do \`${prefix}reset\`
+    Disable to make brackets stay in \`${prefix}stats\` until you do \`${prefix}reset\`
 
 *Default values are __underlined__*`
 
@@ -117,24 +117,25 @@ Syntax: **\`${prefix}setting [setting name] [new value]\`**`
 },
 
 source:
-"Contribute here: https://github.com/LebsterFace/TNTStatsBot",
+"Source Code: https://github.com/Mysterium422/TNTStatsBot",
 
 invalid_game_type:
-"Expected one of: `all`, `wizards`, `run`, `pvp`, `tag`, `bowspleef`",
+"Expected one of: `all`, `wizards`, `run`, `pvp`, `tag`, `bowspleef`, `duels`",
 
 reportbugs:
 "Report any bugs here: https://discord.gg/7Qb5xuJD4C",
 
 update:
-`**Latest Update: v5.0.0**
-- Everything rewritten by Lebster
-- Full changelog soon!`,
+`**Latest Update: v5.0.1**
+- Complete bot rewrite
+- Database restructure
+- New bot responses
+- A whole new look
+- Groundwork for future updates (Leaderboards, Guild Stats, Player Comparison)`,
 
 mysterium:
-`This bot was originally created by Mysterium_
+`This bot was created by Mysterium & Lebster
 **Mysterium's Website (WIP)**: <https://mysterium.me>
-
-Later, Lebster joined the project and rewrote the entire bot!
 **Lebster's Website**: <https://lebster.xyz>
 
 Please report any bugs here: https://discord.gg/7Qb5xuJD4C`,

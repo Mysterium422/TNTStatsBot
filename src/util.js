@@ -10,7 +10,7 @@ const embedFooter = {
 		"TNT Stats Bot by Mysterium_",
 		"Created by Mysterium_",
 		"Rewritten by Lebster",
-		"Version 5.0.0 By Lebster",
+		"Version 5.0.0",
 		"Invite me to your server!",
 		"Found a bug? Report it!",
 		"Join the discord!",

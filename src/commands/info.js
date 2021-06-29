@@ -15,10 +15,10 @@ module.exports = {
 
 		const embed = successEmbed(message.author, [
 			"**Version:** " + require(path.resolve(__dirname, "../../package.json")).version,
-			"**Creator:** Mysterium#5229",
-			"**Rewritten By:** Lebster#0617",
+			"**Developer:** Mysterium#5229",
+			"**Developer:** Lebster#0617",
 			"",
-			"**Total Guilds:** " + client.guilds.cache.size,
+			"**Total Servers:** " + client.guilds.cache.size,
 			"**Total Unique Users:** " + botUsers.size
 		].join("\n"), "Bot Information");
 
