@@ -153,5 +153,8 @@ see_help:
 "See the help menu for info",
 
 hypixel_down:
-"Hypixel could currently be offline? Please retry the command later."
+"Hypixel could currently be offline? Please retry the command later",
+
+specify_username:
+"You need to specify a username or UUID to link"
 };
