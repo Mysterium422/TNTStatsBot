@@ -2,7 +2,7 @@
 "use strict";
 const strings = require("./strings.js"),
 	Discord = require("discord.js");
-const {getRank, defaultTo, hypixelFetch, GAMES, parseUser, getUUIDFromDiscord, getMentioned, embedFooter, GAMES_READABLE, randomChoice, avatarOf, ratio, formatMinutes, formatSeconds} = require("./util.js");
+const {getRank, defaultTo, hypixelFetch, GAMES, parseUser, getUUIDFromDiscord, getMentioned, embedFooter, GAMES_READABLE, randomChoice, avatarOf, ratio, formatMinutes, formatSeconds, using} = require("./util.js");
 
 /**
  * Parse stats arguments
@@ -118,7 +118,7 @@ class HypixelStats {
 				wins: defaultTo(data.stats.TNTGames.wins_tntrun, 0),
 				deaths: defaultTo(data.stats.TNTGames.deaths_tntrun, 0),
 				potions: defaultTo(data.stats.TNTGames.run_potions_splashed_on_players, 0),
-				blocks: defaultTo(data.achievements.tntgames_block_runner, 0) // FIXME: data.achievements can be undefined (try /set Notch)
+				blocks: using(data.achievements, "tntgames_block_runner", 0)
 			},
 			pvp: {
 				record: defaultTo(data.stats.TNTGames.record_pvprun, 0),
@@ -135,7 +135,7 @@ class HypixelStats {
 			tag: {
 				wins: defaultTo(data.stats.TNTGames.wins_tntag, 0),
 				kills: defaultTo(data.stats.TNTGames.kills_tntag, 0),
-				tags: defaultTo(data.achievements.tntgames_clinic, 0)
+				tags: using(data.achievements, "tntgames_clinic", 0)
 			},
 			wizards: {
 				wins: defaultTo(data.stats.TNTGames.wins_capture, 0),
@@ -160,7 +160,7 @@ class HypixelStats {
 				coins: defaultTo(data.stats.TNTGames.coins, 0),
 				wins: defaultTo(data.stats.TNTGames.wins, 0),
 				streak: defaultTo(data.stats.TNTGames.winstreak, 0),
-				playtime: defaultTo(data.achievements.tntgames_tnt_triathlon, 0)
+				playtime: using(data.achievements, "tntgames_tnt_triathlon", 0)
 			},
 			duels: {
 				wins: 0,

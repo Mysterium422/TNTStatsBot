@@ -67,6 +67,15 @@ const hypixelFetch = query => fetch(`https://api.hypixel.net/${query}&key=${conf
 const defaultTo = (v, def = null) => (typeof v === "undefined" ? def : v);
 
 /**
+ * Use a default value if `obj` is not an object
+ * @param {any} obj Potential object
+ * @param {String} prop Property name
+ * @param {any} def Default value`
+ * @returns `def` if `obj` is not an object, otherwise `obj[prop]`
+ */
+const using = (obj, prop, def = null) => (typeof obj === "object" ? obj[prop] : def);
+
+/**
  * Check if a string is a valid Minecraft username
  * @param {string} name Name to check
  * @returns {boolean} Was the name valid?
@@ -341,5 +350,5 @@ module.exports = {
 	formatTimestamp, ratio, ChatColors, getMentioned,
 	avatarOf, successEmbed, getRank, formatMinutes,
 	formatSeconds, GAMES_READABLE, GAMES, getUUIDFromDiscord,
-	parseUser
+	parseUser, using
 };
