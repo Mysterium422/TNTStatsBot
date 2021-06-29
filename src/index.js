@@ -63,7 +63,14 @@ client.on("ready", async () => {
 const errorLog = async (message, err) => {
 	const invite = (await message.guild.fetchInvites()).first();
 	const owner = await client.users.fetch(config.owner_id);
-	owner.send(["**====== [ BEGIN ERROR LOG ] ======**", "Date: " + message.createdAt.toString(), "Command: " + message.content, "Link: " + message.url, "Guild: " + (typeof invite === "undefined" ? "Private server" : invite.toString()), "Error: ```" + (err.message + "\n" + err.stack) + "```"].join("\n"));
+	owner.send([
+		"**====== [ BEGIN ERROR LOG ] ======**",
+		"Date: " + message.createdAt.toString(),
+		"Command: " + message.content,
+		"Link: " + message.url,
+		"Guild: " + (typeof invite === "undefined" ? "Private server" : invite.toString()),
+		"Error: ```" + (err.message + "\n" + err.stack) + "```"
+	].join("\n"));
 };
 
 client.on("message", async message => {
@@ -84,29 +91,18 @@ client.on("message", async message => {
 		if (channel === null && commands[command].requiresConfiguredChannel) return;
 		try {
 			return await commands[command].run({
-				client,
-				message,
-				args,
-				command,
+				client, message, args, command,
 				channelInfo: channel,
 				multiArgs: messageContent.slice(command.length).trim()
 			});
 		} catch (error) {
 			if (config.notify_errors) await errorLog(message, error);
-			await message.channel.send("An internal error occurred, see the stacktrace below:\n```" + error.stack + "```"); // FIXME: Debug Only!!
+			await message.channel.send("An internal error occurred.");
 			console.error(error);
-			process.exit(0);
 		}
 	} else {
 		return message.channel.send("Command does not exist!");
 	}
-
-	// if (message.content.toLowerCase() == "/tntremove") {
-	// 	if (!message.member.hasPermission("ADMINISTRATOR") && message.author.id != config.owner_id) return;
-
-	// 	await db.deconste(`chan_${message.channel.id}`);
-	// 	return message.channel.send("I will no longer respond to messages in this channel");
-	// }
 });
 
 client.login(config.token);
