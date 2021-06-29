@@ -17,7 +17,7 @@ module.exports = {
 		const {uuid} = parsed;
 
 		const data = await fetchStats(uuid);
-		let playername = data.user.player.displayname;
+		let username = data.user.player.displayname;
 
 		if (message.author.id !== config.owner_id) {
 			if (!data.success) {
@@ -29,12 +29,12 @@ module.exports = {
 			) {
 				return message.channel.send(errorEmbed("Discord account not linked", strings.unlinked));
 			} else if (data.user.player.socialMedia.links.DISCORD !== message.author.tag) {
-				return message.channel.send(errorEmbed("Discord account incorrect", `${playername} has their Hypixel profile linked to a different discord user. Did you link the correct discord account?`));
+				return message.channel.send(errorEmbed("Discord account incorrect", `${username} has their Hypixel profile linked to a different discord user. Did you link the correct discord account?`));
 			}
 		}
 
 		await db.linkUUID(uuid, message.author.id);
-		return message.channel.send("Successfully set your IGN to `" + playername + "`");
+		return message.channel.send("Successfully set your IGN to `" + username + "`");
 	},
 	aliases: [],
 	requiresConfiguredChannel: true

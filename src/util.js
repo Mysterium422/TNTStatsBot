@@ -80,7 +80,7 @@ const using = (obj, prop, def = null) => (typeof obj === "object" ? obj[prop] : 
  * @param {string} name Name to check
  * @returns {boolean} Was the name valid?
  */
-const isValidPlayername = name => /^[A-Za-z0-9_]{3,16}$/.test(name);
+const isValidUsername = name => /^[A-Za-z0-9_]{3,16}$/.test(name);
 
 /**
  * Get the UUID associated with a Minecraft username
@@ -88,7 +88,7 @@ const isValidPlayername = name => /^[A-Za-z0-9_]{3,16}$/.test(name);
  * @returns {Promise<string>|null} UUID, or `null` if an error occurred
  */
 const nameToUUID = async name => {
-	if (!isValidPlayername(name)) return null;
+	if (!isValidUsername(name)) return null;
 	// @ts-ignore
 	const response = await fetch(`https://api.mojang.com/users/profiles/minecraft/${name}`);
 	if (response.status === 204) return null;
@@ -327,13 +327,13 @@ const parseUser = async (arg, mentioned = null) => {
 	if (mentioned === null) {
 		if (arg.length > 16) {
 			// UUID specified
-			let playername = await UUIDtoName(arg);
-			if (playername === null) return {success: false, error: ["Invalid UUID", strings.uuid_invalid]};
+			let username = await UUIDtoName(arg);
+			if (username === null) return {success: false, error: ["Invalid UUID", strings.uuid_invalid]};
 			else return {success: true, uuid: arg};
 		} else {
-			// Playername specified
+			// username specified
 			const uuid = await nameToUUID(arg);
-			if (uuid === null) return {success: false, error: ["Invalid playername", strings.playername_invalid]};
+			if (uuid === null) return {success: false, error: ["Invalid username", strings.username_invalid]};
 			return {success: true, uuid};
 		}
 	} else {
@@ -346,7 +346,7 @@ const parseUser = async (arg, mentioned = null) => {
 
 module.exports = {
 	embedFooter, randomChoice, errorEmbed, hypixelFetch,
-	defaultTo, isValidPlayername, nameToUUID, UUIDtoName,
+	defaultTo, isValidUsername, nameToUUID, UUIDtoName,
 	formatTimestamp, ratio, ChatColors, getMentioned,
 	avatarOf, successEmbed, getRank, formatMinutes,
 	formatSeconds, GAMES_READABLE, GAMES, getUUIDFromDiscord,
