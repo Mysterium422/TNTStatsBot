@@ -1,30 +1,31 @@
 {
   "name": "tnt-stats-bot",
-  "version": "4.1.1",
-  "description": "",
-  "main": "index.js",
+  "version": "5.0.0",
+  "description": "Hypixel TNT Games statistics bot for discord",
+  "main": "src/index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node src/index.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Mysterium422/TNTStatsBot"
+    "url": "https://github.com/LebsterFace/TNTStatsBot.git"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Mysterium422/TNTStatsBot/issues"
-  },
-  "homepage": "https://github.com/Mysterium422/TNTStatsBot#readme",
+  "contributors": [
+    "Mysterium",
+    {
+      "name": "LebsterFace",
+      "url": "https://lebster.xyz/",
+      "email": "samsalinsky@gmail.com"
+    }
+  ],
+  "license": "AGPL-3.0-or-later",
+  "homepage": "https://github.com/LebsterFace/TNTStatsBot/blob/main/README.md",
   "dependencies": {
-    "discord.js": "^12.2.0",
-    "js-yaml": "^4.0.0",
-    "merge-files": "^0.1.2",
+    "discord.js": "^12.5.3",
+    "knex": "^0.95.4",
+    "node-cron": "^3.0.0",
     "node-fetch": "^2.6.1",
-    "node-schedule": "^2.0.0",
-    "quick.db": "^7.1.1",
-    "util": "^0.12.3",
-    "yaml": "^1.10.0"
+    "sqlite3": "^5.0.2"
   }
 }
