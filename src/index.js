@@ -15,8 +15,13 @@ let isReady = false;
 let mentionRegex = null;
 const commands = {};
 
-cron.schedule("0 5 * * THU", () => cache.updateAllCaches(true, 40));
-cron.schedule("0 0 1 * *", () => cache.updateAllCaches(false, 40));
+cron.schedule("0 4 * * THU", () => cache.updateAllCaches(true, 40), {
+	timezone: "Etc/UTC"
+});
+
+cron.schedule("0 0 1 * *", () => cache.updateAllCaches(false, 40), {
+	timezone: "Etc/UTC"
+});
 
 client.on("ready", async () => {
 	console.log("[INFO] Initializing...");
