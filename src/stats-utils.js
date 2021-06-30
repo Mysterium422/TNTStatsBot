@@ -280,7 +280,7 @@ class HypixelStats {
 				embed.addField("**Wins**", display(this.stats.all.wins, previous.stats.all.wins), true);
 				embed.addField("**Playtime**", display(this.stats.all.playtime, previous.stats.all.playtime, formatMinutes), true);
 				embed.addField("**TNT Tag Wins**", display(this.stats.tag.wins, previous.stats.tag.wins), true);
-				embed.addField("**TNT Run Record**", display(this.stats.run.record, previous.stats.run.record), true);
+				embed.addField("**TNT Run Record**", display(this.stats.run.record, previous.stats.run.record, formatSeconds), true);
 				embed.addField("**TNT Run Wins**", display(this.stats.run.wins, previous.stats.run.wins), true);
 				embed.addField("**Bowspleef Wins**", display(this.stats.bowspleef.wins, previous.stats.bowspleef.wins), true);
 				embed.addField("**PvP Run Kills**", display(this.stats.pvp.kills, previous.stats.pvp.kills), true);
