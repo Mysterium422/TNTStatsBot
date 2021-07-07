@@ -25,7 +25,7 @@ module.exports = {
 
 		embed.setDescription(
 			"**Showing changes since:** " + formatTimestamp((previous === null ? stats : previous).info.timestamp) +
-			(embed.description === null ? "" : "\n" + embed.description)
+			(embed.description ? "\n" + embed.description : "")
 		);
 
 		await message.channel.send(embed);
