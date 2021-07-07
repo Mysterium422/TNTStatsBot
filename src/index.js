@@ -100,8 +100,6 @@ client.on("message", async message => {
 			await message.channel.send("An internal error occurred.");
 			console.error(error);
 		}
-	} else {
-		return message.channel.send("Command does not exist!");
 	}
 });
 
