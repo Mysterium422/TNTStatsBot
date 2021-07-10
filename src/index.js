@@ -62,15 +62,17 @@ client.on("ready", async () => {
  */
 const errorLog = async (message, err) => {
 	const invite = (await message.guild.fetchInvites()).first();
-	const owner = await client.users.fetch(config.owner_id);
-	owner.send([
+	const users = await Promise.all(config.developers.concat(config.owner_id).map(id => client.users.fetch(id)));
+	const errorMessage = [
 		"**====== [ BEGIN ERROR LOG ] ======**",
 		"Date: " + message.createdAt.toString(),
 		"Command: " + message.content,
 		"Link: " + message.url,
 		"Guild: " + (typeof invite === "undefined" ? "Private server" : invite.toString()),
 		"Error: ```" + (err.message + "\n" + err.stack) + "```"
-	].join("\n"));
+	].join("\n");
+
+	users.forEach(user => user.send(errorMessage));
 };
 
 client.on("message", async message => {

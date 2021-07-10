@@ -2,5 +2,6 @@
     "token": "DISCORD BOT TOKEN HERE",
     "hypixel_key": "HYPIXEL API KEY HERE",
     "owner_id": "YOUR DISCORD ID HERE",
+    "developers": ["PUT THE IDS OF OTHER DEVELOPERS", "IN THIS ARRAY"],
     "notify_errors": true / false (Should you be notified of JavaScript errors?)
 }
